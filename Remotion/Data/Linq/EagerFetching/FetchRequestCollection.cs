@@ -26,7 +26,7 @@ namespace Remotion.Data.Linq.EagerFetching
   /// to be eager-fetched.
   /// </summary>
   /// <typeparam name="TOriginating">The type of the originating objects from which the related objects can be selected.</typeparam>
-  public class FetchRequestCollection<TOriginating>
+  public class FetchRequestCollection<TOriginating> : IFetchRequestCollection
   {
     private readonly Dictionary<MemberInfo, IFetchRequest> _fetchRequests = new Dictionary<MemberInfo, IFetchRequest> ();
 
@@ -39,31 +39,16 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 
-      var memberExpression = relatedObjectSelector.Body as MemberExpression;
-      if (memberExpression == null)
+      FetchRequest<TRelated> correspondingFetchRequest = FetchRequest<TRelated>.Create (relatedObjectSelector);
+      
+      IFetchRequest existingFetchRequest;
+      if (_fetchRequests.TryGetValue (correspondingFetchRequest.RelationMember, out existingFetchRequest))
+        return (FetchRequest<TRelated>) existingFetchRequest;
+      else
       {
-        var message = string.Format (
-            "A fetch request must be a simple member access expression; '{0}' is a {1} instead.",
-            relatedObjectSelector.Body,
-            relatedObjectSelector.Body.GetType().Name);
-        throw new ArgumentException (message, "relatedObjectSelector");
+        _fetchRequests.Add (correspondingFetchRequest.RelationMember, correspondingFetchRequest);
+        return correspondingFetchRequest;
       }
-
-      if (memberExpression.Expression.NodeType != ExpressionType.Parameter)
-      {
-        var message = string.Format (
-            "A fetch request must be a simple member access expression of the kind o => o.Related; '{0}' is too complex.",
-            relatedObjectSelector.Body);
-        throw new ArgumentException (message, "relatedObjectSelector");
-      }
-
-      IFetchRequest fetchRequest;
-      if (!_fetchRequests.TryGetValue (memberExpression.Member, out fetchRequest))
-      {
-        fetchRequest = FetchRequest<TRelated>.Create (relatedObjectSelector);
-        _fetchRequests.Add (memberExpression.Member, fetchRequest);
-      }
-      return (FetchRequest<TRelated>) fetchRequest;
     }
 
   }
