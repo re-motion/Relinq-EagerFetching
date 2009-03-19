@@ -106,14 +106,14 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <param name="fromIdentifierName">The name of the <see cref="FromClauseBase.Identifier"/> to use for the new <see cref="MemberFromClause"/>.</param>
     /// <returns>A new <see cref="MemberFromClause"/> representing the <see cref="RelatedObjectSelector"/>.</returns>
     /// <remarks>
-    /// <see cref="EagerFetchQueryModelCreator"/> uses the <see cref="MemberFromClause"/> returned by this method as follows:
+    /// <see cref="CreateFetchQueryModel"/> uses the <see cref="MemberFromClause"/> returned by this method as follows:
     /// <list type="number">
     ///   <item>It clones the <see cref="QueryModel"/> representing the original query.</item>
     ///   <item>It adds the <see cref="MemberFromClause"/> as the last body clause to the clone.</item>
     ///   <item>It generates a new <see cref="SelectClause"/> and attaches it to the clone.</item>
     /// </list>
     /// </remarks>
-    public MemberFromClause CreateFromClause (SelectClause selectClauseToFetchFrom, string fromIdentifierName)
+    public MemberFromClause CreateFetchFromClause (SelectClause selectClauseToFetchFrom, string fromIdentifierName)
     {
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
       ArgumentUtility.CheckNotNullOrEmpty ("fromIdentifierName", fromIdentifierName);
@@ -148,6 +148,28 @@ namespace Remotion.Data.Linq.EagerFetching
       var projectionExpression = Expression.Lambda (fromIdentifier, oldSelectParameter, fromIdentifier);
 
       return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression, projectionExpression);
+    }
+
+    public QueryModel CreateFetchQueryModel (QueryModel originalQueryModel)
+    {
+      ArgumentUtility.CheckNotNull ("originalQueryModel", originalQueryModel);
+
+      var originalSelectClause = originalQueryModel.SelectOrGroupClause as SelectClause;
+      if (originalSelectClause == null)
+      {
+        var message = string.Format (
+            "Fetch requests only support queries with select clauses, but this query has a {0}.",
+            originalQueryModel.SelectOrGroupClause.GetType().Name);
+        throw new NotSupportedException (message);
+      }
+
+      var fetchQueryModel = originalQueryModel.Clone();
+      var memberFromClause = CreateFetchFromClause (originalSelectClause, fetchQueryModel.GetUniqueIdentifier ("#fetch"));
+      fetchQueryModel.AddBodyClause (memberFromClause);
+
+      var newSelectClause = new SelectClause (memberFromClause, Expression.Lambda (memberFromClause.Identifier, memberFromClause.Identifier));
+      fetchQueryModel.SelectOrGroupClause = newSelectClause;
+      return fetchQueryModel;
     }
   }
 }
