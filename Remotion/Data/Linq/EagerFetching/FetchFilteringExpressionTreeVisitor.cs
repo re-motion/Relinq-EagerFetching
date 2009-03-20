@@ -56,11 +56,17 @@ namespace Remotion.Data.Linq.EagerFetching
 
       if (fetchExpression != null)
       {
+        // TODO 1089: test that this comes before setting _lastFetchRequest
+        // TODO 1089: integration test with two fetches
+        var result = VisitExpression (fetchExpression.Operand);
         _lastFetchRequest = _topLevelFetchRequests.GetOrAddFetchRequest (fetchExpression.RelatedObjectSelector);
-        return VisitExpression (fetchExpression.Operand);
+        return result;
       }
       else if (thenFetchExpression != null)
       {
+        // TODO 1089: test that this comes before setting _lastFetchRequest
+        var result = VisitExpression (thenFetchExpression.Operand);
+
         if (_lastFetchRequest == null)
         {
           throw ParserUtility.CreateParserException (
@@ -68,7 +74,7 @@ namespace Remotion.Data.Linq.EagerFetching
         }
 
         _lastFetchRequest = _lastFetchRequest.GetOrAddInnerFetchRequest (thenFetchExpression.RelatedObjectSelector);
-        return VisitExpression (thenFetchExpression.Operand);
+        return result;
       }
       else
       {

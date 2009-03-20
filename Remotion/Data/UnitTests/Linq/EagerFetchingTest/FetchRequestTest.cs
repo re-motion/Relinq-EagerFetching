@@ -307,5 +307,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 
       fetchRequest.CreateFetchQueryModel (originalQueryModel);
     }
+
+    [Test]
+    [Ignore ("TODO 1089: Test")]
+    public void CreateFetchQueryModel_ResultModifierClausesAreCloned ()
+    {
+      
+    }
   }
 }

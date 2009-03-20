@@ -160,6 +160,16 @@ namespace Remotion.Data.Linq.EagerFetching
       fetchQueryModel.AddBodyClause (memberFromClause);
 
       var newSelectClause = new SelectClause (memberFromClause, Expression.Lambda (memberFromClause.Identifier, memberFromClause.Identifier));
+
+      // TODO 1089: Test ResultModifierClauses
+      IClause previousClause = newSelectClause;
+      foreach (var originalResultModifierClause in originalSelectClause.ResultModifierClauses)
+      {
+        var clonedResultModifierClause = originalResultModifierClause.Clone (previousClause, newSelectClause);
+        newSelectClause.AddResultModifierData (clonedResultModifierClause);
+        previousClause = clonedResultModifierClause;
+      }
+
       fetchQueryModel.SelectOrGroupClause = newSelectClause;
       return fetchQueryModel;
     }
