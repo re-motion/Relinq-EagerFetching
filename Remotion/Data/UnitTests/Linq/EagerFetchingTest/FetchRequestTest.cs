@@ -29,12 +29,22 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
   [TestFixture]
   public class FetchRequestTest
   {
+    private Expression<Func<Student, IEnumerable<int>>> _scoresFetchExpression;
+    private Expression<Func<Student, IEnumerable<Student>>> _friendsFetchExpression;
+
+    [SetUp]
+    public void SetUp ()
+    {
+      _scoresFetchExpression = (s => s.Scores);
+      _friendsFetchExpression = (s => s.Friends);
+    }
+
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression; 'new [] {1, 2, 3}' "
         + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
     public void Create_InvalidExpression ()
     {
-      FetchRequest<int>.Create<Student> (s => new[] { 1, 2, 3 });
+      new FetchRequest ((Expression<Func<Student, IEnumerable<int>>>) (s => new[] { 1, 2, 3 }));
     }
 
     [Test]
@@ -42,27 +52,26 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
     public void Create_InvalidExpression_MoreThanOneMember ()
     {
-      FetchRequest<Student>.Create<Student> (s => s.OtherStudent.Friends);
+      new FetchRequest ((Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends));
     }
 
     [Test]
     public void GetOrAddFetchRequest ()
     {
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       Assert.That (fetchRequest.InnerFetchRequests, Is.Empty);
 
-      Expression<Func<Student, IEnumerable<int>>> expectedExpression = s => s.Scores;
-      var result = fetchRequest.GetOrAddInnerFetchRequest (expectedExpression);
+      var result = fetchRequest.GetOrAddInnerFetchRequest (_scoresFetchExpression);
 
-      Assert.That (result.RelatedObjectSelector, Is.SameAs (expectedExpression));
+      Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
       Assert.That (fetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));
     }
 
     [Test]
     public void RelationMember ()
     {
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       Assert.That (fetchRequest.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
     }
 
@@ -71,7 +80,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
 
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       
       var previousClause = ExpressionHelper.CreateClause();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
@@ -87,7 +96,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "'(sd, i) => sd.Student'. Expected one parameter, but found 2.\r\nParameter name: selectClauseToFetchFrom")]
     public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount ()
     {
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, int, Student>> selectProjection = (sd, i) => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
@@ -101,7 +110,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "it yields 'Remotion.Data.UnitTests.Linq.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
     public void CreateFetchFromClause_InvalidSelectProjection_WrongInputType ()
     {
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student_Detail>> selectProjection = sd => sd;
       var selectClause = new SelectClause (previousClause, selectProjection);
@@ -114,7 +123,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
 
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
@@ -144,7 +153,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
 
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
@@ -169,7 +178,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
                                select sd.Student;
       var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
       Assert.That (fetchQueryModel, Is.Not.Null);
@@ -182,7 +191,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
                           select sd.Student;
       var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
 
@@ -201,7 +210,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
                           select sd.Student;
       var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
 
@@ -222,7 +231,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
                           select sd.Student;
       var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
 
@@ -241,11 +250,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
                           select sd.Student;
       var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
 
-      FetchRequest<int> fetchRequest2 = FetchRequest<int>.Create<Student> (s => s.Scores);
+      FetchRequest fetchRequest2 = new FetchRequest (_scoresFetchExpression);
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
@@ -270,11 +279,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
                           select sd.Student;
       var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
       
-      FetchRequest<int> fetchRequest2 = FetchRequest<int>.Create<Student> (s => s.Scores);
+      FetchRequest fetchRequest2 = new FetchRequest (_scoresFetchExpression);
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
@@ -294,7 +303,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       var originalQueryModel = 
           new QueryModel (typeof (IQueryable<Student>), ExpressionHelper.CreateMainFromClause (), ExpressionHelper.CreateGroupClause ());
-      FetchRequest<Student> fetchRequest = FetchRequest<Student>.Create<Student> (s => s.Friends);
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
       fetchRequest.CreateFetchQueryModel (originalQueryModel);
     }

@@ -22,28 +22,27 @@ using Remotion.Utilities;
 namespace Remotion.Data.Linq.EagerFetching
 {
   /// <summary>
-  /// Holds a number of <see cref="IFetchRequest"/> instances keyed by the <see cref="MemberInfo"/> instances representing the relation members
+  /// Holds a number of <see cref="FetchRequest"/> instances keyed by the <see cref="MemberInfo"/> instances representing the relation members
   /// to be eager-fetched.
   /// </summary>
-  /// <typeparam name="TOriginating">The type of the originating objects from which the related objects can be selected.</typeparam>
-  public class FetchRequestCollection<TOriginating> : IFetchRequestCollection
+  public class FetchRequestCollection
   {
-    private readonly Dictionary<MemberInfo, IFetchRequest> _fetchRequests = new Dictionary<MemberInfo, IFetchRequest> ();
+    private readonly Dictionary<MemberInfo, FetchRequest> _fetchRequests = new Dictionary<MemberInfo, FetchRequest> ();
 
-    public IEnumerable<IFetchRequest> FetchRequests
+    public IEnumerable<FetchRequest> FetchRequests
     {
       get { return _fetchRequests.Values; }
     }
 
-    public FetchRequest<TRelated> GetOrAddFetchRequest<TRelated> (Expression<Func<TOriginating, IEnumerable<TRelated>>> relatedObjectSelector)
+    public FetchRequest GetOrAddFetchRequest (LambdaExpression relatedObjectSelector)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 
-      FetchRequest<TRelated> correspondingFetchRequest = FetchRequest<TRelated>.Create (relatedObjectSelector);
+      FetchRequest correspondingFetchRequest = new FetchRequest (relatedObjectSelector);
       
-      IFetchRequest existingFetchRequest;
+      FetchRequest existingFetchRequest;
       if (_fetchRequests.TryGetValue (correspondingFetchRequest.RelationMember, out existingFetchRequest))
-        return (FetchRequest<TRelated>) existingFetchRequest;
+        return existingFetchRequest;
       else
       {
         _fetchRequests.Add (correspondingFetchRequest.RelationMember, correspondingFetchRequest);

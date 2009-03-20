@@ -25,12 +25,14 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
   [TestFixture]
   public class FetchRequestCollectionTest
   {
-    private FetchRequestCollection<Student> _collection;
+    private FetchRequestCollection _collection;
+    private Expression<Func<Student, IEnumerable<int>>> _scoresFetchExpression;
 
     [SetUp]
     public void SetUp ()
     {
-      _collection = new FetchRequestCollection<Student> ();
+      _collection = new FetchRequestCollection ();
+      _scoresFetchExpression = (s => s.Scores);
     }
 
     [Test]
@@ -38,10 +40,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       Assert.That (_collection.FetchRequests, Is.Empty);
 
-      Expression<Func<Student, IEnumerable<int>>> expectedExpression = s => s.Scores;
-      var result = _collection.GetOrAddFetchRequest (expectedExpression);
+      var result = _collection.GetOrAddFetchRequest (_scoresFetchExpression);
 
-      Assert.That (result.RelatedObjectSelector, Is.SameAs (expectedExpression));
+      Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
       Assert.That (_collection.FetchRequests, Is.EqualTo (new[] { result }));
     }
 
@@ -49,8 +50,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void AddFetchRequest_Twice ()
     {
       Assert.That (_collection.FetchRequests, Is.Empty);
-      var result1 = _collection.GetOrAddFetchRequest (s => s.Scores);
-      var result2 = _collection.GetOrAddFetchRequest (s => s.Scores);
+      var result1 = _collection.GetOrAddFetchRequest (_scoresFetchExpression);
+      var result2 = _collection.GetOrAddFetchRequest (_scoresFetchExpression);
 
       Assert.That (result1, Is.SameAs (result2));
       Assert.That (_collection.FetchRequests, Is.EqualTo (new[] { result1 }));
@@ -61,7 +62,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
     public void AddFetchRequest_InvalidExpression ()
     {
-      _collection.GetOrAddFetchRequest (s => new[] { 1, 2, 3 });
+      _collection.GetOrAddFetchRequest (((Expression<Func<Student, IEnumerable<int>>>) (s => new[] { 1, 2, 3 })));
     }
 
     [Test]
@@ -69,7 +70,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
     public void AddFetchRequest_InvalidExpression_MoreThanOneMember ()
     {
-      _collection.GetOrAddFetchRequest (s => s.OtherStudent.Friends);
+      _collection.GetOrAddFetchRequest (((Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends)));
     }
   }
 }

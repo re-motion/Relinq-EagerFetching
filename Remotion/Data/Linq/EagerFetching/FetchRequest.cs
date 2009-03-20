@@ -25,21 +25,13 @@ namespace Remotion.Data.Linq.EagerFetching
   /// <summary>
   /// Represents a relation property that should be eager-fetched by means of a lambda expression.
   /// </summary>
-  /// <typeparam name="TRelated">The type of the related.</typeparam>
-  public class FetchRequest<TRelated> : IFetchRequest
+  public class FetchRequest
   {
-    public static FetchRequest<TRelated> Create<TOriginating> (Expression<Func<TOriginating, IEnumerable<TRelated>>> relatedObjectSelector)
-    {
-      ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
-
-      return new FetchRequest<TRelated> (relatedObjectSelector);
-    }
-
     private readonly MemberInfo _relationMember;
     private readonly LambdaExpression _relatedObjectSelector;
-    private readonly FetchRequestCollection<TRelated> _innerFetchRequestCollection = new FetchRequestCollection<TRelated>();
+    private readonly FetchRequestCollection _innerFetchRequestCollection = new FetchRequestCollection();
 
-    private FetchRequest (LambdaExpression relatedObjectSelector)
+    public FetchRequest (LambdaExpression relatedObjectSelector)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 
@@ -76,21 +68,20 @@ namespace Remotion.Data.Linq.EagerFetching
     }
 
     /// <summary>
-    /// Gets the inner fetch requests that were issued for this <see cref="FetchRequest{TRelated}"/>.
+    /// Gets the inner fetch requests that were issued for this <see cref="FetchRequest"/>.
     /// </summary>
-    /// <value>The fetch requests added via <see cref="GetOrAddInnerFetchRequest{TRelated}"/>.</value>
-    public IEnumerable<IFetchRequest> InnerFetchRequests
+    /// <value>The fetch requests added via <see cref="GetOrAddInnerFetchRequest"/>.</value>
+    public IEnumerable<FetchRequest> InnerFetchRequests
     {
       get { return _innerFetchRequestCollection.FetchRequests; }
     }
 
     /// <summary>
-    /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequest{TRelated}"/>.
+    /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequest"/>.
     /// </summary>
-    /// <typeparam name="TNextRelated">The type of related objects to be fetched.</typeparam>
     /// <param name="relatedObjectSelector">A lambda expression selecting related objects for a given query result object.</param>
-    /// <returns>An <see cref="IFetchRequest"/> instance representing the fetch request.</returns>
-    public FetchRequest<TNextRelated> GetOrAddInnerFetchRequest<TNextRelated> (Expression<Func<TRelated, IEnumerable<TNextRelated>>> relatedObjectSelector)
+    /// <returns>An <see cref="FetchRequest"/> instance representing the fetch request.</returns>
+    public FetchRequest GetOrAddInnerFetchRequest (LambdaExpression relatedObjectSelector)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
       return _innerFetchRequestCollection.GetOrAddFetchRequest (relatedObjectSelector);
@@ -144,7 +135,8 @@ namespace Remotion.Data.Linq.EagerFetching
         oldSelectParameter);
 
       // for a select clause with a projection of x => expr, we generate a projectionExpression of (x, fromIdentifier) => fromIdentifier
-      var fromIdentifier = Expression.Parameter (typeof (TRelated), fromIdentifierName);
+      var relatedObjectType = ReflectionUtility.GetAscribedGenericArguments (fromExpression.Body.Type, typeof (IEnumerable<>))[0];
+      var fromIdentifier = Expression.Parameter (relatedObjectType, fromIdentifierName);
       var projectionExpression = Expression.Lambda (fromIdentifier, oldSelectParameter, fromIdentifier);
 
       return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression, projectionExpression);
