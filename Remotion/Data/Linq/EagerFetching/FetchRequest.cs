@@ -109,7 +109,8 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
       ArgumentUtility.CheckNotNullOrEmpty ("fromIdentifierName", fromIdentifierName);
 
-      if (selectClauseToFetchFrom.ProjectionExpression.Parameters.Count != 1)
+      // if (selectClauseToFetchFrom.ProjectionExpression.Parameters.Count != 1) // TODO 1096: Use this condition after COMMONS-1096
+      if (selectClauseToFetchFrom.ProjectionExpression.Parameters.Count < 1)
       {
         var message = string.Format ("The given SelectClause contains an invalid projection expression '{0}'. Expected one parameter, but found {1}.", 
             selectClauseToFetchFrom.ProjectionExpression, 

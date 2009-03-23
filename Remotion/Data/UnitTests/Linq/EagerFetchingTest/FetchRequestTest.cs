@@ -94,11 +94,25 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression " 
         + "'(sd, i) => sd.Student'. Expected one parameter, but found 2.\r\nParameter name: selectClauseToFetchFrom")]
-    public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount ()
+    [Ignore ("TODO 1096")]
+    public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount_TooMany ()
     {
       FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, int, Student>> selectProjection = (sd, i) => sd.Student;
+      var selectClause = new SelectClause (previousClause, selectProjection);
+
+      fetchRequest.CreateFetchFromClause (selectClause, "studi");
+    }
+
+    [Test]
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression "
+        + "'() => null'. Expected one parameter, but found 0.\r\nParameter name: selectClauseToFetchFrom")]
+    public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount_TooFew ()
+    {
+      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
+      var previousClause = ExpressionHelper.CreateClause ();
+      Expression<Func<Student>> selectProjection = () => null;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
       fetchRequest.CreateFetchFromClause (selectClause, "studi");
