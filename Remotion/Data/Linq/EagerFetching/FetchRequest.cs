@@ -162,7 +162,6 @@ namespace Remotion.Data.Linq.EagerFetching
 
       var newSelectClause = new SelectClause (memberFromClause, Expression.Lambda (memberFromClause.Identifier, memberFromClause.Identifier));
 
-      // TODO 1089: Test ResultModifierClauses
       IClause previousClause = newSelectClause;
       foreach (var originalResultModifierClause in originalSelectClause.ResultModifierClauses)
       {

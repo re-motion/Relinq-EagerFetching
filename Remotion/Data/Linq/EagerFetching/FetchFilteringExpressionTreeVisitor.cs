@@ -24,8 +24,8 @@ namespace Remotion.Data.Linq.EagerFetching
 {
   // TODO 1089: Test
   /// <summary>
-  /// Analyzes an expression tree for <see cref="FetchExpression"/> and <see cref="ThenFetchExpression"/> instances, removing them in a tree
-  /// and returning them via <see cref="TopLevelFetchRequests"/>.
+  /// Analyzes an expression tree for <see cref="FetchExpression"/> and <see cref="ThenFetchExpression"/> instances, removing them from the tree
+  /// and returning them as <see cref="FetchRequest"/> objects.
   /// </summary>
   public class FetchFilteringExpressionTreeVisitor : ExpressionTreeVisitor
   {
@@ -33,12 +33,13 @@ namespace Remotion.Data.Linq.EagerFetching
     private FetchRequestCollection _topLevelFetchRequests = new FetchRequestCollection ();
     private FetchRequest _lastFetchRequest;
 
-    public FetchRequest[] TopLevelFetchRequests
-    {
-      get { return _topLevelFetchRequests.FetchRequests.ToArray(); }
-    }
-
-    public Expression Visit (Expression expression)
+    /// <summary>
+    /// Visits the specified expression tree, filtering it for <see cref="FetchExpression"/> and <see cref="ThenFetchExpression"/> instances.
+    /// </summary>
+    /// <param name="expression">The expression tree to search.</param>
+    /// <returns>A <see cref="FetchFilteringResult"/> containing the expression tree with the fetch-related expressions removed as well as a list
+    /// of <see cref="FetchRequest"/> objects holding the fetch request data.</returns>
+    public FetchFilteringResult Visit (Expression expression)
     {
       ArgumentUtility.CheckNotNull ("expression", expression);
 
@@ -46,7 +47,8 @@ namespace Remotion.Data.Linq.EagerFetching
       _topLevelFetchRequests = new FetchRequestCollection ();
       _lastFetchRequest = null;
 
-      return VisitExpression (expression);
+      var newExpression = VisitExpression (expression);
+      return new FetchFilteringResult (newExpression, _topLevelFetchRequests.FetchRequests.ToList ().AsReadOnly ());
     }
 
     protected override Expression VisitExpression (Expression expression)
@@ -56,15 +58,12 @@ namespace Remotion.Data.Linq.EagerFetching
 
       if (fetchExpression != null)
       {
-        // TODO 1089: test that this comes before setting _lastFetchRequest
-        // TODO 1089: integration test with two fetches
         var result = VisitExpression (fetchExpression.Operand);
         _lastFetchRequest = _topLevelFetchRequests.GetOrAddFetchRequest (fetchExpression.RelatedObjectSelector);
         return result;
       }
       else if (thenFetchExpression != null)
       {
-        // TODO 1089: test that this comes before setting _lastFetchRequest
         var result = VisitExpression (thenFetchExpression.Operand);
 
         if (_lastFetchRequest == null)

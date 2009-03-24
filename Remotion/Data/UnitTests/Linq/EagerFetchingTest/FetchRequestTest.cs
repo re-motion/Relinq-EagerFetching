@@ -31,12 +31,20 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
   {
     private Expression<Func<Student, IEnumerable<int>>> _scoresFetchExpression;
     private Expression<Func<Student, IEnumerable<Student>>> _friendsFetchExpression;
+    private FetchRequest _friendsFetchRequest;
+    private IQueryable<Student> _studentFromStudentDetailQuery;
+    private QueryModel _studentFromStudentDetailQueryModel;
 
     [SetUp]
     public void SetUp ()
     {
       _scoresFetchExpression = (s => s.Scores);
       _friendsFetchExpression = (s => s.Friends);
+      _friendsFetchRequest = new FetchRequest (_friendsFetchExpression);
+
+      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateQuerySource_Detail ()
+                                        select sd.Student);
+      _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
 
     [Test]
@@ -58,21 +66,18 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     public void GetOrAddFetchRequest ()
     {
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
+      Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.Empty);
 
-      Assert.That (fetchRequest.InnerFetchRequests, Is.Empty);
-
-      var result = fetchRequest.GetOrAddInnerFetchRequest (_scoresFetchExpression);
+      var result = _friendsFetchRequest.GetOrAddInnerFetchRequest (_scoresFetchExpression);
 
       Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
-      Assert.That (fetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));
+      Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));
     }
 
     [Test]
     public void RelationMember ()
     {
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-      Assert.That (fetchRequest.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
+      Assert.That (_friendsFetchRequest.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
     }
 
     [Test]
@@ -80,13 +85,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
 
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-      
       var previousClause = ExpressionHelper.CreateClause();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      var clause = fetchRequest.CreateFetchFromClause (selectClause, "studi");
+      var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
       Assert.That (clause, Is.Not.Null);
       Assert.That (clause.PreviousClause, Is.SameAs (previousClause));
     }
@@ -94,15 +97,14 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression " 
         + "'(sd, i) => sd.Student'. Expected one parameter, but found 2.\r\nParameter name: selectClauseToFetchFrom")]
-    [Ignore ("TODO 1096")]
+    [Ignore ("TODO 1096: Enable this as soon as ")]
     public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount_TooMany ()
     {
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, int, Student>> selectProjection = (sd, i) => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      fetchRequest.CreateFetchFromClause (selectClause, "studi");
+      _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
     }
 
     [Test]
@@ -110,12 +112,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "'() => null'. Expected one parameter, but found 0.\r\nParameter name: selectClauseToFetchFrom")]
     public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount_TooFew ()
     {
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student>> selectProjection = () => null;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      fetchRequest.CreateFetchFromClause (selectClause, "studi");
+      _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
     }
 
     [Test]
@@ -124,12 +125,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "it yields 'Remotion.Data.UnitTests.Linq.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
     public void CreateFetchFromClause_InvalidSelectProjection_WrongInputType ()
     {
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student_Detail>> selectProjection = sd => sd;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      fetchRequest.CreateFetchFromClause (selectClause, "studi");
+      _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
     }
 
     [Test]
@@ -137,13 +137,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
 
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      var clause = fetchRequest.CreateFetchFromClause (selectClause, "studi");
+      var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
 
       // expecting: from studi in sd.Student.Friends
       //            fromExpression: sd => sd.Student.Friends
@@ -167,13 +165,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
 
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      var clause = fetchRequest.CreateFetchFromClause (selectClause, "studi");
+      var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
 
       // expecting: from studi in sd.Student.Friends
       //            projectionExpression: (sd, studi) => studi
@@ -189,44 +185,29 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     public void CreateFetchQueryModel ()
     {
-      var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
-                               select sd.Student;
-      var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-
-      var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
       Assert.That (fetchQueryModel, Is.Not.Null);
-      Assert.That (fetchQueryModel, Is.Not.SameAs (originalQueryModel));
+      Assert.That (fetchQueryModel, Is.Not.SameAs (_studentFromStudentDetailQueryModel));
     }
 
     [Test]
     public void CreateFetchQueryModel_MainFromClause ()
     {
-      var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
-                          select sd.Student;
-      var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-
-      var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
       // from sd in ExpressionHelper.CreateQuerySource_Detail()
       // from <x> in sd.Student.Friends
       // select <x>
 
-      ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.QuerySource, originalQueryModel.MainFromClause.QuerySource);
-      Assert.That (fetchQueryModel.MainFromClause.Identifier, Is.EqualTo (originalQueryModel.MainFromClause.Identifier));
+      ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.QuerySource, _studentFromStudentDetailQueryModel.MainFromClause.QuerySource);
+      Assert.That (fetchQueryModel.MainFromClause.Identifier, Is.EqualTo (_studentFromStudentDetailQueryModel.MainFromClause.Identifier));
     }
 
     [Test]
     public void CreateFetchQueryModel_MemberFromClause ()
     {
-      var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
-                          select sd.Student;
-      var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-
-      var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
       // from sd in ExpressionHelper.CreateQuerySource_Detail()
@@ -242,12 +223,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     public void CreateFetchQueryModel_SelectClause ()
     {
-      var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
-                          select sd.Student;
-      var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-
-      var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
       // from sd in ExpressionHelper.CreateQuerySource_Detail()
@@ -261,14 +237,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     public void CreateFetchQueryModel_Twice_MemberFromClause ()
     {
-      var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
-                          select sd.Student;
-      var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
-      var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
-
-      FetchRequest fetchRequest2 = new FetchRequest (_scoresFetchExpression);
+      var fetchRequest2 = new FetchRequest (_scoresFetchExpression);
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
@@ -290,14 +261,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     public void CreateFetchQueryModel_Twice_SelectClause ()
     {
-      var originalQuery = from sd in ExpressionHelper.CreateQuerySource_Detail ()
-                          select sd.Student;
-      var originalQueryModel = ExpressionHelper.ParseQuery (originalQuery);
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
-
-      var fetchQueryModel = fetchRequest.CreateFetchQueryModel (originalQueryModel);
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
       
-      FetchRequest fetchRequest2 = new FetchRequest (_scoresFetchExpression);
+      var fetchRequest2 = new FetchRequest (_scoresFetchExpression);
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
@@ -317,16 +283,41 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       var originalQueryModel = 
           new QueryModel (typeof (IQueryable<Student>), ExpressionHelper.CreateMainFromClause (), ExpressionHelper.CreateGroupClause ());
-      FetchRequest fetchRequest = new FetchRequest (_friendsFetchExpression);
 
-      fetchRequest.CreateFetchQueryModel (originalQueryModel);
+      _friendsFetchRequest.CreateFetchQueryModel (originalQueryModel);
     }
 
     [Test]
-    [Ignore ("TODO 1089: Test")]
     public void CreateFetchQueryModel_ResultModifierClausesAreCloned ()
     {
-      
+      var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
+      var modifier = ExpressionHelper.CreateResultModifierClause (selectClause, selectClause);
+      selectClause.AddResultModifierData (modifier);
+
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      var fetchSelectClause = (SelectClause)fetchQueryModel.SelectOrGroupClause;
+
+      Assert.That (fetchSelectClause.ResultModifierClauses.Count, Is.EqualTo (1));
+      Assert.That (fetchSelectClause.ResultModifierClauses[0].ResultModifier, Is.SameAs (modifier.ResultModifier));
+    }
+
+    [Test]
+    public void CreateFetchQueryModel_ResultModifierClausesAreClonedWithCorrectPreviousClauses ()
+    {
+      var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
+      var modifier1 = ExpressionHelper.CreateResultModifierClause (selectClause, selectClause);
+      var modifier2 = ExpressionHelper.CreateResultModifierClause (modifier1, selectClause);
+      selectClause.AddResultModifierData (modifier1);
+      selectClause.AddResultModifierData (modifier2);
+
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      var fetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+
+      Assert.That (fetchSelectClause.ResultModifierClauses.Count, Is.EqualTo (2));
+      Assert.That (fetchSelectClause.ResultModifierClauses[0].SelectClause, Is.SameAs (fetchSelectClause));
+      Assert.That (fetchSelectClause.ResultModifierClauses[0].PreviousClause, Is.SameAs (fetchSelectClause));
+      Assert.That (fetchSelectClause.ResultModifierClauses[1].SelectClause, Is.SameAs (fetchSelectClause));
+      Assert.That (fetchSelectClause.ResultModifierClauses[1].PreviousClause, Is.SameAs (fetchSelectClause.ResultModifierClauses[0]));
     }
   }
 }
