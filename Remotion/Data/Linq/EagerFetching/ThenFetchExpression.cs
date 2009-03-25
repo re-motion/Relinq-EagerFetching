@@ -15,7 +15,6 @@
 // 
 using System;
 using System.Linq.Expressions;
-using Remotion.Data.Linq.ExtensionMethods;
 using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
