@@ -13,30 +13,22 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this framework; if not, see http://www.gnu.org/licenses.
 // 
-using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using Remotion.Data.Linq;
+using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.EagerFetching;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 {
-  public class FetchFilteringResult
+  public class TestFetchRequest : FetchRequestBase
   {
-    private readonly Expression _newExpression;
-    private readonly ReadOnlyCollection<FetchRequestBase> _fetchRequests;
-
-    public FetchFilteringResult (Expression newExpression, ReadOnlyCollection<FetchRequestBase> fetchRequests)
+    public TestFetchRequest (LambdaExpression relatedObjectSelector)
+        : base(relatedObjectSelector)
     {
-      _newExpression = newExpression;
-      _fetchRequests = fetchRequests;
     }
 
-    public Expression NewExpression
+    protected override void ModifyQueryModelForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
-      get { return _newExpression; }
-    }
-
-    public ReadOnlyCollection<FetchRequestBase> FetchRequests
-    {
-      get { return _fetchRequests; }
     }
   }
 }

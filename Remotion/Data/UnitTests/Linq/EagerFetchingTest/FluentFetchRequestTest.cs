@@ -14,14 +14,46 @@
 // along with this framework; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
+using Remotion.Data.Linq;
+using Remotion.Data.Linq.EagerFetching;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 {
   [TestFixture]
-  [Ignore ("TODO 1089: Test")]
   public class FluentFetchRequestTest
   {
+    [Test]
+    public void ThenFetch ()
+    {
+      var originatingQuery = ExpressionHelper.CreateQuerySource_Detail();
+      var fluentFetchRequest = 
+          new FluentFetchRequest<Student_Detail, Student> ((QueryProviderBase) originatingQuery.Provider, originatingQuery.Expression);
+
+      Expression<Func<Student, IEnumerable<int>>> relatedObjectSelector = s => s.Scores;
+      var newRequest = fluentFetchRequest.ThenFetch (relatedObjectSelector);
+      Assert.That (newRequest, Is.InstanceOfType (typeof (FluentFetchRequest<Student_Detail, int>)));
+      Assert.That (newRequest.Expression, Is.InstanceOfType (typeof (ThenFetchExpression)));
+      Assert.That (((ThenFetchExpression) newRequest.Expression).Operand, Is.SameAs (fluentFetchRequest.Expression));
+      Assert.That (((ThenFetchExpression) newRequest.Expression).RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
+    }
+
+    [Test]
+    public void ThenFetchOne ()
+    {
+      var originatingQuery = ExpressionHelper.CreateQuerySource_Detail ();
+      var fluentFetchRequest =
+          new FluentFetchRequest<Student_Detail, Student> ((QueryProviderBase) originatingQuery.Provider, originatingQuery.Expression);
+
+      Expression<Func<Student, int>> relatedObjectSelector = s => s.ID;
+      var newRequest = fluentFetchRequest.ThenFetchOne (relatedObjectSelector);
+      Assert.That (newRequest, Is.InstanceOfType (typeof (FluentFetchRequest<Student_Detail, int>)));
+      Assert.That (newRequest.Expression, Is.InstanceOfType (typeof (ThenFetchExpression)));
+      Assert.That (((ThenFetchExpression) newRequest.Expression).Operand, Is.SameAs (fluentFetchRequest.Expression));
+      Assert.That (((ThenFetchExpression) newRequest.Expression).RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
+    }
   }
 }

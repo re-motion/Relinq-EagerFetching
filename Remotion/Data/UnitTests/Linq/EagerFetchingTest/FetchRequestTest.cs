@@ -27,11 +27,13 @@ using Remotion.Data.UnitTests.Linq.ParsingTest;
 namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 {
   [TestFixture]
-  public class FetchRequestTest
+  public class CollectionFetchRequestTest
   {
     private Expression<Func<Student, IEnumerable<int>>> _scoresFetchExpression;
     private Expression<Func<Student, IEnumerable<Student>>> _friendsFetchExpression;
-    private FetchRequest _friendsFetchRequest;
+    private CollectionFetchRequest _friendsFetchRequest;
+    private Expression<Func<Student, Student>> _otherStudentFetchExpression;
+    private CollectionFetchRequest _otherStudentFetchRequest;
     private IQueryable<Student> _studentFromStudentDetailQuery;
     private QueryModel _studentFromStudentDetailQueryModel;
 
@@ -40,7 +42,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       _scoresFetchExpression = (s => s.Scores);
       _friendsFetchExpression = (s => s.Friends);
-      _friendsFetchRequest = new FetchRequest (_friendsFetchExpression);
+      _friendsFetchRequest = new CollectionFetchRequest (_friendsFetchExpression);
+      _otherStudentFetchExpression = (s => s.OtherStudent);
+      _otherStudentFetchRequest = new CollectionFetchRequest (_otherStudentFetchExpression);
 
       _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateQuerySource_Detail ()
                                         select sd.Student);
@@ -48,36 +52,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     }
 
     [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression; 'new [] {1, 2, 3}' "
-        + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
-    public void Create_InvalidExpression ()
+    [Ignore ("TODO 1115")]
+    public void Create_InvalidExpression_NoEnumerableOfT ()
     {
-      new FetchRequest ((Expression<Func<Student, IEnumerable<int>>>) (s => new[] { 1, 2, 3 }));
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression of the kind "
-        + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
-    public void Create_InvalidExpression_MoreThanOneMember ()
-    {
-      new FetchRequest ((Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends));
-    }
-
-    [Test]
-    public void GetOrAddFetchRequest ()
-    {
-      Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.Empty);
-
-      var result = _friendsFetchRequest.GetOrAddInnerFetchRequest (_scoresFetchExpression);
-
-      Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
-      Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));
-    }
-
-    [Test]
-    public void RelationMember ()
-    {
-      Assert.That (_friendsFetchRequest.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
+      new CollectionFetchRequest ((Expression<Func<Student, int>>) (s => s.ID));
+      Assert.Fail ("Expected exception");
     }
 
     [Test]
@@ -92,44 +71,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
       Assert.That (clause, Is.Not.Null);
       Assert.That (clause.PreviousClause, Is.SameAs (previousClause));
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression " 
-        + "'(sd, i) => sd.Student'. Expected one parameter, but found 2.\r\nParameter name: selectClauseToFetchFrom")]
-    [Ignore ("TODO 1096: Enable this as soon as ")]
-    public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount_TooMany ()
-    {
-      var previousClause = ExpressionHelper.CreateClause ();
-      Expression<Func<Student_Detail, int, Student>> selectProjection = (sd, i) => sd.Student;
-      var selectClause = new SelectClause (previousClause, selectProjection);
-
-      _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression "
-        + "'() => null'. Expected one parameter, but found 0.\r\nParameter name: selectClauseToFetchFrom")]
-    public void CreateFetchFromClause_InvalidSelectProjection_WrongParameterCount_TooFew ()
-    {
-      var previousClause = ExpressionHelper.CreateClause ();
-      Expression<Func<Student>> selectProjection = () => null;
-      var selectClause = new SelectClause (previousClause, selectProjection);
-
-      _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression 'sd => sd'. "
-        + "In order to fetch the relation property 'Friends', the projection must yield objects of type 'Remotion.Data.UnitTests.Linq.Student', but "
-        + "it yields 'Remotion.Data.UnitTests.Linq.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
-    public void CreateFetchFromClause_InvalidSelectProjection_WrongInputType ()
-    {
-      var previousClause = ExpressionHelper.CreateClause ();
-      Expression<Func<Student_Detail, Student_Detail>> selectProjection = sd => sd;
-      var selectClause = new SelectClause (previousClause, selectProjection);
-
-      _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
     }
 
     [Test]
@@ -191,6 +132,18 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     }
 
     [Test]
+    [Ignore ("TODO 1115")]
+    public void CreateFetchQueryModel_ObjectFetch ()
+    {
+      var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      Assert.That (fetchQueryModel, Is.Not.Null);
+      Assert.That (fetchQueryModel, Is.Not.SameAs (_studentFromStudentDetailQueryModel));
+
+      // no additional from clauses here
+      Assert.That (fetchQueryModel.BodyClauses.Count, Is.EqualTo (_studentFromStudentDetailQueryModel.BodyClauses.Count));
+    }
+
+    [Test]
     public void CreateFetchQueryModel_MainFromClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
@@ -235,11 +188,27 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     }
 
     [Test]
+    [Ignore ("TODO 1115")]
+    public void CreateFetchQueryModel_ObjectFetch_SelectClause ()
+    {
+      var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+
+      // expecting:
+      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // select sd.Student.OtherStudent
+
+      var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+      var expectedExpression = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student.OtherStudent);
+
+      ExpressionTreeComparer.CheckAreEqualTrees (selectClause.ProjectionExpression, expectedExpression);
+    }
+
+    [Test]
     public void CreateFetchQueryModel_Twice_MemberFromClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
-      var fetchRequest2 = new FetchRequest (_scoresFetchExpression);
+      var fetchRequest2 = new CollectionFetchRequest (_scoresFetchExpression);
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
@@ -263,7 +232,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
       
-      var fetchRequest2 = new FetchRequest (_scoresFetchExpression);
+      var fetchRequest2 = new CollectionFetchRequest (_scoresFetchExpression);
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
@@ -274,17 +243,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 
       var selectClause = (SelectClause) fetchQueryModel2.SelectOrGroupClause;
       Assert.That (selectClause.ProjectionExpression.Body, Is.SameAs (selectClause.ProjectionExpression.Parameters[0]));
-    }
-
-    [Test]
-    [ExpectedException (typeof (NotSupportedException), 
-        ExpectedMessage = "Fetch requests only support queries with select clauses, but this query has a GroupClause.")]
-    public void CreateFetchQueryModel_GroupClauseNotSupported ()
-    {
-      var originalQueryModel = 
-          new QueryModel (typeof (IQueryable<Student>), ExpressionHelper.CreateMainFromClause (), ExpressionHelper.CreateGroupClause ());
-
-      _friendsFetchRequest.CreateFetchQueryModel (originalQueryModel);
     }
 
     [Test]

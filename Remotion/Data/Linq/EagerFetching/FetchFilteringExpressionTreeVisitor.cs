@@ -25,20 +25,20 @@ namespace Remotion.Data.Linq.EagerFetching
   // TODO 1089: Test
   /// <summary>
   /// Analyzes an expression tree for <see cref="FetchExpression"/> and <see cref="ThenFetchExpression"/> instances, removing them from the tree
-  /// and returning them as <see cref="FetchRequest"/> objects.
+  /// and returning them as <see cref="FetchRequestBase"/> objects.
   /// </summary>
   public class FetchFilteringExpressionTreeVisitor : ExpressionTreeVisitor
   {
     private Expression _expressionTreeRoot;
     private FetchRequestCollection _topLevelFetchRequests = new FetchRequestCollection ();
-    private FetchRequest _lastFetchRequest;
-
+    private FetchRequestBase _lastFetchRequest;
+    
     /// <summary>
     /// Visits the specified expression tree, filtering it for <see cref="FetchExpression"/> and <see cref="ThenFetchExpression"/> instances.
     /// </summary>
     /// <param name="expression">The expression tree to search.</param>
     /// <returns>A <see cref="FetchFilteringResult"/> containing the expression tree with the fetch-related expressions removed as well as a list
-    /// of <see cref="FetchRequest"/> objects holding the fetch request data.</returns>
+    /// of <see cref="FetchRequestBase"/> objects holding the fetch request data.</returns>
     public FetchFilteringResult Visit (Expression expression)
     {
       ArgumentUtility.CheckNotNull ("expression", expression);

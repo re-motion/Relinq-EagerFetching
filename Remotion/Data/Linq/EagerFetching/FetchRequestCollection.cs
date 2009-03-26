@@ -22,25 +22,25 @@ using Remotion.Utilities;
 namespace Remotion.Data.Linq.EagerFetching
 {
   /// <summary>
-  /// Holds a number of <see cref="FetchRequest"/> instances keyed by the <see cref="MemberInfo"/> instances representing the relation members
+  /// Holds a number of <see cref="CollectionFetchRequest"/> instances keyed by the <see cref="MemberInfo"/> instances representing the relation members
   /// to be eager-fetched.
   /// </summary>
   public class FetchRequestCollection
   {
-    private readonly Dictionary<MemberInfo, FetchRequest> _fetchRequests = new Dictionary<MemberInfo, FetchRequest> ();
+    private readonly Dictionary<MemberInfo, FetchRequestBase> _fetchRequests = new Dictionary<MemberInfo, FetchRequestBase> ();
 
-    public IEnumerable<FetchRequest> FetchRequests
+    public IEnumerable<FetchRequestBase> FetchRequests
     {
       get { return _fetchRequests.Values; }
     }
 
-    public FetchRequest GetOrAddFetchRequest (LambdaExpression relatedObjectSelector)
+    public FetchRequestBase GetOrAddFetchRequest (LambdaExpression relatedObjectSelector)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 
-      FetchRequest correspondingFetchRequest = new FetchRequest (relatedObjectSelector);
-      
-      FetchRequest existingFetchRequest;
+      var correspondingFetchRequest = new CollectionFetchRequest (relatedObjectSelector);
+
+      FetchRequestBase existingFetchRequest;
       if (_fetchRequests.TryGetValue (correspondingFetchRequest.RelationMember, out existingFetchRequest))
         return existingFetchRequest;
       else
