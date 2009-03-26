@@ -25,7 +25,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <param name="relatedObjectSelector">A lambda expression selecting the next related objects to be eager-fetched.</param>
     /// <returns>A <see cref="FluentFetchRequest{TFetch, TQueried}"/> object on which further recursive fetch requests can be made. The subsequent fetches start 
     /// from the related objects fetched by the fetch request created by this method.</returns>
-    public FluentFetchRequest<TQueried, TRelated> ThenFetch<TRelated> (Expression<Func<TFetch, IEnumerable<TRelated>>> relatedObjectSelector)
+    public FluentFetchRequest<TQueried, TRelated> ThenFetchMany<TRelated> (Expression<Func<TFetch, IEnumerable<TRelated>>> relatedObjectSelector)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 

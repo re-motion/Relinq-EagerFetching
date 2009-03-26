@@ -34,7 +34,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
           new FluentFetchRequest<Student_Detail, Student> ((QueryProviderBase) originatingQuery.Provider, originatingQuery.Expression);
 
       Expression<Func<Student, IEnumerable<int>>> relatedObjectSelector = s => s.Scores;
-      var newRequest = fluentFetchRequest.ThenFetch (relatedObjectSelector);
+      var newRequest = fluentFetchRequest.ThenFetchMany (relatedObjectSelector);
       Assert.That (newRequest, Is.InstanceOfType (typeof (FluentFetchRequest<Student_Detail, int>)));
       Assert.That (newRequest.Expression, Is.InstanceOfType (typeof (ThenFetchExpression)));
       Assert.That (((ThenFetchExpression) newRequest.Expression).Operand, Is.SameAs (fluentFetchRequest.Expression));

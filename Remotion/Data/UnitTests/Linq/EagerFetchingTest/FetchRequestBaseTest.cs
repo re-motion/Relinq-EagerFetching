@@ -83,7 +83,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     public void GetFetchSourceExpression ()
     {
-      // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
+      // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
 
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
@@ -96,7 +96,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     [Test]
     public void GetFetchSourceExpression_Expression ()
     {
-      // simulate a fetch request for the following: var query = from ... select sd.Student; query.Fetch (s => s.Friends);
+      // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
 
       var previousClause = ExpressionHelper.CreateClause ();
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
