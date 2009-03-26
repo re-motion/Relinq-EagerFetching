@@ -40,7 +40,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       Assert.That (_collection.FetchRequests, Is.Empty);
 
-      var result = _collection.GetOrAddFetchRequest (_scoresFetchExpression);
+      var result = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresFetchExpression));
 
       Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
       Assert.That (_collection.FetchRequests, Is.EqualTo (new[] { result }));
@@ -50,8 +50,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void AddFetchRequest_Twice ()
     {
       Assert.That (_collection.FetchRequests, Is.Empty);
-      var result1 = _collection.GetOrAddFetchRequest (_scoresFetchExpression);
-      var result2 = _collection.GetOrAddFetchRequest (_scoresFetchExpression);
+      var result1 = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresFetchExpression));
+      var result2 = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresFetchExpression));
 
       Assert.That (result1, Is.SameAs (result2));
       Assert.That (_collection.FetchRequests, Is.EqualTo (new[] { result1 }));
@@ -62,7 +62,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
     public void AddFetchRequest_InvalidExpression ()
     {
-      _collection.GetOrAddFetchRequest (((Expression<Func<Student, IEnumerable<int>>>) (s => new[] { 1, 2, 3 })));
+      LambdaExpression relatedObjectSelector = ((Expression<Func<Student, IEnumerable<int>>>) (s => new[] { 1, 2, 3 }));
+      _collection.GetOrAddFetchRequest (new FetchManyRequest (relatedObjectSelector));
     }
 
     [Test]
@@ -70,7 +71,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
         + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
     public void AddFetchRequest_InvalidExpression_MoreThanOneMember ()
     {
-      _collection.GetOrAddFetchRequest (((Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends)));
+      LambdaExpression relatedObjectSelector = ((Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends));
+      _collection.GetOrAddFetchRequest (new FetchManyRequest (relatedObjectSelector));
     }
   }
 }

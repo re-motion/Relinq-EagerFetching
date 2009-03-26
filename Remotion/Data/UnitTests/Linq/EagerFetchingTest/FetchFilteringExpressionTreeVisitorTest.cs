@@ -58,6 +58,23 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
+      Assert.That (result.FetchRequests[0], Is.InstanceOfType (typeof (FetchManyRequest)));
+      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
+    }
+
+    [Test]
+    [Ignore ("TODO 1115")]
+    public void Visit_FetchExpression_FetchOneRequest ()
+    {
+      var innerExpression = ExpressionHelper.CreateExpression ();
+      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var fetchExpression = new FetchExpression (innerExpression, relatedObjectSelector); // TODO: Specify to create FetchOneExpression
+
+      var result = _visitor.Visit (fetchExpression);
+
+      Assert.That (result.NewExpression, Is.SameAs (innerExpression));
+      Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
+      Assert.That (result.FetchRequests[0], Is.InstanceOfType (typeof (FetchOneRequest)));
       Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
     }
 
@@ -159,6 +176,31 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs (relatedObjectSelector2));
 
       var fetchRequestForThenFetchExpression = result.FetchRequests[0].InnerFetchRequests.Single ();
+      Assert.That (fetchRequestForThenFetchExpression, Is.InstanceOfType (typeof (FetchManyRequest)));
+      var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
+      Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForThenFetchExpression));
+    }
+
+    [Test]
+    [Ignore ("TODO 1115")]
+    public void Visit_ThenFetchExpression_WithInnerFetch_FetchOne ()
+    {
+      var innerExpression = ExpressionHelper.CreateExpression ();
+      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var fetchExpression = new FetchExpression (innerExpression, relatedObjectSelector1);
+      var thenFetchExpression = new ThenFetchExpression (fetchExpression, relatedObjectSelector2); // TODO 1115: Specify to create a FetchManyExpression here
+
+      var result = _visitor.Visit (thenFetchExpression);
+
+      Assert.That (result.NewExpression, Is.SameAs (innerExpression));
+      Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
+      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector1));
+      Assert.That (result.FetchRequests[0].InnerFetchRequests.Count (), Is.EqualTo (1));
+      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().RelatedObjectSelector, Is.SameAs (relatedObjectSelector2));
+
+      var fetchRequestForThenFetchExpression = result.FetchRequests[0].InnerFetchRequests.Single ();
+      Assert.That (fetchRequestForThenFetchExpression, Is.InstanceOfType (typeof (FetchOneRequest)));
       var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
       Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForThenFetchExpression));
     }

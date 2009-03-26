@@ -21,6 +21,7 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.ParsingTest;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
@@ -68,7 +69,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     {
       Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.Empty);
 
-      var result = _friendsFetchRequest.GetOrAddInnerFetchRequest (_scoresFetchExpression);
+      var result = _friendsFetchRequest.GetOrAddInnerFetchRequest (new FetchManyRequest (_scoresFetchExpression));
 
       Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
       Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));

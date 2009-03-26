@@ -34,19 +34,25 @@ namespace Remotion.Data.Linq.EagerFetching
       get { return _fetchRequests.Values; }
     }
 
-    public FetchRequestBase GetOrAddFetchRequest (LambdaExpression relatedObjectSelector)
+    /// <summary>
+    /// Gets or adds an eager-fetch request to this <see cref="FetchRequestCollection"/>.
+    /// </summary>
+    /// <param name="fetchRequest">The <see cref="FetchRequestBase"/> to be added.</param>
+    /// <returns>
+    /// <paramref name="fetchRequest"/> or, if another <see cref="FetchRequestBase"/> for the same relation member already existed,
+    /// the existing <see cref="FetchRequestBase"/>.
+    /// </returns>
+    public FetchRequestBase GetOrAddFetchRequest (FetchRequestBase fetchRequest)
     {
-      ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
-
-      var correspondingFetchRequest = new FetchManyRequest (relatedObjectSelector);
+      ArgumentUtility.CheckNotNull ("fetchRequest", fetchRequest);
 
       FetchRequestBase existingFetchRequest;
-      if (_fetchRequests.TryGetValue (correspondingFetchRequest.RelationMember, out existingFetchRequest))
+      if (_fetchRequests.TryGetValue (fetchRequest.RelationMember, out existingFetchRequest))
         return existingFetchRequest;
       else
       {
-        _fetchRequests.Add (correspondingFetchRequest.RelationMember, correspondingFetchRequest);
-        return correspondingFetchRequest;
+        _fetchRequests.Add (fetchRequest.RelationMember, fetchRequest);
+        return fetchRequest;
       }
     }
 

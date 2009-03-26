@@ -106,12 +106,15 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
     /// </summary>
-    /// <param name="relatedObjectSelector">A lambda expression selecting related objects for a given query result object.</param>
-    /// <returns>An <see cref="FetchManyRequest"/> instance representing the fetch request.</returns>
-    public FetchRequestBase GetOrAddInnerFetchRequest (LambdaExpression relatedObjectSelector)
+    /// <param name="fetchRequest">The <see cref="FetchRequestBase"/> to be added.</param>
+    /// <returns>
+    /// <paramref name="fetchRequest"/> or, if another <see cref="FetchRequestBase"/> for the same relation member already existed,
+    /// the existing <see cref="FetchRequestBase"/>.
+    /// </returns>
+    public FetchRequestBase GetOrAddInnerFetchRequest (FetchRequestBase fetchRequest)
     {
-      ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
-      return _innerFetchRequestCollection.GetOrAddFetchRequest (relatedObjectSelector);
+      ArgumentUtility.CheckNotNull ("fetchRequest", fetchRequest);
+      return _innerFetchRequestCollection.GetOrAddFetchRequest (fetchRequest);
     }
 
     /// <summary>

@@ -53,5 +53,10 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       return string.Format ("fetch {0} in {1}", RelatedObjectSelector, Operand);
     }
+
+    public FetchRequestBase CreateFetchRequest ()
+    {
+      return new FetchManyRequest (RelatedObjectSelector);
+    }
   }
 }

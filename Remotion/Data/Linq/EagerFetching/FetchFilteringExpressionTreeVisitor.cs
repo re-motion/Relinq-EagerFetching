@@ -59,7 +59,8 @@ namespace Remotion.Data.Linq.EagerFetching
       if (fetchExpression != null)
       {
         var result = VisitExpression (fetchExpression.Operand);
-        _lastFetchRequest = _topLevelFetchRequests.GetOrAddFetchRequest (fetchExpression.RelatedObjectSelector);
+        var fetchRequest = fetchExpression.CreateFetchRequest ();
+        _lastFetchRequest = _topLevelFetchRequests.GetOrAddFetchRequest (fetchRequest);
         return result;
       }
       else if (thenFetchExpression != null)
@@ -72,7 +73,8 @@ namespace Remotion.Data.Linq.EagerFetching
               "FetchExpression preceding ThenFetchExpression", thenFetchExpression, "filtering fetch expressions", _expressionTreeRoot);
         }
 
-        _lastFetchRequest = _lastFetchRequest.GetOrAddInnerFetchRequest (thenFetchExpression.RelatedObjectSelector);
+        var fetchRequest = thenFetchExpression.CreateFetchRequest();
+        _lastFetchRequest = _lastFetchRequest.GetOrAddInnerFetchRequest (fetchRequest);
         return result;
       }
       else
