@@ -51,7 +51,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void Visit_FetchExpression ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression = new FetchExpression (innerExpression, relatedObjectSelector);
 
       var result = _visitor.Visit (fetchExpression);
@@ -65,7 +65,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void Visit_FetchExpression_BuriedWithinOtherExpression ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression = new FetchExpression (innerExpression, relatedObjectSelector);
       var unaryExpression = Expression.Quote (fetchExpression);
 
@@ -83,8 +83,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void Visit_MultipleFetchExpressions ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
-      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (sd => sd.Friends);
+      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<int>> (s => s.Scores);
+      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression1 = new FetchExpression (innerExpression, relatedObjectSelector1);
       var fetchExpression2 = new FetchExpression (fetchExpression1, relatedObjectSelector2);
 
@@ -104,8 +104,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void Visit_SameFetchExpressionTwice ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
-      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression1 = new FetchExpression (innerExpression, relatedObjectSelector1);
       var fetchExpression2 = new FetchExpression (fetchExpression1, relatedObjectSelector2);
 
@@ -117,11 +117,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 
     [Test]
     [ExpectedException (typeof (ParserException), ExpectedMessage = "Expected FetchExpression preceding ThenFetchExpression for filtering fetch "
-        + "expressions, found 'then fetch sd => sd.Student in new [] {}' (ThenFetchExpression).")]
+        + "expressions, found 'then fetch s => s.Friends in new [] {}' (ThenFetchExpression).")]
     public void Visit_ThenFetchExpression_WithoutFetch ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var thenFetchExpression = new ThenFetchExpression (innerExpression, relatedObjectSelector);
       
       _visitor.Visit (thenFetchExpression);
@@ -129,12 +129,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 
     [Test]
     [ExpectedException (typeof (ParserException), ExpectedMessage = "Expected FetchExpression preceding ThenFetchExpression for filtering fetch "
-        + "expressions, found 'then fetch sd => sd.Student in new [] {}' (ThenFetchExpression).")]
+        + "expressions, found 'then fetch s => s.Friends in new [] {}' (ThenFetchExpression).")]
     public void Visit_ThenFetchExpression_WithOuterFetch ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
-      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var thenFetchExpression = new ThenFetchExpression (innerExpression, relatedObjectSelector1);
       var fetchExpression = new FetchExpression (thenFetchExpression, relatedObjectSelector2);
 
@@ -145,8 +145,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void Visit_ThenFetchExpression_WithInnerFetch ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
-      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression = new FetchExpression (innerExpression, relatedObjectSelector1);
       var thenFetchExpression = new ThenFetchExpression (fetchExpression, relatedObjectSelector2);
 
@@ -167,9 +167,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void Visit_ThenFetchExpression_AroundThenFetch ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
-      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
-      var relatedObjectSelector3 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var relatedObjectSelector3 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression = new FetchExpression (innerExpression, relatedObjectSelector1);
       var thenFetchExpression1 = new ThenFetchExpression (fetchExpression, relatedObjectSelector2);
       var thenFetchExpression2 = new ThenFetchExpression (thenFetchExpression1, relatedObjectSelector3);
@@ -193,9 +193,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     public void Visit_ThenFetchExpression_AroundTwoFetches ()
     {
       var innerExpression = ExpressionHelper.CreateExpression ();
-      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
-      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent);
-      var relatedObjectSelector3 = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student);
+      var relatedObjectSelector1 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<int>> (sd => sd.Scores);
+      var relatedObjectSelector2 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
+      var relatedObjectSelector3 = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression1 = new FetchExpression (innerExpression, relatedObjectSelector1);
       var fetchExpression2 = new FetchExpression (fetchExpression1, relatedObjectSelector2);
       var thenFetchExpression = new ThenFetchExpression (fetchExpression2, relatedObjectSelector3);

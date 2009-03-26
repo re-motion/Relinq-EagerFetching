@@ -27,10 +27,23 @@ namespace Remotion.Data.Linq.EagerFetching
   /// </summary>
   public class FetchManyRequest : FetchRequestBase
   {
+    private readonly Type _relatedObjectType;
+
     public FetchManyRequest (LambdaExpression relatedObjectSelector)
         : base(relatedObjectSelector)
     {
-      // TODO 1115: Test for IEnumerable<T>
+      try
+      {
+        _relatedObjectType = ReflectionUtility.GetAscribedGenericArguments (RelatedObjectSelector.Body.Type, typeof (IEnumerable<>))[0];
+      }
+      catch (ArgumentTypeException ex)
+      {
+        var message = string.Format (
+            "A fetch many request must yield a list of related objects, but '{0}' yields '{1}', which is not enumerable.",
+            RelatedObjectSelector, 
+            RelatedObjectSelector.Body.Type.FullName);
+        throw new ArgumentException (message, "relatedObjectSelector", ex);
+      }
     }
 
     /// <summary>
@@ -58,8 +71,7 @@ namespace Remotion.Data.Linq.EagerFetching
       LambdaExpression fromExpression = CreateFetchSourceExpression (selectClauseToFetchFrom);
 
       // for a select clause with a projection of x => expr, we generate a projectionExpression of (x, fromIdentifier) => fromIdentifier
-      var relatedObjectType = ReflectionUtility.GetAscribedGenericArguments (fromExpression.Body.Type, typeof (IEnumerable<>))[0];
-      var fromIdentifier = Expression.Parameter (relatedObjectType, fromIdentifierName);
+      var fromIdentifier = Expression.Parameter (_relatedObjectType, fromIdentifierName);
       
       // this SelectMany clause gets the from identifier plus the input to the from expression as its parameter
       var projectionExpression = Expression.Lambda (fromIdentifier, fromExpression.Parameters[0], fromIdentifier);

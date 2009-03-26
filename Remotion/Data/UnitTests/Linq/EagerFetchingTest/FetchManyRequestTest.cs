@@ -48,11 +48,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
     }
 
     [Test]
-    [Ignore ("TODO 1115")]
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch many request must yield a list of related objects, but 's => s.ID' "
+        + "yields 'System.Int32', which is not enumerable.\r\nParameter name: relatedObjectSelector")]
     public void Create_InvalidExpression_NoEnumerableOfT ()
     {
       new FetchManyRequest ((Expression<Func<Student, int>>) (s => s.ID));
-      Assert.Fail ("Expected exception");
     }
 
     [Test]
