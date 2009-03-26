@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
+using System.Linq;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
@@ -71,14 +72,76 @@ namespace Remotion.Data.Linq.EagerFetching
     }
 
     /// <summary>
+    /// Modifies the given query model's body clauses for fetching, adding new <see cref="AdditionalFromClause"/>s as needed. This
+    /// method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new fetch query model.
+    /// </summary>
+    /// <param name="fetchQueryModel">The fetch query model to modify.</param>
+    /// <param name="originalSelectClause">The original select clause <see cref="RelatedObjectSelector"/> should be applied to.</param>
+    protected abstract void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause);
+
+    /// <summary>
+    /// Creates the new select projection expression for the eager fetching query model. This
+    /// method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new query model.
+    /// </summary>
+    /// <param name="fetchQueryModel">The fetch query model for which to create a new select projection.</param>
+    /// <param name="originalSelectClause">The original select clause <see cref="RelatedObjectSelector"/> should be applied to.</param>
+    /// <returns>
+    /// A new projection expression that selects the related objects as indicated by <see cref="RelatedObjectSelector"/>. This expression
+    /// is later set as the projection of the <paramref name="fetchQueryModel"/>'s <see cref="QueryModel.SelectOrGroupClause"/>.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// The <see cref="QueryModel.SelectOrGroupClause"/> of the <paramref name="fetchQueryModel"/> passed to this method is a clone of
+    /// <paramref name="originalSelectClause"/> and can thus be used as a template for the returned projection expression. Note that
+    /// changes made in <see cref="ModifyBodyClausesForFetching"/> might invalidate some of the data contained in the clone. Implementors of this
+    /// method need to return a select projection that matches those changes.
+    /// </para>
+    /// <para>
+    /// The returned projection's parameter must match the objects flowing into the select clause from the <paramref name="fetchQueryModel"/>'s last
+    /// body clause (or its <see cref="QueryModel.MainFromClause"/> of no body clause exists).
+    /// </para>
+    /// </remarks>
+    protected abstract LambdaExpression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause);
+    
+    /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
     /// </summary>
     /// <param name="relatedObjectSelector">A lambda expression selecting related objects for a given query result object.</param>
-    /// <returns>An <see cref="CollectionFetchRequest"/> instance representing the fetch request.</returns>
+    /// <returns>An <see cref="FetchManyRequest"/> instance representing the fetch request.</returns>
     public FetchRequestBase GetOrAddInnerFetchRequest (LambdaExpression relatedObjectSelector)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
       return _innerFetchRequestCollection.GetOrAddFetchRequest (relatedObjectSelector);
+    }
+
+    /// <summary>
+    /// Creates the fetch query model for this <see cref="FetchRequestBase"/> from a given <paramref name="originalQueryModel"/>.
+    /// </summary>
+    /// <param name="originalQueryModel">The original query model to create a fetch query from.</param>
+    /// <returns>
+    /// A new <see cref="QueryModel"/> which represents the same query as <paramref name="originalQueryModel"/> but selecting
+    /// the objects described by <see cref="RelatedObjectSelector"/> instead of the objects selected by the <paramref name="originalQueryModel"/>.
+    /// </returns>
+    public QueryModel CreateFetchQueryModel (QueryModel originalQueryModel)
+    {
+      ArgumentUtility.CheckNotNull ("originalQueryModel", originalQueryModel);
+
+      var originalSelectClause = originalQueryModel.SelectOrGroupClause as SelectClause;
+      if (originalSelectClause == null)
+      {
+        var message = string.Format (
+            "Fetch requests only support queries with select clauses, but this query has a {0}.",
+            originalQueryModel.SelectOrGroupClause.GetType().Name);
+        throw new NotSupportedException (message);
+      }
+
+      var fetchQueryModel = originalQueryModel.Clone();
+      ModifyBodyClausesForFetching(fetchQueryModel, originalSelectClause);
+
+      SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause);
+      fetchQueryModel.SelectOrGroupClause = newSelectClause;
+
+      return fetchQueryModel;
     }
 
     /// <summary>
@@ -88,7 +151,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <param name="selectClauseToFetchFrom">The select clause yielding the objects to apply <see cref="RelatedObjectSelector"/> to in order to
     /// fetch the related object(s).</param>
     /// <returns>A <see cref="LambdaExpression"/> that returns the fetched object(s).</returns>
-    public LambdaExpression GetFetchSourceExpression (SelectClause selectClauseToFetchFrom)
+    protected LambdaExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
     {
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
 
@@ -119,39 +182,20 @@ namespace Remotion.Data.Linq.EagerFetching
           oldSelectParameter);
     }
 
-    /// <summary>
-    /// Creates the fetch query model for this <see cref="FetchRequestBase"/> from a given <paramref name="originalQueryModel"/>.
-    /// </summary>
-    /// <param name="originalQueryModel">The original query model to create a fetch query from.</param>
-    /// <returns>
-    /// A new <see cref="QueryModel"/> which represents the same query as <paramref name="originalQueryModel"/> but selecting
-    /// the objects described by <see cref="RelatedObjectSelector"/> instead of the objects selected by the <paramref name="originalQueryModel"/>.
-    /// </returns>
-    public QueryModel CreateFetchQueryModel (QueryModel originalQueryModel)
+    private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
-      ArgumentUtility.CheckNotNull ("originalQueryModel", originalQueryModel);
+      var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel, originalSelectClause);
+      var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
+      var newSelectClause = new SelectClause (previousClauseOfNewClause, newSelectProjection);
 
-      var originalSelectClause = originalQueryModel.SelectOrGroupClause as SelectClause;
-      if (originalSelectClause == null)
+      IClause previousClause = newSelectClause;
+      foreach (var originalResultModifierClause in originalSelectClause.ResultModifierClauses)
       {
-        var message = string.Format (
-            "Fetch requests only support queries with select clauses, but this query has a {0}.",
-            originalQueryModel.SelectOrGroupClause.GetType().Name);
-        throw new NotSupportedException (message);
+        var clonedResultModifierClause = originalResultModifierClause.Clone (previousClause, newSelectClause);
+        newSelectClause.AddResultModifierData (clonedResultModifierClause);
+        previousClause = clonedResultModifierClause;
       }
-
-      var fetchQueryModel = originalQueryModel.Clone();
-      ModifyQueryModelForFetching(fetchQueryModel, originalSelectClause);
-
-      return fetchQueryModel;
+      return newSelectClause;
     }
-
-    /// <summary>
-    /// Modifies the given query model for fetching, adding new <see cref="AdditionalFromClause"/>s and modifying the 
-    /// <see cref="QueryModel.SelectOrGroupClause"/> as needed.
-    /// </summary>
-    /// <param name="fetchQueryModel">The fetch query model to modify.</param>
-    /// <param name="originalSelectClause">The original select clause <see cref="RelatedObjectSelector"/> should be applied to.</param>
-    protected abstract void ModifyQueryModelForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause);
   }
 }

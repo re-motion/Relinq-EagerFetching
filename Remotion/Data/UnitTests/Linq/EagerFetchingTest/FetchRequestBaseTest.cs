@@ -21,9 +21,7 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.ParsingTest;
-using Rhino.Mocks;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 {
@@ -32,7 +30,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
   {
     private Expression<Func<Student, IEnumerable<int>>> _scoresFetchExpression;
     private Expression<Func<Student, IEnumerable<Student>>> _friendsFetchExpression;
-    private FetchRequestBase _friendsFetchRequest;
+    private TestFetchRequest _friendsFetchRequest;
     private IQueryable<Student> _studentFromStudentDetailQuery;
     private QueryModel _studentFromStudentDetailQueryModel;
 
@@ -91,7 +89,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      var fetchSourceExpression = _friendsFetchRequest.GetFetchSourceExpression (selectClause);
+      var fetchSourceExpression = _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
       Assert.That (fetchSourceExpression, Is.Not.Null);
     }
 
@@ -104,7 +102,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      var fetchSourceExpression = _friendsFetchRequest.GetFetchSourceExpression (selectClause);
+      var fetchSourceExpression = _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
 
       // expecting: sd => sd.Student.Friends
 
@@ -132,7 +130,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Expression<Func<Student_Detail, int, Student>> selectProjection = (sd, i) => sd.Student;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      _friendsFetchRequest.GetFetchSourceExpression (selectClause);
+      _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
     }
 
     [Test]
@@ -144,7 +142,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Expression<Func<Student>> selectProjection = () => null;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      _friendsFetchRequest.GetFetchSourceExpression (selectClause);
+      _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
     }
 
     [Test]
@@ -157,7 +155,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Expression<Func<Student_Detail, Student_Detail>> selectProjection = sd => sd;
       var selectClause = new SelectClause (previousClause, selectProjection);
 
-      _friendsFetchRequest.GetFetchSourceExpression (selectClause);
+      _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
     }
 
     [Test]
@@ -179,6 +177,55 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
 
       ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.QuerySource, _studentFromStudentDetailQueryModel.MainFromClause.QuerySource);
       Assert.That (fetchQueryModel.MainFromClause.Identifier, Is.EqualTo (_studentFromStudentDetailQueryModel.MainFromClause.Identifier));
+    }
+
+    [Test]
+    public void CreateFetchQueryModel_SelectClause ()
+    {
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).ProjectionExpression, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
+      Assert.That (fetchQueryModel.SelectOrGroupClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
+    }
+
+    [Test]
+    public void CreateFetchQueryModel_SelectClause_WithBodyClause ()
+    {
+      _friendsFetchRequest.FakeBodyClauseToAdd = ExpressionHelper.CreateMemberFromClause ();
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      Assert.That (fetchQueryModel.SelectOrGroupClause.PreviousClause, Is.SameAs (_friendsFetchRequest.FakeBodyClauseToAdd));
+    }
+
+    [Test]
+    public void CreateFetchQueryModel_ResultModifierClausesAreCloned ()
+    {
+      var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
+      var modifier = ExpressionHelper.CreateResultModifierClause (selectClause, selectClause);
+      selectClause.AddResultModifierData (modifier);
+
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      var fetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+
+      Assert.That (fetchSelectClause.ResultModifierClauses.Count, Is.EqualTo (1));
+      Assert.That (fetchSelectClause.ResultModifierClauses[0].ResultModifier, Is.SameAs (modifier.ResultModifier));
+    }
+
+    [Test]
+    public void CreateFetchQueryModel_ResultModifierClausesAreClonedWithCorrectPreviousClauses ()
+    {
+      var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
+      var modifier1 = ExpressionHelper.CreateResultModifierClause (selectClause, selectClause);
+      var modifier2 = ExpressionHelper.CreateResultModifierClause (modifier1, selectClause);
+      selectClause.AddResultModifierData (modifier1);
+      selectClause.AddResultModifierData (modifier2);
+
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      var fetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+
+      Assert.That (fetchSelectClause.ResultModifierClauses.Count, Is.EqualTo (2));
+      Assert.That (fetchSelectClause.ResultModifierClauses[0].SelectClause, Is.SameAs (fetchSelectClause));
+      Assert.That (fetchSelectClause.ResultModifierClauses[0].PreviousClause, Is.SameAs (fetchSelectClause));
+      Assert.That (fetchSelectClause.ResultModifierClauses[1].SelectClause, Is.SameAs (fetchSelectClause));
+      Assert.That (fetchSelectClause.ResultModifierClauses[1].PreviousClause, Is.SameAs (fetchSelectClause.ResultModifierClauses[0]));
     }
 
     [Test]

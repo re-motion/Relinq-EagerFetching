@@ -14,39 +14,25 @@
 // along with this framework; if not, see http://www.gnu.org/licenses.
 // 
 using System.Linq.Expressions;
-using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.EagerFetching;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
+namespace Remotion.Data.Linq.EagerFetching
 {
-  public class TestFetchRequest : FetchRequestBase
+  public class FetchOneRequest : FetchRequestBase
   {
-    public readonly LambdaExpression FakeSelectProjection = Expression.Lambda (Expression.Constant (null, typeof (Student)));
-
-    public IBodyClause FakeBodyClauseToAdd = null;
-
-    public TestFetchRequest (LambdaExpression relatedObjectSelector)
+    public FetchOneRequest (LambdaExpression relatedObjectSelector)
         : base(relatedObjectSelector)
     {
     }
 
     protected override void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
-      if (FakeBodyClauseToAdd != null)
-      {
-        fetchQueryModel.AddBodyClause (FakeBodyClauseToAdd);
-      }
+      // no modifications needed
     }
 
     protected override LambdaExpression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
-      return FakeSelectProjection;
-    }
-
-    public new LambdaExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
-    {
-      return base.CreateFetchSourceExpression (selectClauseToFetchFrom);
+      return CreateFetchSourceExpression (originalSelectClause);
     }
   }
 }

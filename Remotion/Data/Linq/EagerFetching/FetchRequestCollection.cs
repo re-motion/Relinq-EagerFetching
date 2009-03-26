@@ -22,7 +22,7 @@ using Remotion.Utilities;
 namespace Remotion.Data.Linq.EagerFetching
 {
   /// <summary>
-  /// Holds a number of <see cref="CollectionFetchRequest"/> instances keyed by the <see cref="MemberInfo"/> instances representing the relation members
+  /// Holds a number of <see cref="FetchManyRequest"/> instances keyed by the <see cref="MemberInfo"/> instances representing the relation members
   /// to be eager-fetched.
   /// </summary>
   public class FetchRequestCollection
@@ -38,7 +38,7 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 
-      var correspondingFetchRequest = new CollectionFetchRequest (relatedObjectSelector);
+      var correspondingFetchRequest = new FetchManyRequest (relatedObjectSelector);
 
       FetchRequestBase existingFetchRequest;
       if (_fetchRequests.TryGetValue (correspondingFetchRequest.RelationMember, out existingFetchRequest))

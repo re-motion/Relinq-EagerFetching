@@ -96,7 +96,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
           Is.EquivalentTo (new Expression[] {relatedObjectSelector1, relatedObjectSelector2}));
 
       var fetchRequestForExpression2 = result.FetchRequests.Where (fr => fr.RelatedObjectSelector == relatedObjectSelector2).Single ();
-      var lastFetchRequest = (CollectionFetchRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
+      var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
       Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForExpression2));
     }
 
@@ -159,7 +159,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs (relatedObjectSelector2));
 
       var fetchRequestForThenFetchExpression = result.FetchRequests[0].InnerFetchRequests.Single ();
-      var lastFetchRequest = (CollectionFetchRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
+      var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
       Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForThenFetchExpression));
     }
 
@@ -185,7 +185,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs (relatedObjectSelector3));
 
       var fetchRequestForThenFetchExpression2 = result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Single ();
-      var lastFetchRequest = (CollectionFetchRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
+      var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
       Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForThenFetchExpression2));
     }
 

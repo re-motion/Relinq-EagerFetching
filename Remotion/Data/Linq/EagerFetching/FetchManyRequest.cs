@@ -14,6 +14,7 @@
 // along with this framework; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
@@ -24,9 +25,9 @@ namespace Remotion.Data.Linq.EagerFetching
   /// <summary>
   /// Represents a relation collection property that should be eager-fetched by means of a lambda expression.
   /// </summary>
-  public class CollectionFetchRequest : FetchRequestBase
+  public class FetchManyRequest : FetchRequestBase
   {
-    public CollectionFetchRequest (LambdaExpression relatedObjectSelector)
+    public FetchManyRequest (LambdaExpression relatedObjectSelector)
         : base(relatedObjectSelector)
     {
       // TODO 1115: Test for IEnumerable<T>
@@ -54,7 +55,7 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
       ArgumentUtility.CheckNotNullOrEmpty ("fromIdentifierName", fromIdentifierName);
 
-      LambdaExpression fromExpression = GetFetchSourceExpression (selectClauseToFetchFrom);
+      LambdaExpression fromExpression = CreateFetchSourceExpression (selectClauseToFetchFrom);
 
       // for a select clause with a projection of x => expr, we generate a projectionExpression of (x, fromIdentifier) => fromIdentifier
       var relatedObjectType = ReflectionUtility.GetAscribedGenericArguments (fromExpression.Body.Type, typeof (IEnumerable<>))[0];
@@ -66,31 +67,22 @@ namespace Remotion.Data.Linq.EagerFetching
       return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression, projectionExpression);
     }
 
-    protected override void ModifyQueryModelForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
-      //if (typeof (IEnumerable).IsAssignableFrom (RelatedObjectSelector.Body.Type)) // TODO 1115: Replace if with polymorphism
-      {
-        var memberFromClause = CreateFetchFromClause (originalSelectClause, fetchQueryModel.GetUniqueIdentifier ("#fetch"));
-        fetchQueryModel.AddBodyClause (memberFromClause);
+      ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
+      ArgumentUtility.CheckNotNull ("originalSelectClause", originalSelectClause);
 
-        var newSelectClause = new SelectClause (memberFromClause, Expression.Lambda (memberFromClause.Identifier, memberFromClause.Identifier));
+      var memberFromClause = CreateFetchFromClause (originalSelectClause, fetchQueryModel.GetUniqueIdentifier ("#fetch"));
+      fetchQueryModel.AddBodyClause (memberFromClause);
+    }
 
-        IClause previousClause = newSelectClause;
-        foreach (var originalResultModifierClause in originalSelectClause.ResultModifierClauses)
-        {
-          var clonedResultModifierClause = originalResultModifierClause.Clone (previousClause, newSelectClause);
-          newSelectClause.AddResultModifierData (clonedResultModifierClause);
-          previousClause = clonedResultModifierClause;
-        }
+    protected override LambdaExpression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    {
+      ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
+      ArgumentUtility.CheckNotNull ("originalSelectClause", originalSelectClause);
 
-        fetchQueryModel.SelectOrGroupClause = newSelectClause;
-      }
-      //else // TODO 1115: move this to another subclass of FetchRequestBase
-      //{
-      //  var fetchSourceExpression = GetFetchSourceExpression (originalSelectClause);
-      //  var newSelectClause = new SelectClause (fetchQueryModel.SelectOrGroupClause.PreviousClause, fetchSourceExpression);
-      //  fetchQueryModel.SelectOrGroupClause = newSelectClause;
-      //}
+      var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Last();
+      return Expression.Lambda (memberFromClause.Identifier, memberFromClause.Identifier);
     }
   }
 }
