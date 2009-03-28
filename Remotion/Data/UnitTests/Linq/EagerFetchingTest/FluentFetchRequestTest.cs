@@ -27,7 +27,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
   public class FluentFetchRequestTest
   {
     [Test]
-    public void ThenFetch ()
+    public void ThenFetchMany ()
     {
       var originatingQuery = ExpressionHelper.CreateQuerySource_Detail();
       var fluentFetchRequest = 
@@ -36,7 +36,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Expression<Func<Student, IEnumerable<int>>> relatedObjectSelector = s => s.Scores;
       var newRequest = fluentFetchRequest.ThenFetchMany (relatedObjectSelector);
       Assert.That (newRequest, Is.InstanceOfType (typeof (FluentFetchRequest<Student_Detail, int>)));
-      Assert.That (newRequest.Expression, Is.InstanceOfType (typeof (ThenFetchExpression)));
+      Assert.That (newRequest.Expression, Is.InstanceOfType (typeof (ThenFetchManyExpression)));
       Assert.That (((ThenFetchExpression) newRequest.Expression).Operand, Is.SameAs (fluentFetchRequest.Expression));
       Assert.That (((ThenFetchExpression) newRequest.Expression).RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
     }
@@ -51,7 +51,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
       Expression<Func<Student, int>> relatedObjectSelector = s => s.ID;
       var newRequest = fluentFetchRequest.ThenFetchOne (relatedObjectSelector);
       Assert.That (newRequest, Is.InstanceOfType (typeof (FluentFetchRequest<Student_Detail, int>)));
-      Assert.That (newRequest.Expression, Is.InstanceOfType (typeof (ThenFetchExpression)));
+      Assert.That (newRequest.Expression, Is.InstanceOfType (typeof (ThenFetchOneExpression)));
       Assert.That (((ThenFetchExpression) newRequest.Expression).Operand, Is.SameAs (fluentFetchRequest.Expression));
       Assert.That (((ThenFetchExpression) newRequest.Expression).RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
     }

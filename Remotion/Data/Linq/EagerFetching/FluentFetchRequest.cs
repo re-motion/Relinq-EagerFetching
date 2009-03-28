@@ -29,7 +29,7 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 
-      var newExpression = new ThenFetchExpression (Expression, relatedObjectSelector);
+      var newExpression = new ThenFetchManyExpression (Expression, relatedObjectSelector);
       return new FluentFetchRequest<TQueried, TRelated> ((QueryProviderBase) Provider, newExpression);
     }
 
@@ -45,7 +45,7 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 
-      var newExpression = new ThenFetchExpression (Expression, relatedObjectSelector);
+      var newExpression = new ThenFetchOneExpression (Expression, relatedObjectSelector);
       return new FluentFetchRequest<TQueried, TRelated> ((QueryProviderBase) Provider, newExpression);
     }
   }

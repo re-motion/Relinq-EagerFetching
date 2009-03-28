@@ -25,12 +25,12 @@ namespace Remotion.Data.Linq.EagerFetching
   /// <see cref="Remotion.Data.Linq.ExtensionMethods.ExtensionMethods.FetchMany{TOriginating,TRelated}"/>
   /// and analyzed by <see cref="FetchFilteringExpressionTreeVisitor"/>.
   /// </summary>
-  public class FetchExpression : Expression
+  public abstract class FetchExpression : Expression
   {
     private readonly Expression _operand;
     private readonly LambdaExpression _relatedObjectSelector;
 
-    public FetchExpression (Expression operand, LambdaExpression relatedObjectSelector)
+    protected FetchExpression (Expression operand, LambdaExpression relatedObjectSelector)
       : base ((ExpressionType) int.MaxValue, ArgumentUtility.CheckNotNull ("operand", operand).Type)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
@@ -54,9 +54,6 @@ namespace Remotion.Data.Linq.EagerFetching
       return string.Format ("fetch {0} in {1}", RelatedObjectSelector, Operand);
     }
 
-    public FetchRequestBase CreateFetchRequest ()
-    {
-      return new FetchManyRequest (RelatedObjectSelector);
-    }
+    public abstract FetchRequestBase CreateFetchRequest ();
   }
 }
