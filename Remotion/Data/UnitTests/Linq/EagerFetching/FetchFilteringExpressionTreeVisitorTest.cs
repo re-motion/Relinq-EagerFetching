@@ -23,7 +23,7 @@ using System.Linq;
 using Remotion.Data.Linq.Parsing;
 using Remotion.Development.UnitTesting;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
+namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
   [TestFixture]
   public class FetchFilteringExpressionTreeVisitorTest

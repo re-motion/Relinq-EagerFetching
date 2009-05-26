@@ -20,7 +20,7 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetchingTest
+namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
   [TestFixture]
   public class FetchRequestCollectionTest
