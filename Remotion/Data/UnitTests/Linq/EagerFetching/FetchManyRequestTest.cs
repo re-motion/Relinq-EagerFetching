@@ -111,12 +111,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // expecting: from studi in sd.Student.Friends
       //            projectionExpression: (sd, studi) => studi
 
-      Assert.That (clause.ProjectionExpression.Parameters.Count, Is.EqualTo (2));
-      Assert.That (clause.ProjectionExpression.Parameters[0], Is.SameAs (selectProjection.Parameters[0]));
-      Assert.That (clause.ProjectionExpression.Parameters[1].Name, Is.EqualTo ("studi"));
-      Assert.That (clause.ProjectionExpression.Parameters[1].Type, Is.EqualTo (typeof (Student)));
+      Assert.That (clause.ResultSelector.Parameters.Count, Is.EqualTo (2));
+      Assert.That (clause.ResultSelector.Parameters[0], Is.SameAs (selectProjection.Parameters[0]));
+      Assert.That (clause.ResultSelector.Parameters[1].Name, Is.EqualTo ("studi"));
+      Assert.That (clause.ResultSelector.Parameters[1].Type, Is.EqualTo (typeof (Student)));
 
-      Assert.That (clause.ProjectionExpression.Body, Is.SameAs (clause.ProjectionExpression.Parameters[1]));
+      Assert.That (clause.ResultSelector.Body, Is.SameAs (clause.ResultSelector.Parameters[1]));
     }
 
     [Test]

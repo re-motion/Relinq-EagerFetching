@@ -52,7 +52,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// </summary>
     /// <param name="selectClauseToFetchFrom">The <see cref="SelectClause"/> that is used as a template to fetch from. The new 
     /// <see cref="MemberFromClause"/> is created in such a way that it can replace <paramref name="selectClauseToFetchFrom"/>. Its 
-    /// <see cref="AdditionalFromClause.ProjectionExpression"/> selects the fetched related objects.</param>
+    /// <see cref="AdditionalFromClause.ResultSelector"/> selects the fetched related objects.</param>
     /// <param name="fromIdentifierName">The name of the <see cref="FromClauseBase.Identifier"/> to use for the new <see cref="MemberFromClause"/>.</param>
     /// <returns>A new <see cref="MemberFromClause"/> representing the <see cref="FetchRequestBase.RelatedObjectSelector"/>.</returns>
     /// <remarks>
