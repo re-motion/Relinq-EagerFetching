@@ -158,30 +158,30 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
 
-      // if (selectClauseToFetchFrom.ProjectionExpression.Parameters.Count != 1) // TODO 1096: Use this condition after COMMONS-1096
-      if (selectClauseToFetchFrom.ProjectionExpression.Parameters.Count < 1)
+      // if (selectClauseToFetchFrom.Selector.Parameters.Count != 1) // TODO 1096: Use this condition after COMMONS-1096
+      if (selectClauseToFetchFrom.Selector.Parameters.Count < 1)
       {
         var message = string.Format ("The given SelectClause contains an invalid projection expression '{0}'. Expected one parameter, but found {1}.",
-                                     selectClauseToFetchFrom.ProjectionExpression,
-                                     selectClauseToFetchFrom.ProjectionExpression.Parameters.Count);
+                                     selectClauseToFetchFrom.Selector,
+                                     selectClauseToFetchFrom.Selector.Parameters.Count);
         throw new ArgumentException (message, "selectClauseToFetchFrom");
       }
 
-      var oldSelectParameter = selectClauseToFetchFrom.ProjectionExpression.Parameters[0];
-      if (!RelationMember.DeclaringType.IsAssignableFrom (selectClauseToFetchFrom.ProjectionExpression.Body.Type))
+      var oldSelectParameter = selectClauseToFetchFrom.Selector.Parameters[0];
+      if (!RelationMember.DeclaringType.IsAssignableFrom (selectClauseToFetchFrom.Selector.Body.Type))
       {
         var message = string.Format ("The given SelectClause contains an invalid projection expression '{0}'. In order to fetch the relation property "
                                      + "'{1}', the projection must yield objects of type '{2}', but it yields '{3}'.",
-                                     selectClauseToFetchFrom.ProjectionExpression,
+                                     selectClauseToFetchFrom.Selector,
                                      RelationMember.Name,
                                      RelationMember.DeclaringType.FullName,
-                                     selectClauseToFetchFrom.ProjectionExpression.Body.Type);
+                                     selectClauseToFetchFrom.Selector.Body.Type);
         throw new ArgumentException (message, "selectClauseToFetchFrom");
       }
 
       // for a select clause with a projection of x => expr, we generate a fromExpression of x => expr.RelationMember
       return Expression.Lambda (
-          Expression.MakeMemberAccess (selectClauseToFetchFrom.ProjectionExpression.Body, RelationMember),
+          Expression.MakeMemberAccess (selectClauseToFetchFrom.Selector.Body, RelationMember),
           oldSelectParameter);
     }
 

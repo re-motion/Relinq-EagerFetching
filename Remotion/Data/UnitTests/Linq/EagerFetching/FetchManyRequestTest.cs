@@ -154,7 +154,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <x>
 
       var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
-      Assert.That (selectClause.ProjectionExpression.Body, Is.SameAs (selectClause.ProjectionExpression.Parameters[0]));
+      Assert.That (selectClause.Selector.Body, Is.SameAs (selectClause.Selector.Parameters[0]));
     }
 
     [Test]
@@ -196,7 +196,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <y>
 
       var selectClause = (SelectClause) fetchQueryModel2.SelectOrGroupClause;
-      Assert.That (selectClause.ProjectionExpression.Body, Is.SameAs (selectClause.ProjectionExpression.Parameters[0]));
+      Assert.That (selectClause.Selector.Body, Is.SameAs (selectClause.Selector.Parameters[0]));
     }
   }
 }
