@@ -200,35 +200,17 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void CreateFetchQueryModel_ResultModifierClausesAreCloned ()
     {
       var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
-      var modifier = ExpressionHelper.CreateResultModifierClause (selectClause, selectClause);
-      selectClause.AddResultModifierData (modifier);
+      var modifier = ExpressionHelper.CreateResultModifierClause (selectClause);
+      selectClause.AddResultModification (modifier);
 
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
       var fetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
 
-      Assert.That (fetchSelectClause.ResultModifierClauses.Count, Is.EqualTo (1));
-      Assert.That (fetchSelectClause.ResultModifierClauses[0].ResultModifier, Is.SameAs (modifier.ResultModifier));
+      Assert.That (fetchSelectClause.ResultModifications.Count, Is.EqualTo (1));
+      Assert.That (fetchSelectClause.ResultModifications[0].GetType (), Is.SameAs (modifier.GetType ()));
+      Assert.That (fetchSelectClause.ResultModifications[0].SelectClause, Is.SameAs (fetchSelectClause));
     }
-
-    [Test]
-    public void CreateFetchQueryModel_ResultModifierClausesAreClonedWithCorrectPreviousClauses ()
-    {
-      var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
-      var modifier1 = ExpressionHelper.CreateResultModifierClause (selectClause, selectClause);
-      var modifier2 = ExpressionHelper.CreateResultModifierClause (modifier1, selectClause);
-      selectClause.AddResultModifierData (modifier1);
-      selectClause.AddResultModifierData (modifier2);
-
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      var fetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
-
-      Assert.That (fetchSelectClause.ResultModifierClauses.Count, Is.EqualTo (2));
-      Assert.That (fetchSelectClause.ResultModifierClauses[0].SelectClause, Is.SameAs (fetchSelectClause));
-      Assert.That (fetchSelectClause.ResultModifierClauses[0].PreviousClause, Is.SameAs (fetchSelectClause));
-      Assert.That (fetchSelectClause.ResultModifierClauses[1].SelectClause, Is.SameAs (fetchSelectClause));
-      Assert.That (fetchSelectClause.ResultModifierClauses[1].PreviousClause, Is.SameAs (fetchSelectClause.ResultModifierClauses[0]));
-    }
-
+   
     [Test]
     [ExpectedException (typeof (NotSupportedException), 
         ExpectedMessage = "Fetch requests only support queries with select clauses, but this query has a GroupClause.")]

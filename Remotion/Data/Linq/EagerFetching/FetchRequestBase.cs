@@ -191,12 +191,10 @@ namespace Remotion.Data.Linq.EagerFetching
       var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
       var newSelectClause = new SelectClause (previousClauseOfNewClause, newSelectProjection);
 
-      IClause previousClause = newSelectClause;
-      foreach (var originalResultModifierClause in originalSelectClause.ResultModifierClauses)
+      foreach (var originalResultModifierClause in originalSelectClause.ResultModifications)
       {
-        var clonedResultModifierClause = originalResultModifierClause.Clone (previousClause, newSelectClause);
-        newSelectClause.AddResultModifierData (clonedResultModifierClause);
-        previousClause = clonedResultModifierClause;
+        var clonedResultModifierClause = originalResultModifierClause.Clone (newSelectClause);
+        newSelectClause.AddResultModification (clonedResultModifierClause);
       }
       return newSelectClause;
     }
