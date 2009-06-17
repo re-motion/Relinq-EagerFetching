@@ -158,7 +158,7 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
 
-      var selector = selectClauseToFetchFrom.Selector;
+      var selector = selectClauseToFetchFrom.LegacySelector;
 
       // TODO 1096: Remove
       // This was added to work around an issue with the name resolving mechanism: When a LINQ query ends with an additional from clause directlyy
@@ -205,7 +205,8 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel, originalSelectClause);
       var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
-      var newSelectClause = new SelectClause (previousClauseOfNewClause, newSelectProjection);
+      //TODO 1220: create select projection expression
+      var newSelectClause = new SelectClause (previousClauseOfNewClause, newSelectProjection, newSelectProjection.Body);
 
       foreach (var originalResultModifierClause in originalSelectClause.ResultModifications)
       {

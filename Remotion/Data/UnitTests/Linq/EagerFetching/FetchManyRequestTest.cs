@@ -61,8 +61,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
 
       var previousClause = ExpressionHelper.CreateClause();
-      Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
-      var selectClause = new SelectClause (previousClause, selectProjection);
+      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
+      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection, (ParameterExpression) selectProjection.Expression), selectProjection);
 
       var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
       Assert.That (clause, Is.Not.Null);
@@ -75,8 +75,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
 
       var previousClause = ExpressionHelper.CreateClause ();
-      Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
-      var selectClause = new SelectClause (previousClause, selectProjection);
+      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
+      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection, (ParameterExpression) selectProjection.Expression), selectProjection);
 
       var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
 
@@ -84,7 +84,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       //            fromExpression: sd => sd.Student.Friends
 
       Assert.That (clause.FromExpression.Parameters.Count, Is.EqualTo (1));
-      Assert.That (clause.FromExpression.Parameters[0], Is.SameAs (selectProjection.Parameters[0]));
+      Assert.That (clause.FromExpression.Parameters[0], Is.SameAs (selectClause.LegacySelector.Parameters[0]));
 
       var memberExpression = (MemberExpression) clause.FromExpression.Body;
       Assert.That (memberExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
@@ -103,8 +103,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
 
       var previousClause = ExpressionHelper.CreateClause ();
-      Expression<Func<Student_Detail, Student>> selectProjection = sd => sd.Student;
-      var selectClause = new SelectClause (previousClause, selectProjection);
+      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
+      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection, (ParameterExpression) selectProjection.Expression), selectProjection);
 
       var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
 
@@ -112,7 +112,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       //            projectionExpression: (sd, studi) => studi
 
       Assert.That (clause.ResultSelector.Parameters.Count, Is.EqualTo (2));
-      Assert.That (clause.ResultSelector.Parameters[0], Is.SameAs (selectProjection.Parameters[0]));
+      Assert.That (clause.ResultSelector.Parameters[0], Is.SameAs (selectClause.LegacySelector.Parameters[0]));
       Assert.That (clause.ResultSelector.Parameters[1].Name, Is.EqualTo ("studi"));
       Assert.That (clause.ResultSelector.Parameters[1].Type, Is.EqualTo (typeof (Student)));
 
@@ -154,7 +154,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <x>
 
       var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
-      Assert.That (selectClause.Selector.Body, Is.SameAs (selectClause.Selector.Parameters[0]));
+      Assert.That (selectClause.LegacySelector.Body, Is.SameAs (selectClause.LegacySelector.Parameters[0]));
     }
 
     [Test]
@@ -196,7 +196,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <y>
 
       var selectClause = (SelectClause) fetchQueryModel2.SelectOrGroupClause;
-      Assert.That (selectClause.Selector.Body, Is.SameAs (selectClause.Selector.Parameters[0]));
+      Assert.That (selectClause.LegacySelector.Body, Is.SameAs (selectClause.LegacySelector.Parameters[0]));
     }
   }
 }

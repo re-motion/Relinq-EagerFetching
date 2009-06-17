@@ -66,7 +66,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
       var expectedExpression = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student.OtherStudent);
-      ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
+      ExpressionTreeComparer.CheckAreEqualTrees (selectClause.LegacySelector, expectedExpression);
     }
 
     [Test]
@@ -83,7 +83,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var selectClause = (SelectClause) fetchQueryModel2.SelectOrGroupClause;
       var expectedExpression = ExpressionHelper.CreateLambdaExpression<Student_Detail, Student> (sd => sd.Student.OtherStudent.OtherStudent);
-      ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
+      ExpressionTreeComparer.CheckAreEqualTrees (selectClause.LegacySelector, expectedExpression);
     }
   }
 }
