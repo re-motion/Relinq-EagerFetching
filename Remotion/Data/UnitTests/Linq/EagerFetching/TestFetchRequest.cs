@@ -22,7 +22,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
   public class TestFetchRequest : FetchRequestBase
   {
-    public readonly LambdaExpression FakeSelectProjection = Expression.Lambda (Expression.Constant (null, typeof (Student)));
+    public readonly Expression FakeSelectProjection = Expression.Constant (null, typeof (Student));
 
     public IBodyClause FakeBodyClauseToAdd = null;
 
@@ -39,12 +39,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       }
     }
 
-    protected override LambdaExpression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
       return FakeSelectProjection;
     }
 
-    public new LambdaExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
+    public new MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
     {
       return base.CreateFetchSourceExpression (selectClauseToFetchFrom);
     }

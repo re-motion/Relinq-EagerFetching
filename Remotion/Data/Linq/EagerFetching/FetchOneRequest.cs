@@ -30,7 +30,7 @@ namespace Remotion.Data.Linq.EagerFetching
       // no modifications needed
     }
 
-    protected override LambdaExpression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
       return CreateFetchSourceExpression (originalSelectClause);
     }

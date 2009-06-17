@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Utilities;
 using System.Collections.Generic;
 
@@ -68,7 +69,7 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
       ArgumentUtility.CheckNotNullOrEmpty ("fromIdentifierName", fromIdentifierName);
 
-      LambdaExpression fromExpression = CreateFetchSourceExpression (selectClauseToFetchFrom);
+      LambdaExpression fromExpression = Expression.Lambda (CreateFetchSourceExpression (selectClauseToFetchFrom), selectClauseToFetchFrom.LegacySelector.Parameters[0]);
 
       // for a select clause with a projection of x => expr, we generate a projectionExpression of (x, fromIdentifier) => fromIdentifier
       var fromIdentifier = Expression.Parameter (_relatedObjectType, fromIdentifierName);
@@ -88,13 +89,13 @@ namespace Remotion.Data.Linq.EagerFetching
       fetchQueryModel.AddBodyClause (memberFromClause);
     }
 
-    protected override LambdaExpression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
       ArgumentUtility.CheckNotNull ("originalSelectClause", originalSelectClause);
 
       var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Last();
-      return Expression.Lambda (memberFromClause.Identifier, memberFromClause.Identifier);
+      return new QuerySourceReferenceExpression (memberFromClause);
     }
   }
 }

@@ -97,11 +97,11 @@ namespace Remotion.Data.Linq.EagerFetching
     /// method need to return a select projection that matches those changes.
     /// </para>
     /// <para>
-    /// The returned projection's parameter must match the objects flowing into the select clause from the <paramref name="fetchQueryModel"/>'s last
+    /// The returned projection must match the objects flowing into the select clause from the <paramref name="fetchQueryModel"/>'s last
     /// body clause (or its <see cref="QueryModel.MainFromClause"/> of no body clause exists).
     /// </para>
     /// </remarks>
-    protected abstract LambdaExpression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause);
+    protected abstract Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause);
     
     /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
@@ -148,17 +148,16 @@ namespace Remotion.Data.Linq.EagerFetching
     }
 
     /// <summary>
-    /// Gets a <see cref="LambdaExpression"/> that takes the same input as the given <paramref name="selectClauseToFetchFrom"/> and returns the
-    /// fetched object(s).
+    /// Gets an <see cref="Expression"/> that returns the fetched object(s).
     /// </summary>
     /// <param name="selectClauseToFetchFrom">The select clause yielding the objects to apply <see cref="RelatedObjectSelector"/> to in order to
     /// fetch the related object(s).</param>
-    /// <returns>A <see cref="LambdaExpression"/> that returns the fetched object(s).</returns>
-    protected LambdaExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
+    /// <returns>An <see cref="Expression"/> that returns the fetched object(s).</returns>
+    protected MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
     {
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
 
-      var selector = selectClauseToFetchFrom.LegacySelector;
+      var selector = selectClauseToFetchFrom.Selector;
 
       // TODO 1096: Remove
       // This was added to work around an issue with the name resolving mechanism: When a LINQ query ends with an additional from clause directlyy
@@ -168,45 +167,31 @@ namespace Remotion.Data.Linq.EagerFetching
       // used in such expressions, but the current mechanism will throw an exception for this identifier. Therefore, we cannot use the identifier
       // for the fetch source expression. Instead, we find the AdditionalFromClause corresponding to the SelectMany method call and use its
       // ResultSelector, which can be resolved correctly by name.
-      if (selector.Body is ParameterExpression && ((ParameterExpression) selector.Body).Name.StartsWith ("<generated>_"))
+      if (selector is ParameterExpression && ((ParameterExpression) selector).Name.StartsWith ("<generated>_"))
       {
         var additionalFromClause = (AdditionalFromClause) selectClauseToFetchFrom.PreviousClause;
         selector = additionalFromClause.ResultSelector;
       }
 
-      // if (selector.Parameters.Count != 1) // TODO 1096: Use this condition after COMMONS-1096
-      if (selector.Parameters.Count < 1)
+      if (!RelationMember.DeclaringType.IsAssignableFrom (selector.Type))
       {
-        var message = string.Format ("The given SelectClause contains an invalid projection expression '{0}'. Expected one parameter, but found {1}.",
-                                     selector,
-                                     selector.Parameters.Count);
-        throw new ArgumentException (message, "selectClauseToFetchFrom");
-      }
-
-      var oldSelectParameter = selector.Parameters[0];
-      if (!RelationMember.DeclaringType.IsAssignableFrom (selector.Body.Type))
-      {
-        var message = string.Format ("The given SelectClause contains an invalid projection expression '{0}'. In order to fetch the relation property "
-                                     + "'{1}', the projection must yield objects of type '{2}', but it yields '{3}'.",
+        var message = string.Format ("The given SelectClause contains an invalid selector '{0}'. In order to fetch the relation property "
+                                     + "'{1}', the selector must yield objects of type '{2}', but it yields '{3}'.",
                                      selector,
                                      RelationMember.Name,
                                      RelationMember.DeclaringType.FullName,
-                                     selector.Body.Type);
+                                     selector.Type);
         throw new ArgumentException (message, "selectClauseToFetchFrom");
       }
-
-      // for a select clause with a projection of x => expr, we generate a fromExpression of x => expr.RelationMember
-      return Expression.Lambda (
-          Expression.MakeMemberAccess (selector.Body, RelationMember),
-          oldSelectParameter);
+      // for a select clause with a projection of expr, we generate a fetch source expression of expr.RelationMember
+      return Expression.MakeMemberAccess (selector, RelationMember);
     }
 
     private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause)
     {
       var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel, originalSelectClause);
       var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
-      //TODO 1220: create select projection expression
-      var newSelectClause = new SelectClause (previousClauseOfNewClause, newSelectProjection, newSelectProjection.Body);
+      var newSelectClause = new SelectClause (previousClauseOfNewClause, Expression.Lambda (newSelectProjection, originalSelectClause.LegacySelector.Parameters[0]), newSelectProjection);
 
       foreach (var originalResultModifierClause in originalSelectClause.ResultModifications)
       {

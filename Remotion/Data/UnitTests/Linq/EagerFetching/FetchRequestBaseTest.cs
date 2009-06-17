@@ -107,18 +107,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       // expecting: sd => sd.Student.Friends
 
-      Assert.That (fetchSourceExpression.Parameters.Count, Is.EqualTo (1));
-      Assert.That (fetchSourceExpression.Parameters[0], Is.SameAs (selectClause.LegacySelector.Parameters[0]));
+      Assert.That (fetchSourceExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
 
-      var memberExpression = (MemberExpression) fetchSourceExpression.Body;
-      Assert.That (memberExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
-
-      var innerMemberExpression = (MemberExpression) memberExpression.Expression;
+      var innerMemberExpression = (MemberExpression) fetchSourceExpression.Expression;
       Assert.That (innerMemberExpression.Member, Is.EqualTo (typeof (Student_Detail).GetProperty ("Student")));
-
-      var innermostParameterExpression = innerMemberExpression.Expression as ParameterExpression;
-      Assert.That (innermostParameterExpression, Is.Not.Null);
-      Assert.That (innermostParameterExpression, Is.SameAs (fetchSourceExpression.Parameters[0]));
+      Assert.That (innerMemberExpression.Expression, Is.SameAs (selectProjection.Expression));
     }
 
     [Test]
@@ -135,21 +128,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression "
-        + "'() => null'. Expected one parameter, but found 0.\r\nParameter name: selectClauseToFetchFrom")]
-    public void GetFetchSourceExpression_InvalidSelectProjection_WrongParameterCount_TooFew ()
-    {
-      var previousClause = ExpressionHelper.CreateClause ();
-      var selectProjection = ExpressionHelper.MakeExpression<object> (() => null);
-      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection), selectProjection);
-
-
-      _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression 'sd => sd'. "
-        + "In order to fetch the relation property 'Friends', the projection must yield objects of type 'Remotion.Data.UnitTests.Linq.Student', but "
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid selector 'sd'. "
+        + "In order to fetch the relation property 'Friends', the selector must yield objects of type 'Remotion.Data.UnitTests.Linq.Student', but "
         + "it yields 'Remotion.Data.UnitTests.Linq.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
     public void GetFetchSourceExpression_InvalidSelectProjection_WrongInputType ()
     {
@@ -185,8 +165,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void CreateFetchQueryModel_SelectClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).LegacySelector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
-      Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).Selector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection.Body));
+      Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).LegacySelector.Body, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
+      Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).Selector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
       Assert.That (fetchQueryModel.SelectOrGroupClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
     }
 
