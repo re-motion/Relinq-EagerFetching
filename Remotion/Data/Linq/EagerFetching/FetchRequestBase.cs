@@ -195,7 +195,7 @@ namespace Remotion.Data.Linq.EagerFetching
 
       foreach (var originalResultModifierClause in originalSelectClause.ResultModifications)
       {
-        var clonedResultModifierClause = originalResultModifierClause.Clone (newSelectClause);
+        var clonedResultModifierClause = originalResultModifierClause.Clone (newSelectClause, new FromClauseMapping()); // TODO 1229
         newSelectClause.AddResultModification (clonedResultModifierClause);
       }
       return newSelectClause;

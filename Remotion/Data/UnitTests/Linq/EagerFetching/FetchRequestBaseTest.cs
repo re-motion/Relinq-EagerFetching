@@ -182,7 +182,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void CreateFetchQueryModel_ResultModifierClausesAreCloned ()
     {
       var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
-      var modifier = ExpressionHelper.CreateResultModifierClause (selectClause);
+      var modifier = ExpressionHelper.CreateResultModification (selectClause);
       selectClause.AddResultModification (modifier);
 
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
