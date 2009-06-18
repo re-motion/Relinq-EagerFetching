@@ -84,7 +84,6 @@ namespace Remotion.Data.Linq.EagerFetching
     /// method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new query model.
     /// </summary>
     /// <param name="fetchQueryModel">The fetch query model for which to create a new select projection.</param>
-    /// <param name="originalSelectClause">The original select clause <see cref="RelatedObjectSelector"/> should be applied to.</param>
     /// <returns>
     /// A new projection expression that selects the related objects as indicated by <see cref="RelatedObjectSelector"/>. This expression
     /// is later set as the projection of the <paramref name="fetchQueryModel"/>'s <see cref="QueryModel.SelectOrGroupClause"/>.
@@ -92,7 +91,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <remarks>
     /// <para>
     /// The <see cref="QueryModel.SelectOrGroupClause"/> of the <paramref name="fetchQueryModel"/> passed to this method is a clone of
-    /// <paramref name="originalSelectClause"/> and can thus be used as a template for the returned projection expression. Note that
+    /// the original <see cref="SelectClause"/> and can thus be used as a template for the returned projection expression. Note that
     /// changes made in <see cref="ModifyBodyClausesForFetching"/> might invalidate some of the data contained in the clone. Implementors of this
     /// method need to return a select projection that matches those changes.
     /// </para>
@@ -101,7 +100,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// body clause (or its <see cref="QueryModel.MainFromClause"/> of no body clause exists).
     /// </para>
     /// </remarks>
-    protected abstract Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause);
+    protected abstract Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel);
     
     /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
@@ -192,7 +191,7 @@ namespace Remotion.Data.Linq.EagerFetching
 
     private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause, CloneContext cloneContext)
     {
-      var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel, originalSelectClause);
+      var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel);
       var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
       var newSelectClause = new SelectClause (previousClauseOfNewClause, Expression.Lambda (newSelectProjection, originalSelectClause.LegacySelector.Parameters[0]), newSelectProjection);
 

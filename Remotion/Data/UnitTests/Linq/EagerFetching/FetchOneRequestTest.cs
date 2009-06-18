@@ -20,6 +20,7 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
 
@@ -75,8 +76,13 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
+      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // select sd.Student.OtherStudent
+
       var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
       Assert.That (selectClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
+      var innerMemberExpression = (MemberExpression)((MemberExpression) selectClause.Selector).Expression; // sd.Student
+      Assert.That (((QuerySourceReferenceExpression) innerMemberExpression.Expression).ReferencedClause,  Is.SameAs (fetchQueryModel.MainFromClause));
     }
 
     [Test]

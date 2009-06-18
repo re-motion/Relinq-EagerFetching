@@ -89,10 +89,9 @@ namespace Remotion.Data.Linq.EagerFetching
       fetchQueryModel.AddBodyClause (memberFromClause);
     }
 
-    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
-      ArgumentUtility.CheckNotNull ("originalSelectClause", originalSelectClause);
 
       var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Last();
       return new QuerySourceReferenceExpression (memberFromClause);

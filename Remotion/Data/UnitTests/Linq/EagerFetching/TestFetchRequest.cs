@@ -39,7 +39,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       }
     }
 
-    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel)
     {
       return FakeSelectProjection;
     }
