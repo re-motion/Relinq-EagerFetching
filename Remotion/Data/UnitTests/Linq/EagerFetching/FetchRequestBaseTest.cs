@@ -21,8 +21,10 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Clauses.ExecutionStrategies;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
+using Rhino.Mocks;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
@@ -191,6 +193,29 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (fetchSelectClause.ResultModifications.Count, Is.EqualTo (1));
       Assert.That (fetchSelectClause.ResultModifications[0].GetType (), Is.SameAs (modifier.GetType ()));
       Assert.That (fetchSelectClause.ResultModifications[0].SelectClause, Is.SameAs (fetchSelectClause));
+    }
+
+    [Test]
+    public void CreateFetchQueryModel_SubQueriesAddedByResultModifierClone_GetCorrectParentQueryModel ()
+    {
+      var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
+      var newSubQuery = ExpressionHelper.CreateQueryModel ();
+      var resultModificationMock = MockRepository.GenerateMock<ResultModificationBase> (selectClause, CollectionExecutionStrategy.Instance);
+
+      resultModificationMock
+          .Expect (mock => mock.Clone (Arg<CloneContext>.Is.Anything))
+          .Return (ExpressionHelper.CreateResultModification ());
+      resultModificationMock
+          .Expect (mock => mock.Clone (Arg<CloneContext>.Is.Anything))
+          .WhenCalled (mi => ((CloneContext) mi.Arguments[0]).SubQueryRegistry.Add (newSubQuery))
+          .Return (ExpressionHelper.CreateResultModification());
+      resultModificationMock.Replay ();
+      selectClause.AddResultModification (resultModificationMock);
+
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+
+      resultModificationMock.VerifyAllExpectations();
+      Assert.That (newSubQuery.ParentQuery, Is.SameAs (fetchQueryModel));
     }
    
     [Test]

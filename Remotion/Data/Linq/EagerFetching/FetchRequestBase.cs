@@ -137,12 +137,14 @@ namespace Remotion.Data.Linq.EagerFetching
         throw new NotSupportedException (message);
       }
 
-      var cloneContext = new CloneContext (new ClonedClauseMapping(), new List<QueryModel>());
+      var cloneContext = new CloneContext (new ClonedClauseMapping(), new SubQueryRegistry());
       var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClonedClauseMapping);
       ModifyBodyClausesForFetching (fetchQueryModel, (SelectClause) fetchQueryModel.SelectOrGroupClause);
 
       SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause, cloneContext);
       fetchQueryModel.SelectOrGroupClause = newSelectClause;
+
+      cloneContext.SubQueryRegistry.UpdateAllParentQueries (fetchQueryModel);
 
       // TODO 1229: Test that subqueries in select clauses have their parent query model set correctly.
 
