@@ -146,8 +146,6 @@ namespace Remotion.Data.Linq.EagerFetching
 
       cloneContext.SubQueryRegistry.UpdateAllParentQueries (fetchQueryModel);
 
-      // TODO 1229: Test that subqueries in select clauses have their parent query model set correctly.
-
       return fetchQueryModel;
     }
 
