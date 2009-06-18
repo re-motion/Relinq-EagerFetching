@@ -88,7 +88,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var previousClause = ExpressionHelper.CreateClause ();
       var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection, (ParameterExpression) selectProjection.Expression), selectProjection);
+      var selectClause = new SelectClause (previousClause, selectProjection);
 
       var fetchSourceExpression = _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
       Assert.That (fetchSourceExpression, Is.Not.Null);
@@ -101,7 +101,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var previousClause = ExpressionHelper.CreateClause ();
       var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection, (ParameterExpression) selectProjection.Expression), selectProjection);
+      var selectClause = new SelectClause (previousClause, selectProjection);
 
       var fetchSourceExpression = _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
 
@@ -122,7 +122,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var previousClause = ExpressionHelper.CreateClause ();
       var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection, (ParameterExpression) selectProjection.Expression), selectProjection);
+      var selectClause = new SelectClause (previousClause, selectProjection);
 
       _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
     }
@@ -135,7 +135,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var previousClause = ExpressionHelper.CreateClause ();
       var selectProjection = (ParameterExpression) ExpressionHelper.MakeExpression<Student_Detail, Student_Detail> (sd => sd);
-      var selectClause = new SelectClause (previousClause, Expression.Lambda (selectProjection, selectProjection), selectProjection);
+      var selectClause = new SelectClause (previousClause, selectProjection);
 
       _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
     }
@@ -165,7 +165,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void CreateFetchQueryModel_SelectClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).LegacySelector.Body, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
       Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).Selector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
       Assert.That (fetchQueryModel.SelectOrGroupClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
     }

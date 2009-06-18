@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
-using System.Linq;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
@@ -41,7 +40,6 @@ namespace Remotion.Data.Linq.EagerFetching
       
       var selectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
       selectClause.Selector = newSelectProjection;
-      selectClause.LegacySelector = Expression.Lambda (newSelectProjection, selectClause.LegacySelector.Parameters[0]);
     }
   }
 }
