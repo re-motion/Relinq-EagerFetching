@@ -138,10 +138,11 @@ namespace Remotion.Data.Linq.EagerFetching
         throw new NotSupportedException (message);
       }
 
-      var fetchQueryModel = originalQueryModel.Clone();
+      var clonedClauseMapping = new ClonedClauseMapping ();
+      var fetchQueryModel = originalQueryModel.Clone (clonedClauseMapping);
       ModifyBodyClausesForFetching(fetchQueryModel, originalSelectClause);
 
-      SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause);
+      SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause, clonedClauseMapping);
       fetchQueryModel.SelectOrGroupClause = newSelectClause;
 
       return fetchQueryModel;
@@ -187,15 +188,17 @@ namespace Remotion.Data.Linq.EagerFetching
       return Expression.MakeMemberAccess (selector, RelationMember);
     }
 
-    private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause, ClonedClauseMapping clonedClauseMapping)
     {
       var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel, originalSelectClause);
       var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
       var newSelectClause = new SelectClause (previousClauseOfNewClause, Expression.Lambda (newSelectProjection, originalSelectClause.LegacySelector.Parameters[0]), newSelectProjection);
 
+      clonedClauseMapping.ReplaceMapping (originalSelectClause, newSelectClause);
+
       foreach (var originalResultModifierClause in originalSelectClause.ResultModifications)
       {
-        var clonedResultModifierClause = originalResultModifierClause.Clone (new ClonedClauseMapping()); // TODO 1229
+        var clonedResultModifierClause = originalResultModifierClause.Clone (clonedClauseMapping);
         newSelectClause.AddResultModification (clonedResultModifierClause);
       }
       return newSelectClause;
