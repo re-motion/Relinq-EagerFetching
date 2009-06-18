@@ -13,8 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
+using System.Linq;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
@@ -25,14 +27,21 @@ namespace Remotion.Data.Linq.EagerFetching
     {
     }
 
-    protected override void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    /// <summary>
+    /// Modifies the given query model for fetching, changing the <see cref="SelectClause.Selector"/> to the fetch source expression.
+    /// For example, a fetch request such as <c>FetchOne (x => x.Customer)</c> will be transformed into a <see cref="SelectClause"/> selecting
+    /// <c>y.Customer</c> (where <c>y</c> is what the query model originally selected).
+    /// This method is called by <see cref="ModifyFetchQueryModel"/> in the process of creating the new fetch query model.
+    /// </summary>
+    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
-      // no modifications needed
-    }
+      ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
-    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel)
-    {
-      return CreateFetchSourceExpression ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      var newSelectProjection = CreateFetchSourceExpression ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      
+      var selectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      selectClause.Selector = newSelectProjection;
+      selectClause.LegacySelector = Expression.Lambda (newSelectProjection, selectClause.LegacySelector.Parameters[0]);
     }
   }
 }

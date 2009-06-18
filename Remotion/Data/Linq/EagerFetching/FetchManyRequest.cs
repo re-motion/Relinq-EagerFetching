@@ -80,21 +80,28 @@ namespace Remotion.Data.Linq.EagerFetching
       return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression, projectionExpression);
     }
 
-    protected override void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause clonedOriginalSelectClause)
+    /// <summary>
+    /// Modifies the given query model for fetching, adding a <see cref="MemberFromClause"/> and changing the <see cref="SelectClause.Selector"/> to 
+    /// retrieve the result of the <see cref="MemberFromClause"/>.
+    /// For example, a fetch request such as <c>FetchMany (x => x.Orders)</c> will be transformed into a <see cref="MemberFromClause"/> selecting
+    /// <c>y.Orders</c> (where <c>y</c> is what the query model originally selected) and a <see cref="SelectClause"/> selecting the result of the
+    /// <see cref="MemberFromClause"/>.
+    /// This method is called by <see cref="ModifyFetchQueryModel"/> in the process of creating the new fetch query model.
+    /// </summary>
+    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
-      ArgumentUtility.CheckNotNull ("clonedOriginalSelectClause", clonedOriginalSelectClause);
 
-      var memberFromClause = CreateFetchFromClause (clonedOriginalSelectClause, fetchQueryModel.GetUniqueIdentifier ("#fetch"));
+      var memberFromClause = CreateFetchFromClause ((SelectClause) fetchQueryModel.SelectOrGroupClause, fetchQueryModel.GetUniqueIdentifier ("#fetch"));
       fetchQueryModel.AddBodyClause (memberFromClause);
-    }
 
-    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel)
-    {
-      ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
-
-      var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Last();
-      return new QuerySourceReferenceExpression (memberFromClause);
+      var newSelectProjection = new QuerySourceReferenceExpression (memberFromClause);
+      var originalFetchSelectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      var newSelectClause = new SelectClause (
+          memberFromClause, 
+          Expression.Lambda (newSelectProjection, originalFetchSelectClause.LegacySelector.Parameters[0]), 
+          newSelectProjection);
+      fetchQueryModel.SelectOrGroupClause = newSelectClause;
     }
   }
 }

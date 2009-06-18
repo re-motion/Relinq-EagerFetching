@@ -129,7 +129,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    [Ignore ("TODO 1220: Clone bug breaks this test, uncomment after 1229")]
     public void CreateFetchQueryModel_MemberFromClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
@@ -173,10 +172,10 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
       var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Single ();
       Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedClause, Is.SameAs (memberFromClause));
+      Assert.That (selectClause.PreviousClause, Is.SameAs (memberFromClause));
     }
 
     [Test]
-    [Ignore ("TODO 1220: Clone bug breaks this test, uncomment after 1229")]
     public void CreateFetchQueryModel_Twice_MemberFromClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);

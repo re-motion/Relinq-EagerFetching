@@ -31,17 +31,16 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
     }
 
-    protected override void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
+      var selectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      selectClause.LegacySelector = Expression.Lambda (FakeSelectProjection, selectClause.LegacySelector.Parameters[0]);
+      selectClause.Selector = FakeSelectProjection;
       if (FakeBodyClauseToAdd != null)
       {
         fetchQueryModel.AddBodyClause (FakeBodyClauseToAdd);
+        selectClause.PreviousClause = FakeBodyClauseToAdd;
       }
-    }
-
-    protected override Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel)
-    {
-      return FakeSelectProjection;
     }
 
     public new MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)

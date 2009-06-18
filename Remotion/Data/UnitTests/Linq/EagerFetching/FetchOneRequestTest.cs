@@ -57,7 +57,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    [Ignore ("TODO 1220: Clone bug breaks this test, uncomment after 1229")]
     public void CreateFetchQueryModel_ObjectFetch_SelectClause ()
     {
       var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
@@ -86,7 +85,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    [Ignore ("TODO 1220: Clone bug breaks this test, uncomment after 1229")]
     public void CreateFetchQueryModel_Twice_SelectClause ()
     {
       var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
@@ -99,7 +97,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select sd.Student.OtherStudent.OtherStudent
 
       var selectClause = (SelectClause) fetchQueryModel2.SelectOrGroupClause;
-      var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (fetchQueryModel.MainFromClause, sd => sd.Student.OtherStudent.OtherStudent);
+      var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (fetchQueryModel2.MainFromClause, sd => sd.Student.OtherStudent.OtherStudent);
       ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
     }
   }

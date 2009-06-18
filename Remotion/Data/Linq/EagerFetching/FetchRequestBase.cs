@@ -72,36 +72,13 @@ namespace Remotion.Data.Linq.EagerFetching
     }
 
     /// <summary>
-    /// Modifies the given query model's body clauses for fetching, adding new <see cref="AdditionalFromClause"/>s as needed. This
-    /// method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new fetch query model.
+    /// Modifies the given query model for fetching, adding new <see cref="MemberFromClause"/>s and changing the <see cref="SelectClause"/> as needed.
+    /// This method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
     /// <param name="fetchQueryModel">The fetch query model to modify.</param>
-    /// <param name="originalSelectClause">The original select clause <see cref="RelatedObjectSelector"/> should be applied to.</param>
-    protected abstract void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause);
+    protected abstract void ModifyFetchQueryModel (QueryModel fetchQueryModel);
 
-    /// <summary>
-    /// Creates the new select projection expression for the eager fetching query model. This
-    /// method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new query model.
-    /// </summary>
-    /// <param name="fetchQueryModel">The fetch query model for which to create a new select projection.</param>
-    /// <returns>
-    /// A new projection expression that selects the related objects as indicated by <see cref="RelatedObjectSelector"/>. This expression
-    /// is later set as the projection of the <paramref name="fetchQueryModel"/>'s <see cref="QueryModel.SelectOrGroupClause"/>.
-    /// </returns>
-    /// <remarks>
-    /// <para>
-    /// The <see cref="QueryModel.SelectOrGroupClause"/> of the <paramref name="fetchQueryModel"/> passed to this method is a clone of
-    /// the original <see cref="SelectClause"/> and can thus be used as a template for the returned projection expression. Note that
-    /// changes made in <see cref="ModifyBodyClausesForFetching"/> might invalidate some of the data contained in the clone. Implementors of this
-    /// method need to return a select projection that matches those changes.
-    /// </para>
-    /// <para>
-    /// The returned projection must match the objects flowing into the select clause from the <paramref name="fetchQueryModel"/>'s last
-    /// body clause (or its <see cref="QueryModel.MainFromClause"/> of no body clause exists).
-    /// </para>
-    /// </remarks>
-    protected abstract Expression CreateSelectProjectionForFetching (QueryModel fetchQueryModel);
-    
+
     /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
     /// </summary>
@@ -137,15 +114,27 @@ namespace Remotion.Data.Linq.EagerFetching
         throw new NotSupportedException (message);
       }
 
+      // clone the original query model, modify it as needed by the fetch request, then copy over the result modifications if needed
+      
       var cloneContext = new CloneContext (new ClonedClauseMapping(), new SubQueryRegistry());
       var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClonedClauseMapping);
-      ModifyBodyClausesForFetching (fetchQueryModel, (SelectClause) fetchQueryModel.SelectOrGroupClause);
+      var originalFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
 
-      SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause, cloneContext);
-      fetchQueryModel.SelectOrGroupClause = newSelectClause;
+      ModifyFetchQueryModel(fetchQueryModel);
+
+      var newFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+      if (newFetchSelectClause != originalFetchSelectClause)
+      {
+        cloneContext.ClonedClauseMapping.AddMapping (originalFetchSelectClause, newFetchSelectClause);
+
+        foreach (var originalResultModifierClause in originalFetchSelectClause.ResultModifications)
+        {
+          var clonedResultModifierClause = originalResultModifierClause.Clone (cloneContext);
+          newFetchSelectClause.AddResultModification (clonedResultModifierClause);
+        }
+      }
 
       cloneContext.SubQueryRegistry.UpdateAllParentQueries (fetchQueryModel);
-
       return fetchQueryModel;
     }
 
@@ -187,22 +176,6 @@ namespace Remotion.Data.Linq.EagerFetching
       }
       // for a select clause with a projection of expr, we generate a fetch source expression of expr.RelationMember
       return Expression.MakeMemberAccess (selector, RelationMember);
-    }
-
-    private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause, CloneContext cloneContext)
-    {
-      var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel);
-      var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
-      var newSelectClause = new SelectClause (previousClauseOfNewClause, Expression.Lambda (newSelectProjection, originalSelectClause.LegacySelector.Parameters[0]), newSelectProjection);
-
-      cloneContext.ClonedClauseMapping.ReplaceMapping (originalSelectClause, newSelectClause);
-
-      foreach (var originalResultModifierClause in originalSelectClause.ResultModifications)
-      {
-        var clonedResultModifierClause = originalResultModifierClause.Clone (cloneContext);
-        newSelectClause.AddResultModification (clonedResultModifierClause);
-      }
-      return newSelectClause;
     }
   }
 }
