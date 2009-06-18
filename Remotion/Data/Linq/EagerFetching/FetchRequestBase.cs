@@ -138,12 +138,14 @@ namespace Remotion.Data.Linq.EagerFetching
         throw new NotSupportedException (message);
       }
 
-      var clonedClauseMapping = new ClonedClauseMapping ();
-      var fetchQueryModel = originalQueryModel.Clone (clonedClauseMapping);
+      var cloneContext = new CloneContext (new ClonedClauseMapping(), new List<QueryModel>());
+      var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClonedClauseMapping);
       ModifyBodyClausesForFetching (fetchQueryModel, (SelectClause) fetchQueryModel.SelectOrGroupClause);
 
-      SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause, clonedClauseMapping);
+      SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause, cloneContext);
       fetchQueryModel.SelectOrGroupClause = newSelectClause;
+
+      // TODO 1229: Test that subqueries in select clauses have their parent query model set correctly.
 
       return fetchQueryModel;
     }
@@ -188,17 +190,17 @@ namespace Remotion.Data.Linq.EagerFetching
       return Expression.MakeMemberAccess (selector, RelationMember);
     }
 
-    private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause, ClonedClauseMapping clonedClauseMapping)
+    private SelectClause CreateNewSelectClause (QueryModel fetchQueryModel, SelectClause originalSelectClause, CloneContext cloneContext)
     {
       var newSelectProjection = CreateSelectProjectionForFetching (fetchQueryModel, originalSelectClause);
       var previousClauseOfNewClause = fetchQueryModel.BodyClauses.LastOrDefault () ?? (IClause) fetchQueryModel.MainFromClause;
       var newSelectClause = new SelectClause (previousClauseOfNewClause, Expression.Lambda (newSelectProjection, originalSelectClause.LegacySelector.Parameters[0]), newSelectProjection);
 
-      clonedClauseMapping.ReplaceMapping (originalSelectClause, newSelectClause);
+      cloneContext.ClonedClauseMapping.ReplaceMapping (originalSelectClause, newSelectClause);
 
       foreach (var originalResultModifierClause in originalSelectClause.ResultModifications)
       {
-        var clonedResultModifierClause = originalResultModifierClause.Clone (clonedClauseMapping);
+        var clonedResultModifierClause = originalResultModifierClause.Clone (cloneContext);
         newSelectClause.AddResultModification (clonedResultModifierClause);
       }
       return newSelectClause;
