@@ -80,12 +80,12 @@ namespace Remotion.Data.Linq.EagerFetching
       return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression, projectionExpression);
     }
 
-    protected override void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause originalSelectClause)
+    protected override void ModifyBodyClausesForFetching (QueryModel fetchQueryModel, SelectClause clonedOriginalSelectClause)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
-      ArgumentUtility.CheckNotNull ("originalSelectClause", originalSelectClause);
+      ArgumentUtility.CheckNotNull ("clonedOriginalSelectClause", clonedOriginalSelectClause);
 
-      var memberFromClause = CreateFetchFromClause (originalSelectClause, fetchQueryModel.GetUniqueIdentifier ("#fetch"));
+      var memberFromClause = CreateFetchFromClause (clonedOriginalSelectClause, fetchQueryModel.GetUniqueIdentifier ("#fetch"));
       fetchQueryModel.AddBodyClause (memberFromClause);
     }
 

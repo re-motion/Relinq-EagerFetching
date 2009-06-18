@@ -150,6 +150,17 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
+    public void CreateFetchQueryModel_MemberFromClause_PreviousClauseIsClauseInNewQueryModel ()
+    {
+      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+
+      Assert.That (fetchQueryModel.BodyClauses.Count, Is.EqualTo (1));
+      var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Single ();
+
+      Assert.That (memberFromClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
+    }
+
+    [Test]
     public void CreateFetchQueryModel_SelectClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);

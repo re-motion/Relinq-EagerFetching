@@ -140,7 +140,7 @@ namespace Remotion.Data.Linq.EagerFetching
 
       var clonedClauseMapping = new ClonedClauseMapping ();
       var fetchQueryModel = originalQueryModel.Clone (clonedClauseMapping);
-      ModifyBodyClausesForFetching(fetchQueryModel, originalSelectClause);
+      ModifyBodyClausesForFetching (fetchQueryModel, (SelectClause) fetchQueryModel.SelectOrGroupClause);
 
       SelectClause newSelectClause = CreateNewSelectClause(fetchQueryModel, originalSelectClause, clonedClauseMapping);
       fetchQueryModel.SelectOrGroupClause = newSelectClause;

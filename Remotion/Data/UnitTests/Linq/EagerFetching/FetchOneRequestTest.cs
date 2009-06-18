@@ -71,6 +71,15 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
+    public void CreateFetchQueryModel_ObjectFetch_SelectClausee_PreviousClauseIsClauseInNewQueryModel ()
+    {
+      var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+
+      var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+      Assert.That (selectClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
+    }
+
+    [Test]
     [Ignore ("TODO 1220: Clone bug breaks this test, uncomment after 1229")]
     public void CreateFetchQueryModel_Twice_SelectClause ()
     {
