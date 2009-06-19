@@ -95,27 +95,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    public void CreateFetchFromClause_ProjectionExpression ()
-    {
-      // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
-
-      var previousClause = ExpressionHelper.CreateClause ();
-      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (previousClause, selectProjection);
-
-      var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
-
-      // expecting: from studi in sd.Student.Friends
-      //            projectionExpression: (sd, studi) => studi
-
-      Assert.That (clause.ResultSelector.Parameters.Count, Is.EqualTo (1));
-      Assert.That (clause.ResultSelector.Parameters[0].Name, Is.EqualTo ("studi"));
-      Assert.That (clause.ResultSelector.Parameters[0].Type, Is.EqualTo (typeof (Student)));
-
-      Assert.That (((ParameterExpression) clause.ResultSelector.Body).Name, Is.EqualTo ("studi"));
-    }
-
-    [Test]
     public void CreateFetchQueryModel ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);

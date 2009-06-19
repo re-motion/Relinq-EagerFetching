@@ -14,7 +14,6 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
@@ -52,8 +51,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <see cref="QueryModel"/> in order to construct an eager-fetch query.
     /// </summary>
     /// <param name="selectClauseToFetchFrom">The <see cref="SelectClause"/> that is used as a template to fetch from. The new 
-    /// <see cref="MemberFromClause"/> is created in such a way that it can replace <paramref name="selectClauseToFetchFrom"/>. Its 
-    /// <see cref="AdditionalFromClause.ResultSelector"/> selects the fetched related objects.</param>
+    /// <see cref="MemberFromClause"/> is created in such a way that it can replace <paramref name="selectClauseToFetchFrom"/>.</param>
     /// <param name="fromIdentifierName">The name of the <see cref="FromClauseBase.Identifier"/> to use for the new <see cref="MemberFromClause"/>.</param>
     /// <returns>A new <see cref="MemberFromClause"/> representing the <see cref="FetchRequestBase.RelatedObjectSelector"/>.</returns>
     /// <remarks>
@@ -71,14 +69,8 @@ namespace Remotion.Data.Linq.EagerFetching
 
       LambdaExpression fromExpression = Expression.Lambda (CreateFetchSourceExpression (selectClauseToFetchFrom));
 
-      // for a select clause with a projection of x => expr, we generate a projectionExpression of (x, fromIdentifier) => fromIdentifier
       var fromIdentifier = Expression.Parameter (_relatedObjectType, fromIdentifierName);
-      
-      // this SelectMany clause gets the from identifier plus the input to the from expression as its parameter
-      // TODO: the parameters of this SelectMany lambda are invalid, but we will remove the lambda anyway
-      var projectionExpression = Expression.Lambda (fromIdentifier, fromIdentifier);
-
-      return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression, projectionExpression);
+      return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression);
     }
 
     /// <summary>

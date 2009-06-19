@@ -150,20 +150,6 @@ namespace Remotion.Data.Linq.EagerFetching
 
       var selector = selectClauseToFetchFrom.Selector;
 
-      // TODO 1096: Remove
-      // This was added to work around an issue with the name resolving mechanism: When a LINQ query ends with an additional from clause directlyy
-      // followed by a select clause, the C# does not amit a trailing Select method call. Instead, it simply puts the projection of the select 
-      // clause into the ResultSelector of the SelectMany method call. We still add a Select clause to the query model with a generated
-      // Selector of the form "<generated>_0 => <generated>_0". A better field resolving mechanism will not depend on the names of the identifiers
-      // used in such expressions, but the current mechanism will throw an exception for this identifier. Therefore, we cannot use the identifier
-      // for the fetch source expression. Instead, we find the AdditionalFromClause corresponding to the SelectMany method call and use its
-      // ResultSelector, which can be resolved correctly by name.
-      if (selector is ParameterExpression && ((ParameterExpression) selector).Name.StartsWith ("<generated>_"))
-      {
-        var additionalFromClause = (AdditionalFromClause) selectClauseToFetchFrom.PreviousClause;
-        selector = additionalFromClause.ResultSelector;
-      }
-
       if (!RelationMember.DeclaringType.IsAssignableFrom (selector.Type))
       {
         var message = string.Format ("The given SelectClause contains an invalid selector '{0}'. In order to fetch the relation property "
