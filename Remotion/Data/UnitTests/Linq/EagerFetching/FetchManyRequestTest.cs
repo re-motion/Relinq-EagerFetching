@@ -84,7 +84,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // expecting: from studi in sd.Student.Friends
       //            fromExpression: sd => sd.Student.Friends
 
-      var memberExpression = (MemberExpression) clause.FromExpression.Body;
+      var memberExpression = (MemberExpression) clause.FromExpression;
       Assert.That (memberExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
 
       var innerMemberExpression = (MemberExpression) memberExpression.Expression;
@@ -118,8 +118,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var expectedFromExpression = 
           ExpressionHelper.Resolve<Student_Detail, IEnumerable<Student>> (fetchQueryModel.MainFromClause, sd => sd.Student.Friends);
       
-      ExpressionTreeComparer.CheckAreEqualTrees (memberFromClause.FromExpression, 
-          Expression.Lambda (expectedFromExpression));
+      ExpressionTreeComparer.CheckAreEqualTrees (memberFromClause.FromExpression, expectedFromExpression);
     }
 
     [Test]

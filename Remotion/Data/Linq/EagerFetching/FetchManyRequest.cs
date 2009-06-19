@@ -67,8 +67,7 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
       ArgumentUtility.CheckNotNullOrEmpty ("fromIdentifierName", fromIdentifierName);
 
-      LambdaExpression fromExpression = Expression.Lambda (CreateFetchSourceExpression (selectClauseToFetchFrom));
-
+      var fromExpression = CreateFetchSourceExpression (selectClauseToFetchFrom);
       var fromIdentifier = Expression.Parameter (_relatedObjectType, fromIdentifierName);
       return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression);
     }
