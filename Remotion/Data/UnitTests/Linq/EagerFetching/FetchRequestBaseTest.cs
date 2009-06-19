@@ -115,19 +115,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid projection expression " 
-        + "'(sd, i) => sd.Student'. Expected one parameter, but found 2.\r\nParameter name: selectClauseToFetchFrom")]
-    [Ignore ("TODO 1096: Enable this as soon as SelectMany clauses don't lead to invalid select projections any longer.")]
-    public void GetFetchSourceExpression_InvalidSelectProjection_WrongParameterCount_TooMany ()
-    {
-      var previousClause = ExpressionHelper.CreateClause ();
-      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (previousClause, selectProjection);
-
-      _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
-    }
-
-    [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid selector 'sd'. "
         + "In order to fetch the relation property 'Friends', the selector must yield objects of type 'Remotion.Data.UnitTests.Linq.Student', but "
         + "it yields 'Remotion.Data.UnitTests.Linq.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
