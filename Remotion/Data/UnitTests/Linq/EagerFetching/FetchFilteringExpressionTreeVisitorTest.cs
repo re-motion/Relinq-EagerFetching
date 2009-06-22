@@ -21,27 +21,19 @@ using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
 using System.Linq;
 using Remotion.Data.Linq.Parsing;
-using Remotion.Development.UnitTesting;
+using Remotion.Data.UnitTests.Linq.Parsing.ExpressionTreeVisitors;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
   [TestFixture]
   public class FetchFilteringExpressionTreeVisitorTest
   {
-    private FetchFilteringExpressionTreeVisitor _visitor;
-
-    [SetUp]
-    public void SetUp ()
-    {
-      _visitor = new FetchFilteringExpressionTreeVisitor ();
-    }
-
     [Test]
     public void Visit_OrdinaryExpression ()
     {
       var expression = ExpressionHelper.CreateExpression ();
 
-      var result = _visitor.Visit (expression);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (expression);
 
       Assert.That (result.NewExpression, Is.SameAs (expression));
       Assert.That (result.FetchRequests, Is.Empty);
@@ -54,7 +46,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression = new FetchManyExpression (innerExpression, relatedObjectSelector);
 
-      var result = _visitor.Visit (fetchExpression);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (fetchExpression);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
@@ -69,7 +61,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var fetchExpression = new FetchOneExpression (innerExpression, relatedObjectSelector);
 
-      var result = _visitor.Visit (fetchExpression);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (fetchExpression);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
@@ -85,7 +77,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchExpression = new FetchManyExpression (innerExpression, relatedObjectSelector);
       var unaryExpression = Expression.Quote (fetchExpression);
 
-      var result = _visitor.Visit (unaryExpression);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (unaryExpression);
 
       Assert.That (result.NewExpression, Is.InstanceOfType (typeof (UnaryExpression)));
       Assert.That (result.NewExpression.NodeType, Is.EqualTo(ExpressionType.Quote));
@@ -104,16 +96,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchExpression1 = new FetchManyExpression (innerExpression, relatedObjectSelector1);
       var fetchExpression2 = new FetchManyExpression (fetchExpression1, relatedObjectSelector2);
 
-      var result = _visitor.Visit (fetchExpression2);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (fetchExpression2);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (2));
       Assert.That (result.FetchRequests.Select (fr => fr.RelatedObjectSelector).ToArray(), 
           Is.EquivalentTo (new Expression[] {relatedObjectSelector1, relatedObjectSelector2}));
-
-      var fetchRequestForExpression2 = result.FetchRequests.Where (fr => fr.RelatedObjectSelector == relatedObjectSelector2).Single ();
-      var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
-      Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForExpression2));
     }
 
     [Test]
@@ -125,7 +113,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchExpression1 = new FetchManyExpression (innerExpression, relatedObjectSelector1);
       var fetchExpression2 = new FetchManyExpression (fetchExpression1, relatedObjectSelector2);
 
-      var result = _visitor.Visit (fetchExpression2);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (fetchExpression2);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
@@ -140,7 +128,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends);
       var thenFetchExpression = new ThenFetchManyExpression (innerExpression, relatedObjectSelector);
       
-      _visitor.Visit (thenFetchExpression);
+      FetchFilteringExpressionTreeVisitor.Visit (thenFetchExpression);
     }
 
     [Test]
@@ -154,7 +142,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var thenFetchExpression = new ThenFetchManyExpression (innerExpression, relatedObjectSelector1);
       var fetchExpression = new FetchManyExpression (thenFetchExpression, relatedObjectSelector2);
 
-      _visitor.Visit (fetchExpression);
+      FetchFilteringExpressionTreeVisitor.Visit (fetchExpression);
     }
 
     [Test]
@@ -166,7 +154,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchExpression = new FetchManyExpression (innerExpression, relatedObjectSelector1);
       var thenFetchExpression = new ThenFetchManyExpression (fetchExpression, relatedObjectSelector2);
 
-      var result = _visitor.Visit (thenFetchExpression);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (thenFetchExpression);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
@@ -176,8 +164,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var fetchRequestForThenFetchExpression = result.FetchRequests[0].InnerFetchRequests.Single ();
       Assert.That (fetchRequestForThenFetchExpression, Is.InstanceOfType (typeof (FetchManyRequest)));
-      var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
-      Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForThenFetchExpression));
     }
 
     [Test]
@@ -189,7 +175,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchExpression = new FetchManyExpression (innerExpression, relatedObjectSelector1);
       var thenFetchExpression = new ThenFetchOneExpression (fetchExpression, relatedObjectSelector2);
 
-      var result = _visitor.Visit (thenFetchExpression);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (thenFetchExpression);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
@@ -199,8 +185,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var fetchRequestForThenFetchExpression = result.FetchRequests[0].InnerFetchRequests.Single ();
       Assert.That (fetchRequestForThenFetchExpression, Is.InstanceOfType (typeof (FetchOneRequest)));
-      var lastFetchRequest = (FetchOneRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
-      Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForThenFetchExpression));
     }
 
     [Test]
@@ -214,7 +198,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var thenFetchExpression1 = new ThenFetchManyExpression (fetchExpression, relatedObjectSelector2);
       var thenFetchExpression2 = new ThenFetchManyExpression (thenFetchExpression1, relatedObjectSelector3);
 
-      var result = _visitor.Visit (thenFetchExpression2);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (thenFetchExpression2);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
@@ -223,10 +207,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().RelatedObjectSelector, Is.SameAs (relatedObjectSelector2));
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Count(), Is.EqualTo (1));
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs (relatedObjectSelector3));
-
-      var fetchRequestForThenFetchExpression2 = result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Single ();
-      var lastFetchRequest = (FetchManyRequest) PrivateInvoke.GetNonPublicField (_visitor, "_lastFetchRequest");
-      Assert.That (lastFetchRequest, Is.SameAs (fetchRequestForThenFetchExpression2));
     }
 
     [Test]
@@ -240,7 +220,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchExpression2 = new FetchManyExpression (fetchExpression1, relatedObjectSelector2);
       var thenFetchExpression = new ThenFetchManyExpression (fetchExpression2, relatedObjectSelector3);
 
-      var result = _visitor.Visit (thenFetchExpression);
+      var result = FetchFilteringExpressionTreeVisitor.Visit (thenFetchExpression);
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (2));
@@ -248,6 +228,15 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchResultForExpression2 = result.FetchRequests.Where (fr => fr.RelatedObjectSelector == relatedObjectSelector2).Single();
       Assert.That (fetchResultForExpression2.InnerFetchRequests.Count(), Is.EqualTo (1));
       Assert.That (fetchResultForExpression2.InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs(relatedObjectSelector3));
+    }
+
+    [Test]
+    public void VisitUnknownExpression_Ignored ()
+    {
+      var expression = new UnknownExpression (typeof (object));
+      var result =  FetchFilteringExpressionTreeVisitor.Visit (expression);
+
+      Assert.That (result.NewExpression, Is.SameAs (expression));
     }
   }
 }
