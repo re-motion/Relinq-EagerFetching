@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
-using System.Linq;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
@@ -116,7 +115,7 @@ namespace Remotion.Data.Linq.EagerFetching
 
       // clone the original query model, modify it as needed by the fetch request, then copy over the result modifications if needed
       
-      var cloneContext = new CloneContext (new ClonedClauseMapping(), new SubQueryRegistry());
+      var cloneContext = new CloneContext (new ClonedClauseMapping());
       var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClonedClauseMapping);
       var originalFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
 
@@ -133,8 +132,6 @@ namespace Remotion.Data.Linq.EagerFetching
           newFetchSelectClause.AddResultModification (clonedResultModifierClause);
         }
       }
-
-      cloneContext.SubQueryRegistry.UpdateAllParentQueries (fetchQueryModel);
       return fetchQueryModel;
     }
 

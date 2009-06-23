@@ -180,19 +180,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    public void CreateFetchQueryModel_SubQueriesAddedByResultModifierClone_GetCorrectParentQueryModel ()
-    {
-      var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
-      var resultModification = new ResultModificationWithSubQuery (selectClause);
-      selectClause.AddResultModification (resultModification);
-
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      var clonedResultModification = (ResultModificationWithSubQuery) ((SelectClause) fetchQueryModel.SelectOrGroupClause).ResultModifications[0];
-      Assert.That (clonedResultModification.SubQuery.ParentQuery, Is.SameAs (fetchQueryModel));
-    }
-   
-    [Test]
     [ExpectedException (typeof (NotSupportedException), 
         ExpectedMessage = "Fetch requests only support queries with select clauses, but this query has a GroupClause.")]
     public void CreateFetchQueryModel_GroupClauseNotSupported ()
