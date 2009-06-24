@@ -166,7 +166,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var memberFromClause1 = (MemberFromClause) fetchQueryModel2.BodyClauses.First ();
       var memberFromClause2 = (MemberFromClause) fetchQueryModel2.BodyClauses.Last ();
 
-      Assert.That (memberFromClause1.Identifier.Name, Is.Not.EqualTo (memberFromClause2.Identifier.Name));
+      Assert.That (memberFromClause1.ItemName, Is.Not.EqualTo (memberFromClause2.ItemName));
 
       Assert.That (((QuerySourceReferenceExpression) memberFromClause2.MemberExpression.Expression).ReferencedClause, Is.SameAs (memberFromClause1));
       Assert.That (memberFromClause2.MemberExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Scores")));

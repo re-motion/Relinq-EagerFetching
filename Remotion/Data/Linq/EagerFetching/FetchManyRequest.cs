@@ -52,7 +52,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// </summary>
     /// <param name="selectClauseToFetchFrom">The <see cref="SelectClause"/> that is used as a template to fetch from. The new 
     /// <see cref="MemberFromClause"/> is created in such a way that it can replace <paramref name="selectClauseToFetchFrom"/>.</param>
-    /// <param name="fromIdentifierName">The name of the <see cref="FromClauseBase.Identifier"/> to use for the new <see cref="MemberFromClause"/>.</param>
+    /// <param name="fromItemName">The name to be used for the <see cref="FromClauseBase.ItemName"/> property of the new <see cref="MemberFromClause"/>.</param>
     /// <returns>A new <see cref="MemberFromClause"/> representing the <see cref="FetchRequestBase.RelatedObjectSelector"/>.</returns>
     /// <remarks>
     /// <see cref="FetchRequestBase.CreateFetchQueryModel"/> uses the <see cref="MemberFromClause"/> returned by this method as follows:
@@ -62,14 +62,13 @@ namespace Remotion.Data.Linq.EagerFetching
     ///   <item>It generates a new <see cref="SelectClause"/> and attaches it to the clone.</item>
     /// </list>
     /// </remarks>
-    public MemberFromClause CreateFetchFromClause (SelectClause selectClauseToFetchFrom, string fromIdentifierName)
+    public MemberFromClause CreateFetchFromClause (SelectClause selectClauseToFetchFrom, string fromItemName)
     {
       ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
-      ArgumentUtility.CheckNotNullOrEmpty ("fromIdentifierName", fromIdentifierName);
+      ArgumentUtility.CheckNotNullOrEmpty ("fromItemName", fromItemName);
 
       var fromExpression = CreateFetchSourceExpression (selectClauseToFetchFrom);
-      var fromIdentifier = Expression.Parameter (_relatedObjectType, fromIdentifierName);
-      return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromIdentifier, fromExpression);
+      return new MemberFromClause (selectClauseToFetchFrom.PreviousClause, fromItemName, _relatedObjectType, fromExpression);
     }
 
     /// <summary>
