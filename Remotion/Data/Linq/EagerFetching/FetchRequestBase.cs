@@ -129,7 +129,7 @@ namespace Remotion.Data.Linq.EagerFetching
         foreach (var originalResultModifierClause in originalFetchSelectClause.ResultModifications)
         {
           var clonedResultModifierClause = originalResultModifierClause.Clone (cloneContext);
-          newFetchSelectClause.AddResultModification (clonedResultModifierClause);
+          newFetchSelectClause.ResultModifications.Add (clonedResultModifierClause);
         }
       }
       return fetchQueryModel;

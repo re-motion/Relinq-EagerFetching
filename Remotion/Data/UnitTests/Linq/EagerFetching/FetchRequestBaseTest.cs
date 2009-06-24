@@ -169,7 +169,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
       var modifier = ExpressionHelper.CreateResultModification (selectClause);
-      selectClause.AddResultModification (modifier);
+      selectClause.ResultModifications.Add (modifier);
 
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
       var fetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
