@@ -149,6 +149,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
+    [Ignore("TODO 1178")]
     public void CreateFetchQueryModel_Twice_MemberFromClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);

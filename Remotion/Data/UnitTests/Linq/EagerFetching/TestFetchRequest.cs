@@ -37,7 +37,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       selectClause.Selector = FakeSelectProjection;
       if (FakeBodyClauseToAdd != null)
       {
-        fetchQueryModel.AddBodyClause (FakeBodyClauseToAdd);
+        fetchQueryModel.BodyClauses.Add (FakeBodyClauseToAdd);
         selectClause.PreviousClause = FakeBodyClauseToAdd;
       }
     }

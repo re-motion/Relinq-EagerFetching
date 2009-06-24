@@ -84,7 +84,7 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
       var memberFromClause = CreateFetchFromClause ((SelectClause) fetchQueryModel.SelectOrGroupClause, fetchQueryModel.GetNewName ("#fetch"));
-      fetchQueryModel.AddBodyClause (memberFromClause);
+      fetchQueryModel.BodyClauses.Add (memberFromClause);
 
       var newSelector = new QuerySourceReferenceExpression (memberFromClause);
       var newSelectClause = new SelectClause (memberFromClause, newSelector);
