@@ -157,7 +157,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void CreateFetchQueryModel_ResultModifierClausesAreCloned ()
     {
       var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
-      var modifier = ExpressionHelper.CreateResultModification (selectClause);
+      var modifier = ExpressionHelper.CreateResultModification ();
       selectClause.ResultModifications.Add (modifier);
 
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
@@ -165,7 +165,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       Assert.That (fetchSelectClause.ResultModifications.Count, Is.EqualTo (1));
       Assert.That (fetchSelectClause.ResultModifications[0].GetType (), Is.SameAs (modifier.GetType ()));
-      Assert.That (fetchSelectClause.ResultModifications[0].SelectClause, Is.SameAs (fetchSelectClause));
     }
 
     [Test]
