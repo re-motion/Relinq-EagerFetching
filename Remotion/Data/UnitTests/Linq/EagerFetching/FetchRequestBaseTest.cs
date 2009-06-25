@@ -141,7 +141,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // from sd in ExpressionHelper.CreateQuerySource_Detail()
       // (same as in original query model)
 
-      ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.QuerySource, _studentFromStudentDetailQueryModel.MainFromClause.QuerySource);
+      ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.FromExpression, _studentFromStudentDetailQueryModel.MainFromClause.FromExpression);
       Assert.That (fetchQueryModel.MainFromClause.ItemName, Is.EqualTo (_studentFromStudentDetailQueryModel.MainFromClause.ItemName));
       Assert.That (fetchQueryModel.MainFromClause.ItemType, Is.SameAs (_studentFromStudentDetailQueryModel.MainFromClause.ItemType));
     }
