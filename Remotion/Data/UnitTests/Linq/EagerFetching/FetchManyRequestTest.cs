@@ -67,7 +67,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
       Assert.That (clause, Is.Not.Null);
-      Assert.That (clause.PreviousClause, Is.SameAs (previousClause));
     }
 
     [Test]
@@ -128,8 +127,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       Assert.That (fetchQueryModel.BodyClauses.Count, Is.EqualTo (1));
       var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Single ();
-
-      Assert.That (memberFromClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
     }
 
     [Test]
@@ -145,7 +142,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
       var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Single ();
       Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedClause, Is.SameAs (memberFromClause));
-      Assert.That (selectClause.PreviousClause, Is.SameAs (memberFromClause));
     }
 
     [Test]

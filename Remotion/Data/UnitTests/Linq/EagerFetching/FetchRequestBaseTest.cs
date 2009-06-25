@@ -154,15 +154,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
       Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).Selector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
-      Assert.That (fetchQueryModel.SelectOrGroupClause.PreviousClause, Is.SameAs (fetchQueryModel.MainFromClause));
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_SelectClause_WithBodyClause ()
-    {
-      _friendsFetchRequest.FakeBodyClauseToAdd = ExpressionHelper.CreateMemberFromClause ();
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (fetchQueryModel.SelectOrGroupClause.PreviousClause, Is.SameAs (_friendsFetchRequest.FakeBodyClauseToAdd));
     }
 
     [Test]
