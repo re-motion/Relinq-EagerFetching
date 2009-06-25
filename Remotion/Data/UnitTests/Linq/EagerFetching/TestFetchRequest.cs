@@ -36,10 +36,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var selectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
       selectClause.Selector = FakeSelectProjection;
       if (FakeBodyClauseToAdd != null)
-      {
         fetchQueryModel.BodyClauses.Add (FakeBodyClauseToAdd);
-        selectClause.PreviousClause = FakeBodyClauseToAdd;
-      }
     }
 
     public new MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)

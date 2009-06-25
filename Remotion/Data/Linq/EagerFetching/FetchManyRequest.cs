@@ -68,7 +68,7 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNullOrEmpty ("fromItemName", fromItemName);
 
       var fromExpression = CreateFetchSourceExpression (selectClauseToFetchFrom);
-      return new MemberFromClause (null, fromItemName, _relatedObjectType, fromExpression);
+      return new MemberFromClause (fromItemName, _relatedObjectType, fromExpression);
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ namespace Remotion.Data.Linq.EagerFetching
       fetchQueryModel.BodyClauses.Add (memberFromClause);
 
       var newSelector = new QuerySourceReferenceExpression (memberFromClause);
-      var newSelectClause = new SelectClause (memberFromClause, newSelector);
+      var newSelectClause = new SelectClause (newSelector);
       fetchQueryModel.SelectOrGroupClause = newSelectClause;
     }
   }

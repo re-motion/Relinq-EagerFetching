@@ -61,9 +61,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
 
-      var previousClause = ExpressionHelper.CreateClause();
       var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (previousClause, selectProjection);
+      var selectClause = new SelectClause (selectProjection);
 
       var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
       Assert.That (clause, Is.Not.Null);
@@ -74,9 +73,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
 
-      var previousClause = ExpressionHelper.CreateClause ();
       var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (previousClause, selectProjection);
+      var selectClause = new SelectClause (selectProjection);
 
       var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
 
