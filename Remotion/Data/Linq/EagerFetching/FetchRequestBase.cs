@@ -71,7 +71,8 @@ namespace Remotion.Data.Linq.EagerFetching
     }
 
     /// <summary>
-    /// Modifies the given query model for fetching, adding new <see cref="MemberFromClause"/>s and changing the <see cref="SelectClause"/> as needed.
+    /// Modifies the given query model for fetching, adding new <see cref="AdditionalFromClause"/> instances and changing the 
+    /// <see cref="SelectClause"/> as needed.
     /// This method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
     /// <param name="fetchQueryModel">The fetch query model to modify.</param>

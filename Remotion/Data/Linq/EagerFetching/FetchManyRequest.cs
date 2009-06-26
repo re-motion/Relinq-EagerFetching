@@ -47,43 +47,19 @@ namespace Remotion.Data.Linq.EagerFetching
     }
 
     /// <summary>
-    /// Creates a <see cref="MemberFromClause"/> that represents the <see cref="FetchRequestBase.RelatedObjectSelector"/>. This can be inserted into a 
-    /// <see cref="QueryModel"/> in order to construct an eager-fetch query.
-    /// </summary>
-    /// <param name="selectClauseToFetchFrom">The <see cref="SelectClause"/> that is used as a template to fetch from. The new 
-    /// <see cref="MemberFromClause"/> is created in such a way that it can replace <paramref name="selectClauseToFetchFrom"/>.</param>
-    /// <param name="fromItemName">The name to be used for the <see cref="FromClauseBase.ItemName"/> property of the new <see cref="MemberFromClause"/>.</param>
-    /// <returns>A new <see cref="MemberFromClause"/> representing the <see cref="FetchRequestBase.RelatedObjectSelector"/>.</returns>
-    /// <remarks>
-    /// <see cref="FetchRequestBase.CreateFetchQueryModel"/> uses the <see cref="MemberFromClause"/> returned by this method as follows:
-    /// <list type="number">
-    ///   <item>It clones the <see cref="QueryModel"/> representing the original query.</item>
-    ///   <item>It adds the <see cref="MemberFromClause"/> as the last body clause to the clone.</item>
-    ///   <item>It generates a new <see cref="SelectClause"/> and attaches it to the clone.</item>
-    /// </list>
-    /// </remarks>
-    public MemberFromClause CreateFetchFromClause (SelectClause selectClauseToFetchFrom, string fromItemName)
-    {
-      ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
-      ArgumentUtility.CheckNotNullOrEmpty ("fromItemName", fromItemName);
-
-      var fromExpression = CreateFetchSourceExpression (selectClauseToFetchFrom);
-      return new MemberFromClause (fromItemName, _relatedObjectType, fromExpression);
-    }
-
-    /// <summary>
-    /// Modifies the given query model for fetching, adding a <see cref="MemberFromClause"/> and changing the <see cref="SelectClause.Selector"/> to 
-    /// retrieve the result of the <see cref="MemberFromClause"/>.
-    /// For example, a fetch request such as <c>FetchMany (x => x.Orders)</c> will be transformed into a <see cref="MemberFromClause"/> selecting
+    /// Modifies the given query model for fetching, adding an <see cref="AdditionalFromClause"/> and changing the <see cref="SelectClause.Selector"/> to 
+    /// retrieve the result of the <see cref="AdditionalFromClause"/>.
+    /// For example, a fetch request such as <c>FetchMany (x => x.Orders)</c> will be transformed into a <see cref="AdditionalFromClause"/> selecting
     /// <c>y.Orders</c> (where <c>y</c> is what the query model originally selected) and a <see cref="SelectClause"/> selecting the result of the
-    /// <see cref="MemberFromClause"/>.
+    /// <see cref="AdditionalFromClause"/>.
     /// This method is called by <see cref="ModifyFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
     protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
-      var memberFromClause = CreateFetchFromClause ((SelectClause) fetchQueryModel.SelectOrGroupClause, fetchQueryModel.GetNewName ("#fetch"));
+      var fromExpression = CreateFetchSourceExpression ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      var memberFromClause = new AdditionalFromClause (fetchQueryModel.GetNewName ("#fetch"), _relatedObjectType, fromExpression);
       fetchQueryModel.BodyClauses.Add (memberFromClause);
 
       var newSelector = new QuerySourceReferenceExpression (memberFromClause);

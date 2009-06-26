@@ -57,41 +57,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    public void CreateFetchFromClause ()
-    {
-      // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
-
-      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (selectProjection);
-
-      var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
-      Assert.That (clause, Is.Not.Null);
-    }
-
-    [Test]
-    public void CreateFetchFromClause_FromExpression ()
-    {
-      // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
-
-      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (selectProjection);
-
-      var clause = _friendsFetchRequest.CreateFetchFromClause (selectClause, "studi");
-
-      // expecting: from studi in sd.Student.Friends
-      //            fromExpression: sd => sd.Student.Friends
-
-      var memberExpression = (MemberExpression) clause.FromExpression;
-      Assert.That (memberExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
-
-      var innerMemberExpression = (MemberExpression) memberExpression.Expression;
-      Assert.That (innerMemberExpression.Member, Is.EqualTo (typeof (Student_Detail).GetProperty ("Student")));
-
-      var innermostParameterExpression = (ParameterExpression) innerMemberExpression.Expression;
-      Assert.That (innermostParameterExpression.Name, Is.EqualTo ("sd"));
-    }
-
-    [Test]
     public void CreateFetchQueryModel ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
@@ -110,21 +75,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <x>
 
       Assert.That (fetchQueryModel.BodyClauses.Count, Is.EqualTo (1));
-      var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Single ();
+      var memberFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses.Single ();
 
       var expectedFromExpression = 
           ExpressionHelper.Resolve<Student_Detail, IEnumerable<Student>> (fetchQueryModel.MainFromClause, sd => sd.Student.Friends);
       
       ExpressionTreeComparer.CheckAreEqualTrees (memberFromClause.FromExpression, expectedFromExpression);
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_MemberFromClause_PreviousClauseIsClauseInNewQueryModel ()
-    {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      Assert.That (fetchQueryModel.BodyClauses.Count, Is.EqualTo (1));
-      var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Single ();
     }
 
     [Test]
@@ -138,7 +94,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <x>
 
       var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
-      var memberFromClause = (MemberFromClause) fetchQueryModel.BodyClauses.Single ();
+      var memberFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses.Single ();
       Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedClause, Is.SameAs (memberFromClause));
     }
 
@@ -157,13 +113,14 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <y>
 
       Assert.That (fetchQueryModel2.BodyClauses.Count, Is.EqualTo (2));
-      var memberFromClause1 = (MemberFromClause) fetchQueryModel2.BodyClauses.First ();
-      var memberFromClause2 = (MemberFromClause) fetchQueryModel2.BodyClauses.Last ();
+      var memberFromClause1 = (AdditionalFromClause) fetchQueryModel2.BodyClauses[0];
+      var memberFromClause2 = (AdditionalFromClause) fetchQueryModel2.BodyClauses[1];
 
       Assert.That (memberFromClause1.ItemName, Is.Not.EqualTo (memberFromClause2.ItemName));
 
-      Assert.That (((QuerySourceReferenceExpression) memberFromClause2.MemberExpression.Expression).ReferencedClause, Is.SameAs (memberFromClause1));
-      Assert.That (memberFromClause2.MemberExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Scores")));
+      var memberFromExpression = (MemberExpression) memberFromClause2.FromExpression;
+      Assert.That (((QuerySourceReferenceExpression) memberFromExpression.Expression).ReferencedClause, Is.SameAs (memberFromClause1));
+      Assert.That (memberFromExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Scores")));
     }
 
     [Test]
