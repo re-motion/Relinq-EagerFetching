@@ -125,8 +125,6 @@ namespace Remotion.Data.Linq.EagerFetching
       var newFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
       if (newFetchSelectClause != originalFetchSelectClause)
       {
-        cloneContext.ClauseMapping.AddMapping (originalFetchSelectClause, newFetchSelectClause);
-
         foreach (var originalResultModifierClause in originalFetchSelectClause.ResultModifications)
         {
           var clonedResultModifierClause = originalResultModifierClause.Clone (cloneContext);
