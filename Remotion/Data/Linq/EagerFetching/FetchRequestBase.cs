@@ -116,8 +116,8 @@ namespace Remotion.Data.Linq.EagerFetching
 
       // clone the original query model, modify it as needed by the fetch request, then copy over the result modifications if needed
       
-      var cloneContext = new CloneContext (new ClonedClauseMapping());
-      var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClonedClauseMapping);
+      var cloneContext = new CloneContext (new ClauseMapping());
+      var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClauseMapping);
       var originalFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
 
       ModifyFetchQueryModel(fetchQueryModel);
@@ -125,7 +125,7 @@ namespace Remotion.Data.Linq.EagerFetching
       var newFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
       if (newFetchSelectClause != originalFetchSelectClause)
       {
-        cloneContext.ClonedClauseMapping.AddMapping (originalFetchSelectClause, newFetchSelectClause);
+        cloneContext.ClauseMapping.AddMapping (originalFetchSelectClause, newFetchSelectClause);
 
         foreach (var originalResultModifierClause in originalFetchSelectClause.ResultModifications)
         {
