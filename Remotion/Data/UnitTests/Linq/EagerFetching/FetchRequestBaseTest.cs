@@ -158,13 +158,13 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var selectClause = (SelectClause) _studentFromStudentDetailQueryModel.SelectOrGroupClause;
       var modifier = ExpressionHelper.CreateResultModification ();
-      selectClause.ResultModifications.Add (modifier);
+      selectClause.ResultOperators.Add (modifier);
 
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
       var fetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
 
-      Assert.That (fetchSelectClause.ResultModifications.Count, Is.EqualTo (1));
-      Assert.That (fetchSelectClause.ResultModifications[0].GetType (), Is.SameAs (modifier.GetType ()));
+      Assert.That (fetchSelectClause.ResultOperators.Count, Is.EqualTo (1));
+      Assert.That (fetchSelectClause.ResultOperators[0].GetType (), Is.SameAs (modifier.GetType ()));
     }
 
     [Test]

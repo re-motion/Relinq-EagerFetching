@@ -125,10 +125,10 @@ namespace Remotion.Data.Linq.EagerFetching
       var newFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
       if (newFetchSelectClause != originalFetchSelectClause)
       {
-        foreach (var originalResultModifierClause in originalFetchSelectClause.ResultModifications)
+        foreach (var originalResultModifierClause in originalFetchSelectClause.ResultOperators)
         {
           var clonedResultModifierClause = originalResultModifierClause.Clone (cloneContext);
-          newFetchSelectClause.ResultModifications.Add (clonedResultModifierClause);
+          newFetchSelectClause.ResultOperators.Add (clonedResultModifierClause);
         }
       }
       return fetchQueryModel;
