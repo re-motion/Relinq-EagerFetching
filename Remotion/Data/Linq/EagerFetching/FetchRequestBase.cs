@@ -118,19 +118,9 @@ namespace Remotion.Data.Linq.EagerFetching
       
       var cloneContext = new CloneContext (new ClauseMapping());
       var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClauseMapping);
-      var originalFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
-
+      
       ModifyFetchQueryModel(fetchQueryModel);
 
-      var newFetchSelectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
-      if (newFetchSelectClause != originalFetchSelectClause)
-      {
-        foreach (var originalResultOperatorClause in originalFetchSelectClause.ResultOperators)
-        {
-          var clonedResultOperatorClause = originalResultOperatorClause.Clone (cloneContext);
-          newFetchSelectClause.ResultOperators.Add (clonedResultOperatorClause);
-        }
-      }
       return fetchQueryModel;
     }
 
