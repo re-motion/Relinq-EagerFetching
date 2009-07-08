@@ -30,7 +30,7 @@ namespace Remotion.Data.Linq.EagerFetching
     private readonly LambdaExpression _relatedObjectSelector;
 
     protected FetchExpression (Expression operand, LambdaExpression relatedObjectSelector)
-      : base ((ExpressionType) int.MaxValue, ArgumentUtility.CheckNotNull ("operand", operand).Type)
+        : base ((ExpressionType) int.MaxValue, ArgumentUtility.CheckNotNull ("operand", operand).Type)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
 

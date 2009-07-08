@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
+using System;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
@@ -22,7 +23,7 @@ namespace Remotion.Data.Linq.EagerFetching
   public class FetchOneRequest : FetchRequestBase
   {
     public FetchOneRequest (LambdaExpression relatedObjectSelector)
-        : base(relatedObjectSelector)
+        : base (relatedObjectSelector)
     {
     }
 
@@ -37,7 +38,7 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
       var newSelectProjection = CreateFetchSourceExpression ((SelectClause) fetchQueryModel.SelectOrGroupClause);
-      
+
       var selectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
       selectClause.Selector = newSelectProjection;
     }

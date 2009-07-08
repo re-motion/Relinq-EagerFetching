@@ -14,11 +14,11 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Utilities;
-using System.Collections.Generic;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
@@ -30,7 +30,7 @@ namespace Remotion.Data.Linq.EagerFetching
     private readonly Type _relatedObjectType;
 
     public FetchManyRequest (LambdaExpression relatedObjectSelector)
-        : base(relatedObjectSelector)
+        : base (relatedObjectSelector)
     {
       try
       {
@@ -40,7 +40,7 @@ namespace Remotion.Data.Linq.EagerFetching
       {
         var message = string.Format (
             "A fetch many request must yield a list of related objects, but '{0}' yields '{1}', which is not enumerable.",
-            RelatedObjectSelector, 
+            RelatedObjectSelector,
             RelatedObjectSelector.Body.Type.FullName);
         throw new ArgumentException (message, "relatedObjectSelector", ex);
       }

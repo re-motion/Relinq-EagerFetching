@@ -13,10 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
+using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Remotion.Data.Linq.Parsing;
 using Remotion.Utilities;
-using System.Linq;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
@@ -38,15 +39,15 @@ namespace Remotion.Data.Linq.EagerFetching
 
       FetchFilteringExpressionTreeVisitor visitor = new FetchFilteringExpressionTreeVisitor();
       var newExpression = visitor.VisitExpression (expression);
-      return new FetchFilteringResult (newExpression, visitor._topLevelFetchRequests.FetchRequests.ToList ().AsReadOnly ());
+      return new FetchFilteringResult (newExpression, visitor._topLevelFetchRequests.FetchRequests.ToList().AsReadOnly());
     }
 
-    private readonly FetchRequestCollection _topLevelFetchRequests = new FetchRequestCollection ();
+    private readonly FetchRequestCollection _topLevelFetchRequests = new FetchRequestCollection();
     private FetchRequestBase _lastFetchRequest;
 
     private FetchFilteringExpressionTreeVisitor ()
     {
-      _topLevelFetchRequests = new FetchRequestCollection ();
+      _topLevelFetchRequests = new FetchRequestCollection();
       _lastFetchRequest = null;
     }
 
@@ -58,7 +59,7 @@ namespace Remotion.Data.Linq.EagerFetching
       if (fetchExpression != null)
       {
         var result = VisitExpression (fetchExpression.Operand);
-        var fetchRequest = fetchExpression.CreateFetchRequest ();
+        var fetchRequest = fetchExpression.CreateFetchRequest();
         _lastFetchRequest = _topLevelFetchRequests.GetOrAddFetchRequest (fetchRequest);
         return result;
       }

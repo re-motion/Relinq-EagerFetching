@@ -15,7 +15,6 @@
 // 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Utilities;
 
@@ -27,7 +26,7 @@ namespace Remotion.Data.Linq.EagerFetching
   /// </summary>
   public class FetchRequestCollection
   {
-    private readonly Dictionary<MemberInfo, FetchRequestBase> _fetchRequests = new Dictionary<MemberInfo, FetchRequestBase> ();
+    private readonly Dictionary<MemberInfo, FetchRequestBase> _fetchRequests = new Dictionary<MemberInfo, FetchRequestBase>();
 
     public IEnumerable<FetchRequestBase> FetchRequests
     {
@@ -55,6 +54,5 @@ namespace Remotion.Data.Linq.EagerFetching
         return fetchRequest;
       }
     }
-
   }
 }

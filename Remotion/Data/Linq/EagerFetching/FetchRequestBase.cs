@@ -1,3 +1,18 @@
+// This file is part of the re-motion Core Framework (www.re-motion.org)
+// Copyright (C) 2005-2009 rubicon informationstechnologie gmbh, www.rubicon.eu
+// 
+// The re-motion Core Framework is free software; you can redistribute it 
+// and/or modify it under the terms of the GNU Lesser General Public License 
+// version 3.0 as published by the Free Software Foundation.
+// 
+// re-motion is distributed in the hope that it will be useful, 
+// but WITHOUT ANY WARRANTY; without even the implied warranty of 
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with re-motion; if not, see http://www.gnu.org/licenses.
+// 
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -12,7 +27,7 @@ namespace Remotion.Data.Linq.EagerFetching
   /// </summary>
   public abstract class FetchRequestBase
   {
-    private readonly FetchRequestCollection _innerFetchRequestCollection = new FetchRequestCollection ();
+    private readonly FetchRequestCollection _innerFetchRequestCollection = new FetchRequestCollection();
 
     private readonly MemberInfo _relationMember;
     private readonly LambdaExpression _relatedObjectSelector;
@@ -27,7 +42,7 @@ namespace Remotion.Data.Linq.EagerFetching
         var message = string.Format (
             "A fetch request must be a simple member access expression; '{0}' is a {1} instead.",
             relatedObjectSelector.Body,
-            relatedObjectSelector.Body.GetType ().Name);
+            relatedObjectSelector.Body.GetType().Name);
         throw new ArgumentException (message, "relatedObjectSelector");
       }
 
@@ -115,11 +130,11 @@ namespace Remotion.Data.Linq.EagerFetching
       }
 
       // clone the original query model, modify it as needed by the fetch request, then copy over the result operators if needed
-      
+
       var cloneContext = new CloneContext (new ClauseMapping());
       var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClauseMapping);
-      
-      ModifyFetchQueryModel(fetchQueryModel);
+
+      ModifyFetchQueryModel (fetchQueryModel);
 
       return fetchQueryModel;
     }
@@ -138,12 +153,13 @@ namespace Remotion.Data.Linq.EagerFetching
 
       if (!RelationMember.DeclaringType.IsAssignableFrom (selector.Type))
       {
-        var message = string.Format ("The given SelectClause contains an invalid selector '{0}'. In order to fetch the relation property "
-                                     + "'{1}', the selector must yield objects of type '{2}', but it yields '{3}'.",
-                                     selector,
-                                     RelationMember.Name,
-                                     RelationMember.DeclaringType.FullName,
-                                     selector.Type);
+        var message = string.Format (
+            "The given SelectClause contains an invalid selector '{0}'. In order to fetch the relation property "
+            + "'{1}', the selector must yield objects of type '{2}', but it yields '{3}'.",
+            selector,
+            RelationMember.Name,
+            RelationMember.DeclaringType.FullName,
+            selector.Type);
         throw new ArgumentException (message, "selectClauseToFetchFrom");
       }
       // for a select clause with a projection of expr, we generate a fetch source expression of expr.RelationMember
