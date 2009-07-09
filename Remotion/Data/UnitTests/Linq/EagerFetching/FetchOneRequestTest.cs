@@ -65,7 +65,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // from sd in ExpressionHelper.CreateQuerySource_Detail()
       // select sd.Student.OtherStudent
 
-      var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+      var selectClause = fetchQueryModel.SelectClause;
       var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (fetchQueryModel.MainFromClause, sd => sd.Student.OtherStudent);
       ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
     }
@@ -78,7 +78,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // from sd in ExpressionHelper.CreateQuerySource_Detail()
       // select sd.Student.OtherStudent
 
-      var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+      var selectClause = fetchQueryModel.SelectClause;
       var innerMemberExpression = (MemberExpression)((MemberExpression) selectClause.Selector).Expression; // sd.Student
       Assert.That (((QuerySourceReferenceExpression) innerMemberExpression.Expression).ReferencedClause,  Is.SameAs (fetchQueryModel.MainFromClause));
     }
@@ -95,7 +95,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // from sd in ExpressionHelper.CreateQuerySource_Detail()
       // select sd.Student.OtherStudent.OtherStudent
 
-      var selectClause = (SelectClause) fetchQueryModel2.SelectOrGroupClause;
+      var selectClause = fetchQueryModel2.SelectClause;
       var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (fetchQueryModel2.MainFromClause, sd => sd.Student.OtherStudent.OtherStudent);
       ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
     }

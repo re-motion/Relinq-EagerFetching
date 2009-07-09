@@ -120,17 +120,7 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("originalQueryModel", originalQueryModel);
 
-      var originalSelectClause = originalQueryModel.SelectOrGroupClause as SelectClause;
-      if (originalSelectClause == null)
-      {
-        var message = string.Format (
-            "Fetch requests only support queries with select clauses, but this query has a {0}.",
-            originalQueryModel.SelectOrGroupClause.GetType().Name);
-        throw new NotSupportedException (message);
-      }
-
       // clone the original query model, modify it as needed by the fetch request, then copy over the result operators if needed
-
       var cloneContext = new CloneContext (new ClauseMapping());
       var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClauseMapping);
 

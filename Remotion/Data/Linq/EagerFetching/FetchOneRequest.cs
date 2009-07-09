@@ -37,9 +37,8 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
-      var newSelectProjection = CreateFetchSourceExpression ((SelectClause) fetchQueryModel.SelectOrGroupClause);
-
-      var selectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      var newSelectProjection = CreateFetchSourceExpression (fetchQueryModel.SelectClause);
+      var selectClause = fetchQueryModel.SelectClause;
       selectClause.Selector = newSelectProjection;
     }
   }

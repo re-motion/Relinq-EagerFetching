@@ -150,7 +150,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void CreateFetchQueryModel_SelectClause ()
     {
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (((SelectClause) fetchQueryModel.SelectOrGroupClause).Selector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
+      Assert.That (fetchQueryModel.SelectClause.Selector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
     }
 
     [Test]

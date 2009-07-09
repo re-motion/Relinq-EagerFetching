@@ -33,7 +33,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
     protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
-      var selectClause = ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      var selectClause = fetchQueryModel.SelectClause;
       selectClause.Selector = FakeSelectProjection;
       if (FakeBodyClauseToAdd != null)
         fetchQueryModel.BodyClauses.Add (FakeBodyClauseToAdd);

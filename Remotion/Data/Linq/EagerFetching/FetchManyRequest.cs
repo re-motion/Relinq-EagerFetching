@@ -58,13 +58,13 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
-      var fromExpression = CreateFetchSourceExpression ((SelectClause) fetchQueryModel.SelectOrGroupClause);
+      var fromExpression = CreateFetchSourceExpression (fetchQueryModel.SelectClause);
       var memberFromClause = new AdditionalFromClause (fetchQueryModel.GetNewName ("#fetch"), _relatedObjectType, fromExpression);
       fetchQueryModel.BodyClauses.Add (memberFromClause);
 
       var newSelector = new QuerySourceReferenceExpression (memberFromClause);
       var newSelectClause = new SelectClause (newSelector);
-      fetchQueryModel.SelectOrGroupClause = newSelectClause;
+      fetchQueryModel.SelectClause = newSelectClause;
     }
   }
 }

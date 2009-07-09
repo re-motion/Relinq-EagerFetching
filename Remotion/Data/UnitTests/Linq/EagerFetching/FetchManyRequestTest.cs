@@ -93,7 +93,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // from <x> in sd.Student.Friends
       // select <x>
 
-      var selectClause = (SelectClause) fetchQueryModel.SelectOrGroupClause;
+      var selectClause = fetchQueryModel.SelectClause;
       var memberFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses.Single ();
       Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedClause, Is.SameAs (memberFromClause));
     }
@@ -138,7 +138,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       // select <y>
 
       var memberFromClause2 = fetchQueryModel2.BodyClauses.Last();
-      var selectClause = (SelectClause) fetchQueryModel2.SelectOrGroupClause;
+      var selectClause = fetchQueryModel2.SelectClause;
       Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedClause, Is.SameAs (memberFromClause2));
     }
   }
