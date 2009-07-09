@@ -163,16 +163,5 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (fetchQueryModel.ResultOperators.Count, Is.EqualTo (1));
       Assert.That (fetchQueryModel.ResultOperators[0].GetType (), Is.SameAs (resultOperator.GetType ()));
     }
-
-    [Test]
-    [ExpectedException (typeof (NotSupportedException), 
-        ExpectedMessage = "Fetch requests only support queries with select clauses, but this query has a GroupClause.")]
-    public void CreateFetchQueryModel_GroupClauseNotSupported ()
-    {
-      var originalQueryModel = 
-          new QueryModel (typeof (IQueryable<Student>), ExpressionHelper.CreateMainFromClause (), ExpressionHelper.CreateGroupClause ());
-
-      _friendsFetchRequest.CreateFetchQueryModel (originalQueryModel);
-    }
   }
 }
