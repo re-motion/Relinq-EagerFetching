@@ -121,8 +121,8 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("originalQueryModel", originalQueryModel);
 
       // clone the original query model, modify it as needed by the fetch request, then copy over the result operators if needed
-      var cloneContext = new CloneContext (new ClauseMapping());
-      var fetchQueryModel = originalQueryModel.Clone (cloneContext.ClauseMapping);
+      var cloneContext = new CloneContext (new QuerySourceMapping());
+      var fetchQueryModel = originalQueryModel.Clone (cloneContext.QuerySourceMapping);
 
       ModifyFetchQueryModel (fetchQueryModel);
 
