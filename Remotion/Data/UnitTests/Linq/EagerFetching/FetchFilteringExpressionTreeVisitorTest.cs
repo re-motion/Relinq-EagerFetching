@@ -22,6 +22,7 @@ using Remotion.Data.Linq.EagerFetching;
 using System.Linq;
 using Remotion.Data.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.Parsing.ExpressionTreeVisitors;
+using Remotion.Data.UnitTests.Linq.TestDomain;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {

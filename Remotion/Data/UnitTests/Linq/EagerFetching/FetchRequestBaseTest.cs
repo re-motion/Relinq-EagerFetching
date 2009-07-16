@@ -23,6 +23,7 @@ using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
+using Remotion.Data.UnitTests.Linq.TestDomain;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
@@ -114,8 +115,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid selector 'sd'. "
-        + "In order to fetch the relation property 'Friends', the selector must yield objects of type 'Remotion.Data.UnitTests.Linq.Student', but "
-        + "it yields 'Remotion.Data.UnitTests.Linq.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
+        + "In order to fetch the relation property 'Friends', the selector must yield objects of type 'Remotion.Data.UnitTests.Linq.TestDomain.Student', but "
+        + "it yields 'Remotion.Data.UnitTests.Linq.TestDomain.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
     public void GetFetchSourceExpression_InvalidSelectProjection_WrongInputType ()
     {
       var selectProjection = (ParameterExpression) ExpressionHelper.MakeExpression<Student_Detail, Student_Detail> (sd => sd);
