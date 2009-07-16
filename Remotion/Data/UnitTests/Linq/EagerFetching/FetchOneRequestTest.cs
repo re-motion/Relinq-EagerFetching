@@ -81,7 +81,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var selectClause = fetchQueryModel.SelectClause;
       var innerMemberExpression = (MemberExpression)((MemberExpression) selectClause.Selector).Expression; // sd.Student
-      Assert.That (((QuerySourceReferenceExpression) innerMemberExpression.Expression).ReferencedClause,  Is.SameAs (fetchQueryModel.MainFromClause));
+      Assert.That (((QuerySourceReferenceExpression) innerMemberExpression.Expression).ReferencedQuerySource,  Is.SameAs (fetchQueryModel.MainFromClause));
     }
 
     [Test]

@@ -96,7 +96,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var selectClause = fetchQueryModel.SelectClause;
       var memberFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses.Single ();
-      Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedClause, Is.SameAs (memberFromClause));
+      Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedQuerySource, Is.SameAs (memberFromClause));
     }
 
     [Test]
@@ -120,7 +120,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (memberFromClause1.ItemName, Is.Not.EqualTo (memberFromClause2.ItemName));
 
       var memberFromExpression = (MemberExpression) memberFromClause2.FromExpression;
-      Assert.That (((QuerySourceReferenceExpression) memberFromExpression.Expression).ReferencedClause, Is.SameAs (memberFromClause1));
+      Assert.That (((QuerySourceReferenceExpression) memberFromExpression.Expression).ReferencedQuerySource, Is.SameAs (memberFromClause1));
       Assert.That (memberFromExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Scores")));
     }
 
@@ -140,7 +140,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       var memberFromClause2 = fetchQueryModel2.BodyClauses.Last();
       var selectClause = fetchQueryModel2.SelectClause;
-      Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedClause, Is.SameAs (memberFromClause2));
+      Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedQuerySource, Is.SameAs (memberFromClause2));
     }
   }
 }
