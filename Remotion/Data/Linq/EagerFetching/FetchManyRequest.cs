@@ -34,7 +34,7 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       try
       {
-        _relatedObjectType = ReflectionUtility.GetAscribedGenericArguments (RelatedObjectSelector.Body.Type, typeof (IEnumerable<>))[0];
+        _relatedObjectType = Utilities.ReflectionUtility.GetAscribedGenericArguments (RelatedObjectSelector.Body.Type, typeof (IEnumerable<>))[0];
       }
       catch (ArgumentTypeException ex)
       {

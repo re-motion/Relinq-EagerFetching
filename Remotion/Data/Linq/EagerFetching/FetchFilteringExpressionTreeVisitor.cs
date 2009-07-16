@@ -69,7 +69,7 @@ namespace Remotion.Data.Linq.EagerFetching
 
         if (_lastFetchRequest == null)
         {
-          throw ParserUtility.CreateParserException (
+          throw new ParserException (
               "FetchExpression preceding ThenFetchExpression", thenFetchExpression, "filtering fetch expressions");
         }
 
