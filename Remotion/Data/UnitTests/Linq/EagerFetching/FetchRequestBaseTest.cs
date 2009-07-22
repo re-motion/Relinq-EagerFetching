@@ -42,7 +42,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       _scoresFetchExpression = (s => s.Scores);
       _friendsFetchExpression = (s => s.Friends);
       _friendsFetchRequest = new TestFetchRequest (_friendsFetchExpression);
-      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateQuerySource_Detail ()
+      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
                                         select sd.Student);
       _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
@@ -139,7 +139,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // (same as in original query model)
 
       ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.FromExpression, _studentFromStudentDetailQueryModel.MainFromClause.FromExpression);

@@ -41,7 +41,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       _otherStudentFetchExpression = (s => s.OtherStudent);
       _otherStudentFetchRequest = new FetchOneRequest (_otherStudentFetchExpression);
 
-      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateQuerySource_Detail ()
+      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
                                         select sd.Student);
       _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
@@ -63,7 +63,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // select sd.Student.OtherStudent
 
       var selectClause = fetchQueryModel.SelectClause;
@@ -76,7 +76,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // select sd.Student.OtherStudent
 
       var selectClause = fetchQueryModel.SelectClause;
@@ -93,7 +93,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // select sd.Student.OtherStudent.OtherStudent
 
       var selectClause = fetchQueryModel2.SelectClause;

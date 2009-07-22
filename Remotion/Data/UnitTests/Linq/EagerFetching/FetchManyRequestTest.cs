@@ -44,7 +44,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       _friendsFetchExpression = (s => s.Friends);
       _friendsFetchRequest = new FetchManyRequest (_friendsFetchExpression);
 
-      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateQuerySource_Detail ()
+      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
                                         select sd.Student);
       _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
@@ -71,7 +71,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // from <x> in sd.Student.Friends
       // select <x>
 
@@ -90,7 +90,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // from <x> in sd.Student.Friends
       // select <x>
 
@@ -108,7 +108,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // from <x> in sd.Student.Friends
       // from <y> in <x>.Scores
       // select <y>
@@ -133,7 +133,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
-      // from sd in ExpressionHelper.CreateQuerySource_Detail()
+      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // from <x> in sd.Student.Friends
       // from <y> in <x>.Scores
       // select <y>

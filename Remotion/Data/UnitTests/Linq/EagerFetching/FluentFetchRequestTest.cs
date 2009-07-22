@@ -30,7 +30,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [Test]
     public void ThenFetchMany ()
     {
-      var originatingQuery = ExpressionHelper.CreateQuerySource_Detail();
+      var originatingQuery = ExpressionHelper.CreateStudentDetailQueryable();
       var fluentFetchRequest = 
           new FluentFetchRequest<Student_Detail, Student> ((QueryProviderBase) originatingQuery.Provider, originatingQuery.Expression);
 
@@ -45,7 +45,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [Test]
     public void ThenFetchOne ()
     {
-      var originatingQuery = ExpressionHelper.CreateQuerySource_Detail ();
+      var originatingQuery = ExpressionHelper.CreateStudentDetailQueryable ();
       var fluentFetchRequest =
           new FluentFetchRequest<Student_Detail, Student> ((QueryProviderBase) originatingQuery.Provider, originatingQuery.Expression);
 
