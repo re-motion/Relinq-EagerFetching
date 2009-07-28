@@ -15,11 +15,11 @@
 // 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
-using System.Linq;
 using Remotion.Data.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.Parsing.ExpressionTreeVisitors;
 using Remotion.Data.UnitTests.Linq.TestDomain;
