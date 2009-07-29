@@ -15,20 +15,22 @@
 // 
 using System;
 using System.Linq.Expressions;
+using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.EagerFetching;
+using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
-  /// <summary>
-  /// Provides a fluent interface to recursively fetch related objects of objects which themselves are eager-fetched. All query methods
-  /// are implemented by <see cref="ExtensionMethods"/>.
-  /// </summary>
-  /// <typeparam name="TQueried">The type of the objects returned by the query.</typeparam>
-  /// <typeparam name="TFetch">The type of object from which the recursive fetch operation should be made.</typeparam>
-  public class FluentFetchRequest<TQueried, TFetch> : QueryableBase<TQueried>
+  public class TestFetchExpressionNodeBase : FetchExpressionNodeBase
   {
-    public FluentFetchRequest (QueryProviderBase provider, Expression expression)
-        : base (provider, expression)
+    public TestFetchExpressionNodeBase (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
+        : base(parseInfo, relatedObjectSelector)
     {
+    }
+
+    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
+    {
+      throw new NotImplementedException();
     }
   }
 }

@@ -15,20 +15,25 @@
 // 
 using System;
 using System.Linq.Expressions;
+using System.Reflection;
+using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
+using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
-  /// <summary>
-  /// Provides a fluent interface to recursively fetch related objects of objects which themselves are eager-fetched. All query methods
-  /// are implemented by <see cref="ExtensionMethods"/>.
-  /// </summary>
-  /// <typeparam name="TQueried">The type of the objects returned by the query.</typeparam>
-  /// <typeparam name="TFetch">The type of object from which the recursive fetch operation should be made.</typeparam>
-  public class FluentFetchRequest<TQueried, TFetch> : QueryableBase<TQueried>
+  public class FetchManyExpressionNode : FetchExpressionNodeBase
   {
-    public FluentFetchRequest (QueryProviderBase provider, Expression expression)
-        : base (provider, expression)
+    public static readonly MethodInfo[] SupportedMethods = new[] { typeof (ExtensionMethods).GetMethod ("FetchMany") };
+
+    public FetchManyExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
+        : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {
+    }
+
+    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
+    {
+      return new FetchManyRequest (RelationMember);
     }
   }
 }
