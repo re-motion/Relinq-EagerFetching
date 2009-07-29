@@ -15,6 +15,7 @@
 // 
 using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
@@ -28,6 +29,7 @@ namespace Remotion.Data.Linq.EagerFetching
   {
     private readonly Expression _operand;
     private readonly LambdaExpression _relatedObjectSelector;
+    private readonly MemberInfo _relatedMember;
 
     protected ThenFetchExpression (Expression operand, LambdaExpression relatedObjectSelector)
         : base ((ExpressionType) (-1), ArgumentUtility.CheckNotNull ("operand", operand).Type)
@@ -36,6 +38,26 @@ namespace Remotion.Data.Linq.EagerFetching
 
       _operand = operand;
       _relatedObjectSelector = relatedObjectSelector;
+
+      var memberExpression = relatedObjectSelector.Body as MemberExpression;
+      if (memberExpression == null)
+      {
+        var message = string.Format (
+            "A fetch request must be a simple member access expression; '{0}' is a {1} instead.",
+            relatedObjectSelector.Body,
+            relatedObjectSelector.Body.GetType ().Name);
+        throw new ArgumentException (message, "relatedObjectSelector");
+      }
+
+      if (memberExpression.Expression.NodeType != ExpressionType.Parameter)
+      {
+        var message = string.Format (
+            "A fetch request must be a simple member access expression of the kind o => o.Related; '{0}' is too complex.",
+            relatedObjectSelector.Body);
+        throw new ArgumentException (message, "relatedObjectSelector");
+      }
+
+      _relatedMember = memberExpression.Member;
     }
 
     public Expression Operand
@@ -46,6 +68,11 @@ namespace Remotion.Data.Linq.EagerFetching
     public LambdaExpression RelatedObjectSelector
     {
       get { return _relatedObjectSelector; }
+    }
+
+    public MemberInfo RelatedMember
+    {
+      get { return _relatedMember; }
     }
 
     public override string ToString ()

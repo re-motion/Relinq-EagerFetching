@@ -14,8 +14,7 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Utilities;
@@ -29,21 +28,11 @@ namespace Remotion.Data.Linq.EagerFetching
   {
     private readonly Type _relatedObjectType;
 
-    public FetchManyRequest (LambdaExpression relatedObjectSelector)
-        : base (relatedObjectSelector)
+    public FetchManyRequest (MemberInfo relationMember)
+        : base (ArgumentUtility.CheckNotNull ("relationMember", relationMember))
     {
-      try
-      {
-        _relatedObjectType = Utilities.ReflectionUtility.GetAscribedGenericArguments (RelatedObjectSelector.Body.Type, typeof (IEnumerable<>))[0];
-      }
-      catch (ArgumentTypeException ex)
-      {
-        var message = string.Format (
-            "A fetch many request must yield a list of related objects, but '{0}' yields '{1}', which is not enumerable.",
-            RelatedObjectSelector,
-            RelatedObjectSelector.Body.Type.FullName);
-        throw new ArgumentException (message, "relatedObjectSelector", ex);
-      }
+      var memberType = Utilities.ReflectionUtility.GetFieldOrPropertyType (relationMember);
+      _relatedObjectType = ReflectionUtility.GetItemTypeOfIEnumerable (memberType, "relationMember");
     }
 
     /// <summary>
@@ -65,6 +54,18 @@ namespace Remotion.Data.Linq.EagerFetching
       var newSelector = new QuerySourceReferenceExpression (memberFromClause);
       var newSelectClause = new SelectClause (newSelector);
       fetchQueryModel.SelectClause = newSelectClause;
+    }
+
+    public override ResultOperatorBase Clone (CloneContext cloneContext)
+    {
+      ArgumentUtility.CheckNotNull ("cloneContext", cloneContext);
+
+      var clone = new FetchManyRequest (RelationMember);
+      foreach (var innerFetchRequest in InnerFetchRequests)
+        clone.GetOrAddInnerFetchRequest ((FetchRequestBase) innerFetchRequest.Clone (cloneContext));
+
+      return clone;
+
     }
   }
 }

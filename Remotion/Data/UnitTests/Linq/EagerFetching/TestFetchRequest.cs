@@ -15,10 +15,12 @@
 // 
 using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.TestDomain;
+using Remotion.Utilities;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
@@ -28,8 +30,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
     public IBodyClause FakeBodyClauseToAdd = null;
 
-    public TestFetchRequest (LambdaExpression relatedObjectSelector)
-        : base(relatedObjectSelector)
+    public TestFetchRequest (MemberInfo relationMember)
+        : base (relationMember)
     {
     }
 
@@ -44,6 +46,17 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public new MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
     {
       return base.CreateFetchSourceExpression (selectClauseToFetchFrom);
+    }
+
+    public override ResultOperatorBase Clone (CloneContext cloneContext)
+    {
+      ArgumentUtility.CheckNotNull ("cloneContext", cloneContext);
+
+      var clone = new TestFetchRequest (RelationMember);
+      foreach (var innerFetchRequest in clone.InnerFetchRequests)
+        clone.GetOrAddInnerFetchRequest ((FetchRequestBase) innerFetchRequest.Clone (cloneContext));
+
+      return clone;
     }
   }
 }

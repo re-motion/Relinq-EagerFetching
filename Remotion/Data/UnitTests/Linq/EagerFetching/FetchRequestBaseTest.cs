@@ -14,13 +14,14 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Clauses.StreamedData;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.TestDomain;
@@ -30,8 +31,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
   [TestFixture]
   public class FetchRequestBaseTest
   {
-    private Expression<Func<Student, IEnumerable<int>>> _scoresFetchExpression;
-    private Expression<Func<Student, IEnumerable<Student>>> _friendsFetchExpression;
+    private MemberInfo _scoresMember;
+    private MemberInfo _friendsMember;
+
     private TestFetchRequest _friendsFetchRequest;
     private IQueryable<Student> _studentFromStudentDetailQuery;
     private QueryModel _studentFromStudentDetailQueryModel;
@@ -39,30 +41,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [SetUp]
     public void SetUp ()
     {
-      _scoresFetchExpression = (s => s.Scores);
-      _friendsFetchExpression = (s => s.Friends);
-      _friendsFetchRequest = new TestFetchRequest (_friendsFetchExpression);
+      _scoresMember = typeof (Student).GetProperty ("Scores");
+      _friendsMember = typeof (Student).GetProperty ("Friends");
+      _friendsFetchRequest = new TestFetchRequest (_friendsMember);
       _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
                                         select sd.Student);
       _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression; 'new [] {1, 2, 3}' "
-        + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
-    public void Create_InvalidExpression ()
-    {
-      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<int>> (s => new[] { 1, 2, 3 });
-      new TestFetchRequest (relatedObjectSelector);
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression of the kind "
-        + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
-    public void Create_InvalidExpression_MoreThanOneMember ()
-    {
-      var relatedObjectSelector = (Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends);
-      new TestFetchRequest (relatedObjectSelector);
     }
 
     [Test]
@@ -70,9 +54,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.Empty);
 
-      var result = _friendsFetchRequest.GetOrAddInnerFetchRequest (new FetchManyRequest (_scoresFetchExpression));
+      var result = _friendsFetchRequest.GetOrAddInnerFetchRequest (new FetchManyRequest (_scoresMember));
 
-      Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
+      Assert.That (result.RelationMember, Is.SameAs (_scoresMember));
       Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));
     }
 
@@ -155,14 +139,25 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    public void CreateFetchQueryModel_ResultOperatorsAreCloned ()
+    public void CreateFetchQueryModel_ResultOperatorsAreCloned_WithoutFetch ()
     {
       var resultOperator = ExpressionHelper.CreateResultOperator ();
+      _studentFromStudentDetailQueryModel.ResultOperators.Add (resultOperator);
+      _studentFromStudentDetailQueryModel.ResultOperators.Add (_friendsFetchRequest);
+
       var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      fetchQueryModel.ResultOperators.Add (resultOperator);
 
       Assert.That (fetchQueryModel.ResultOperators.Count, Is.EqualTo (1));
       Assert.That (fetchQueryModel.ResultOperators[0].GetType (), Is.SameAs (resultOperator.GetType ()));
+    }
+
+    [Test]
+    public void ExecuteInMemory ()
+    {
+      var input = new StreamedSequence (new[] { 1, 2, 3 }, new StreamedSequenceInfo (typeof (int[]), Expression.Constant (0)));
+      var result = _friendsFetchRequest.ExecuteInMemory (input);
+
+      Assert.That (result, Is.SameAs (input));
     }
   }
 }

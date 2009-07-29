@@ -18,53 +18,25 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Clauses.ResultOperators;
+using Remotion.Data.Linq.Clauses.StreamedData;
 using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
   /// <summary>
-  /// Base class for classes representing a property that should be eager-fetched by means of a lambda expression.
+  /// Base class for classes representing a property that should be eager-fetched when a query is executed.
   /// </summary>
-  public abstract class FetchRequestBase
+  public abstract class FetchRequestBase : SequenceTypePreservingResultOperatorBase
   {
     private readonly FetchRequestCollection _innerFetchRequestCollection = new FetchRequestCollection();
 
-    private readonly MemberInfo _relationMember;
-    private readonly LambdaExpression _relatedObjectSelector;
+    private MemberInfo _relationMember;
 
-    protected FetchRequestBase (LambdaExpression relatedObjectSelector)
+    protected FetchRequestBase (MemberInfo relationMember)
     {
-      ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
-
-      var memberExpression = relatedObjectSelector.Body as MemberExpression;
-      if (memberExpression == null)
-      {
-        var message = string.Format (
-            "A fetch request must be a simple member access expression; '{0}' is a {1} instead.",
-            relatedObjectSelector.Body,
-            relatedObjectSelector.Body.GetType().Name);
-        throw new ArgumentException (message, "relatedObjectSelector");
-      }
-
-      if (memberExpression.Expression.NodeType != ExpressionType.Parameter)
-      {
-        var message = string.Format (
-            "A fetch request must be a simple member access expression of the kind o => o.Related; '{0}' is too complex.",
-            relatedObjectSelector.Body);
-        throw new ArgumentException (message, "relatedObjectSelector");
-      }
-
-      _relationMember = memberExpression.Member;
-      _relatedObjectSelector = relatedObjectSelector;
-    }
-
-    /// <summary>
-    /// Gets the <see cref="LambdaExpression"/> acting as the selector of the related object(s) to be fetched.
-    /// </summary>
-    /// <value>The related object selector.</value>
-    public LambdaExpression RelatedObjectSelector
-    {
-      get { return _relatedObjectSelector; }
+      ArgumentUtility.CheckNotNull ("relationMember", relationMember);
+      _relationMember = relationMember;
     }
 
     /// <summary>
@@ -74,6 +46,7 @@ namespace Remotion.Data.Linq.EagerFetching
     public MemberInfo RelationMember
     {
       get { return _relationMember; }
+      set { _relationMember = ArgumentUtility.CheckNotNull ("value", value); }
     }
 
     /// <summary>
@@ -92,8 +65,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// </summary>
     /// <param name="fetchQueryModel">The fetch query model to modify.</param>
     protected abstract void ModifyFetchQueryModel (QueryModel fetchQueryModel);
-
-
+    
     /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
     /// </summary>
@@ -114,7 +86,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <param name="originalQueryModel">The original query model to create a fetch query from.</param>
     /// <returns>
     /// A new <see cref="QueryModel"/> which represents the same query as <paramref name="originalQueryModel"/> but selecting
-    /// the objects described by <see cref="RelatedObjectSelector"/> instead of the objects selected by the <paramref name="originalQueryModel"/>.
+    /// the objects described by <see cref="RelationMember"/> instead of the objects selected by the <paramref name="originalQueryModel"/>.
     /// </returns>
     public QueryModel CreateFetchQueryModel (QueryModel originalQueryModel)
     {
@@ -124,6 +96,12 @@ namespace Remotion.Data.Linq.EagerFetching
       var cloneContext = new CloneContext (new QuerySourceMapping());
       var fetchQueryModel = originalQueryModel.Clone (cloneContext.QuerySourceMapping);
 
+      foreach (var resultOperator in fetchQueryModel.ResultOperators.AsChangeResistantEnumerableWithIndex ())
+      {
+        if (resultOperator.Value is FetchRequestBase)
+          fetchQueryModel.ResultOperators.RemoveAt (resultOperator.Index);
+      }
+
       ModifyFetchQueryModel (fetchQueryModel);
 
       return fetchQueryModel;
@@ -132,7 +110,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <summary>
     /// Gets an <see cref="Expression"/> that returns the fetched object(s).
     /// </summary>
-    /// <param name="selectClauseToFetchFrom">The select clause yielding the objects to apply <see cref="RelatedObjectSelector"/> to in order to
+    /// <param name="selectClauseToFetchFrom">The select clause yielding the objects to apply <see cref="RelationMember"/> to in order to
     /// fetch the related object(s).</param>
     /// <returns>An <see cref="Expression"/> that returns the fetched object(s).</returns>
     protected MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
@@ -154,6 +132,12 @@ namespace Remotion.Data.Linq.EagerFetching
       }
       // for a select clause with a projection of expr, we generate a fetch source expression of expr.RelationMember
       return Expression.MakeMemberAccess (selector, RelationMember);
+    }
+
+    public override StreamedSequence ExecuteInMemory<T> (StreamedSequence input)
+    {
+      ArgumentUtility.CheckNotNull ("input", input);
+      return input;
     }
   }
 }

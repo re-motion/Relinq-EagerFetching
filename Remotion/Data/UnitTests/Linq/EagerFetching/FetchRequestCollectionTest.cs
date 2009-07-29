@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
@@ -27,13 +28,13 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
   public class FetchRequestCollectionTest
   {
     private FetchRequestCollection _collection;
-    private Expression<Func<Student, IEnumerable<int>>> _scoresFetchExpression;
+    private MemberInfo _scoresMember;
 
     [SetUp]
     public void SetUp ()
     {
       _collection = new FetchRequestCollection ();
-      _scoresFetchExpression = (s => s.Scores);
+      _scoresMember = typeof (Student).GetProperty ("Scores");
     }
 
     [Test]
@@ -41,9 +42,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       Assert.That (_collection.FetchRequests, Is.Empty);
 
-      var result = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresFetchExpression));
+      var result = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresMember));
 
-      Assert.That (result.RelatedObjectSelector, Is.SameAs (_scoresFetchExpression));
+      Assert.That (result.RelationMember, Is.SameAs (_scoresMember));
       Assert.That (_collection.FetchRequests, Is.EqualTo (new[] { result }));
     }
 
@@ -51,29 +52,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void AddFetchRequest_Twice ()
     {
       Assert.That (_collection.FetchRequests, Is.Empty);
-      var result1 = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresFetchExpression));
-      var result2 = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresFetchExpression));
+      var result1 = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresMember));
+      var result2 = _collection.GetOrAddFetchRequest (new FetchManyRequest (_scoresMember));
 
       Assert.That (result1, Is.SameAs (result2));
       Assert.That (_collection.FetchRequests, Is.EqualTo (new[] { result1 }));
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression; 'new [] {1, 2, 3}' "
-        + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
-    public void AddFetchRequest_InvalidExpression ()
-    {
-      LambdaExpression relatedObjectSelector = ((Expression<Func<Student, IEnumerable<int>>>) (s => new[] { 1, 2, 3 }));
-      _collection.GetOrAddFetchRequest (new FetchManyRequest (relatedObjectSelector));
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression of the kind "
-        + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
-    public void AddFetchRequest_InvalidExpression_MoreThanOneMember ()
-    {
-      LambdaExpression relatedObjectSelector = ((Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends));
-      _collection.GetOrAddFetchRequest (new FetchManyRequest (relatedObjectSelector));
     }
   }
 }

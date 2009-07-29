@@ -14,16 +14,19 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Linq.Expressions;
+using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
+  /// <summary>
+  /// Represents a property holding one object that should be eager-fetched when a query is executed.
+  /// </summary>
   public class FetchOneRequest : FetchRequestBase
   {
-    public FetchOneRequest (LambdaExpression relatedObjectSelector)
-        : base (relatedObjectSelector)
+    public FetchOneRequest (MemberInfo relationMember)
+        : base (ArgumentUtility.CheckNotNull ("relationMember", relationMember))
     {
     }
 
@@ -40,6 +43,17 @@ namespace Remotion.Data.Linq.EagerFetching
       var newSelectProjection = CreateFetchSourceExpression (fetchQueryModel.SelectClause);
       var selectClause = fetchQueryModel.SelectClause;
       selectClause.Selector = newSelectProjection;
+    }
+
+    public override ResultOperatorBase Clone (CloneContext cloneContext)
+    {
+      ArgumentUtility.CheckNotNull ("cloneContext", cloneContext);
+      
+      var clone = new FetchOneRequest (RelationMember);
+      foreach (var innerFetchRequest in InnerFetchRequests)
+        clone.GetOrAddInnerFetchRequest ((FetchRequestBase) innerFetchRequest.Clone (cloneContext));
+
+      return clone;
     }
   }
 }

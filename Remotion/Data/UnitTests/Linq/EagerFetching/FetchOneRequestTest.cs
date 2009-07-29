@@ -19,17 +19,19 @@ using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
+using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.TestDomain;
+using System.Reflection;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
   [TestFixture]
   public class FetchOneRequestTest
   {
-    private Expression<Func<Student, Student>> _otherStudentFetchExpression;
+    private MemberInfo _otherStudentMember;
     private FetchOneRequest _otherStudentFetchRequest;
     private IQueryable<Student> _studentFromStudentDetailQuery;
     private QueryModel _studentFromStudentDetailQueryModel;
@@ -37,8 +39,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [SetUp]
     public void SetUp ()
     {
-      _otherStudentFetchExpression = (s => s.OtherStudent);
-      _otherStudentFetchRequest = new FetchOneRequest (_otherStudentFetchExpression);
+      _otherStudentMember = typeof (Student).GetProperty ("OtherStudent");
+      _otherStudentFetchRequest = new FetchOneRequest (_otherStudentMember);
 
       _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
                                         select sd.Student);
@@ -88,7 +90,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
 
-      var fetchRequest2 = new FetchOneRequest (_otherStudentFetchExpression);
+      var fetchRequest2 = new FetchOneRequest (_otherStudentMember);
       var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
 
       // expecting:
@@ -98,6 +100,31 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var selectClause = fetchQueryModel2.SelectClause;
       var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (fetchQueryModel2.MainFromClause, sd => sd.Student.OtherStudent.OtherStudent);
       ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
+    }
+
+    [Test]
+    public void Clone ()
+    {
+      var clone = _otherStudentFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
+
+      Assert.That (clone, Is.Not.SameAs (_otherStudentFetchRequest));
+      Assert.That (clone, Is.InstanceOfType (typeof (FetchOneRequest)));
+      Assert.That (((FetchOneRequest) clone).RelationMember, Is.SameAs (_otherStudentFetchRequest.RelationMember));
+      Assert.That (((FetchOneRequest) clone).InnerFetchRequests.ToArray(), Is.Empty);
+    }
+
+    [Test]
+    public void Clone_WithInnerFetchRequests ()
+    {
+      var innerRequest = new FetchOneRequest (_otherStudentMember);
+      _otherStudentFetchRequest.GetOrAddInnerFetchRequest (innerRequest);
+
+      var clone = _otherStudentFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
+      var innerClones = ((FetchOneRequest) clone).InnerFetchRequests.ToArray ();
+      Assert.That (innerClones.Length, Is.EqualTo (1));
+      Assert.That (innerClones[0], Is.InstanceOfType (typeof (FetchOneRequest)));
+      Assert.That (innerClones[0], Is.Not.SameAs (innerRequest));
+      Assert.That (innerClones[0].RelationMember, Is.SameAs (innerRequest.RelationMember));
     }
   }
 }

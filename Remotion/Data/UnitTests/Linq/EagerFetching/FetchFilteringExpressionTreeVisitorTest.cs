@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
@@ -29,6 +30,16 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
   [TestFixture]
   public class FetchFilteringExpressionTreeVisitorTest
   {
+    private MemberInfo _scoresMember;
+    private MemberInfo _friendsMember;
+
+    [SetUp]
+    public void SetUp ()
+    {
+      _scoresMember = typeof (Student).GetProperty ("Scores");
+      _friendsMember = typeof (Student).GetProperty ("Friends");
+    }
+
     [Test]
     public void Visit_OrdinaryExpression ()
     {
@@ -52,7 +63,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
       Assert.That (result.FetchRequests[0], Is.InstanceOfType (typeof (FetchManyRequest)));
-      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
+      Assert.That (result.FetchRequests[0].RelationMember, Is.SameAs (_friendsMember));
     }
 
     [Test]
@@ -67,7 +78,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
       Assert.That (result.FetchRequests[0], Is.InstanceOfType (typeof (FetchOneRequest)));
-      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
+      Assert.That (result.FetchRequests[0].RelationMember, Is.SameAs (_friendsMember));
     }
 
     [Test]
@@ -85,7 +96,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (result.NewExpression, Is.Not.SameAs (unaryExpression));
       Assert.That (((UnaryExpression)result.NewExpression).Operand, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector));
+      Assert.That (result.FetchRequests[0].RelationMember, Is.SameAs (_friendsMember));
     }
 
     [Test]
@@ -101,8 +112,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (2));
-      Assert.That (result.FetchRequests.Select (fr => fr.RelatedObjectSelector).ToArray(), 
-          Is.EquivalentTo (new Expression[] {relatedObjectSelector1, relatedObjectSelector2}));
+      Assert.That (result.FetchRequests.Select (fr => fr.RelationMember).ToArray(),  Is.EquivalentTo (new[] {_scoresMember, _friendsMember}));
     }
 
     [Test]
@@ -159,9 +169,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector1));
+      Assert.That (result.FetchRequests[0].RelationMember, Is.SameAs (_friendsMember));
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Count(), Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs (relatedObjectSelector2));
+      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().RelationMember, Is.SameAs (_friendsMember));
 
       var fetchRequestForThenFetchExpression = result.FetchRequests[0].InnerFetchRequests.Single ();
       Assert.That (fetchRequestForThenFetchExpression, Is.InstanceOfType (typeof (FetchManyRequest)));
@@ -180,9 +190,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector1));
+      Assert.That (result.FetchRequests[0].RelationMember, Is.SameAs (_friendsMember));
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Count (), Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().RelatedObjectSelector, Is.SameAs (relatedObjectSelector2));
+      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().RelationMember, Is.SameAs (_friendsMember));
 
       var fetchRequestForThenFetchExpression = result.FetchRequests[0].InnerFetchRequests.Single ();
       Assert.That (fetchRequestForThenFetchExpression, Is.InstanceOfType (typeof (FetchOneRequest)));
@@ -203,11 +213,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].RelatedObjectSelector, Is.SameAs (relatedObjectSelector1));
+      Assert.That (result.FetchRequests[0].RelationMember, Is.SameAs (_friendsMember));
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Count(), Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().RelatedObjectSelector, Is.SameAs (relatedObjectSelector2));
+      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().RelationMember, Is.SameAs (_friendsMember));
       Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Count(), Is.EqualTo (1));
-      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs (relatedObjectSelector3));
+      Assert.That (result.FetchRequests[0].InnerFetchRequests.Single ().InnerFetchRequests.Single().RelationMember, Is.SameAs (_friendsMember));
     }
 
     [Test]
@@ -226,9 +236,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (result.NewExpression, Is.SameAs (innerExpression));
       Assert.That (result.FetchRequests.Count, Is.EqualTo (2));
       
-      var fetchResultForExpression2 = result.FetchRequests.Where (fr => fr.RelatedObjectSelector == relatedObjectSelector2).Single();
+      var fetchResultForExpression2 = result.FetchRequests.Where (fr => fr.RelationMember == _friendsMember).Single();
       Assert.That (fetchResultForExpression2.InnerFetchRequests.Count(), Is.EqualTo (1));
-      Assert.That (fetchResultForExpression2.InnerFetchRequests.Single().RelatedObjectSelector, Is.SameAs(relatedObjectSelector3));
+      Assert.That (fetchResultForExpression2.InnerFetchRequests.Single().RelationMember, Is.SameAs(_friendsMember));
     }
 
     [Test]

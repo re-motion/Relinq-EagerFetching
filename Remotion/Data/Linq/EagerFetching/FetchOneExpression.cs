@@ -27,7 +27,7 @@ namespace Remotion.Data.Linq.EagerFetching
 
     public override FetchRequestBase CreateFetchRequest ()
     {
-      return new FetchOneRequest (RelatedObjectSelector);
+      return new FetchOneRequest (RelatedMember);
     }
   }
 }
