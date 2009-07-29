@@ -33,7 +33,9 @@ namespace Remotion.Data.Linq.EagerFetching
 
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
-      return new FetchManyRequest (RelationMember);
+      var resultOperator = new FetchManyRequest (RelationMember);
+      clauseGenerationContext.AddContextInfo (this, resultOperator);
+      return resultOperator;
     }
   }
 }

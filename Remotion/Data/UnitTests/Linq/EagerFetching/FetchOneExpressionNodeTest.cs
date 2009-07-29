@@ -50,5 +50,12 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (QueryModel.ResultOperators[0], Is.InstanceOfType (typeof (FetchOneRequest)));
       Assert.That (((FetchOneRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Student).GetProperty ("OtherStudent")));
     }
+
+    [Test]
+    public void Apply_AddsMapping ()
+    {
+      _node.Apply (QueryModel, ClauseGenerationContext);
+      Assert.That (ClauseGenerationContext.GetContextInfo (_node), Is.SameAs (QueryModel.ResultOperators[0]));
+    }
   }
 }

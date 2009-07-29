@@ -25,7 +25,6 @@ using Remotion.Data.UnitTests.Linq.TestDomain;
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
   [TestFixture]
-  [Ignore ("TODO 1403")]
   public class FetchExpressionNode_IntegrationTest : ExpressionNodeTestBase
   {
     [Test]
@@ -33,9 +32,9 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     {
       var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
       var node2 = new ThenFetchManyExpressionNode (
-          CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
-      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Student, bool> (s => s.HasDog));
-      var node4 = new FetchManyExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Student, List<int>> (s => s.Scores));
+          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
+      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Student, bool> (s => s.HasDog));
+      var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Student, List<int>> (s => s.Scores));
 
       node1.Apply (QueryModel, ClauseGenerationContext);
       node2.Apply (QueryModel, ClauseGenerationContext);

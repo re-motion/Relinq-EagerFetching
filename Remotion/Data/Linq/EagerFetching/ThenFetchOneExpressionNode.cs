@@ -17,6 +17,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Parsing;
 using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Utilities;
 
@@ -33,7 +34,20 @@ namespace Remotion.Data.Linq.EagerFetching
 
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
-      throw new NotImplementedException ();
+      throw new NotImplementedException ("Call ApplyNodeSpecificSemantics instead.");
+    }
+
+    protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    {
+      var previousFetchRequest = clauseGenerationContext.GetContextInfo (Source) as FetchRequestBase;
+      if (previousFetchRequest == null)
+        throw new ParserException ("ThenFetchOne must directly follow another Fetch request.");
+
+      FetchRequestBase innerFetchRequest = new FetchOneRequest (RelationMember);
+      innerFetchRequest = previousFetchRequest.GetOrAddInnerFetchRequest (innerFetchRequest);
+      clauseGenerationContext.AddContextInfo (this, innerFetchRequest);
+
+      return queryModel;
     }
   }
 }

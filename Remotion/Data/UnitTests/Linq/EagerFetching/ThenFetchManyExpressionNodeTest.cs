@@ -15,10 +15,12 @@
 // 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.Parsing;
+using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Data.UnitTests.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Data.UnitTests.Linq.TestDomain;
 using System.Linq;
@@ -30,11 +32,20 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
   {
     private ThenFetchManyExpressionNode _node;
 
+    private TestFetchRequest _sourceFetchRequest;
+    private IExpressionNode _sourceFetchRequestNode;
+
     public override void SetUp ()
     {
       base.SetUp ();
 
-      _node = new ThenFetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
+      _sourceFetchRequest = new TestFetchRequest (typeof (Student).GetProperty ("OtherStudent"));
+      _sourceFetchRequestNode = new MainSourceExpressionNode ("x", Expression.Constant (new Student[0]));
+      ClauseGenerationContext.AddContextInfo (_sourceFetchRequestNode, _sourceFetchRequest);
+
+      QueryModel.ResultOperators.Add (_sourceFetchRequest);
+
+      _node = new ThenFetchManyExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
     }
 
     [Test]
@@ -45,27 +56,45 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    [Ignore ("TODO 1403")]
     public void Apply ()
     {
-      var testFetchRequest = new TestFetchRequest (typeof (Student).GetProperty ("OtherStudent"));
-      QueryModel.ResultOperators.Add (testFetchRequest);
-      
-      _node.Apply (QueryModel, ClauseGenerationContext);
+      var queryModel = _node.Apply (QueryModel, ClauseGenerationContext);
+      Assert.That (queryModel, Is.SameAs (QueryModel));
 
-      Assert.That (QueryModel.ResultOperators, Is.EqualTo (new[] { testFetchRequest }));
-      var innerFetchRequests = testFetchRequest.InnerFetchRequests.ToArray();
+      Assert.That (QueryModel.ResultOperators, Is.EqualTo (new[] { _sourceFetchRequest }));
+      var innerFetchRequests = _sourceFetchRequest.InnerFetchRequests.ToArray ();
       Assert.That (innerFetchRequests.Length, Is.EqualTo (1));
       Assert.That (innerFetchRequests[0], Is.InstanceOfType (typeof (FetchManyRequest)));
       Assert.That (innerFetchRequests[0].RelationMember, Is.SameAs (typeof (Student).GetProperty ("Friends")));
     }
 
     [Test]
-    [ExpectedException (typeof (ParserException))]
-    [Ignore ("TODO 1403")]
-    public void Apply_WithoutPreviousFetchRequest ()
+    public void Apply_AddsMapping ()
     {
       _node.Apply (QueryModel, ClauseGenerationContext);
+
+      var innerFetchRequest = ((FetchRequestBase) QueryModel.ResultOperators[0]).InnerFetchRequests.Single ();
+      Assert.That (ClauseGenerationContext.GetContextInfo (_node), Is.SameAs (innerFetchRequest));
+    }
+
+    [Test]
+    public void Apply_AddsMappingForExisting ()
+    {
+      _node.Apply (QueryModel, ClauseGenerationContext);
+
+      var node = new ThenFetchManyExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
+      node.Apply (QueryModel, ClauseGenerationContext);
+
+      var innerFetchRequest = ((FetchRequestBase) QueryModel.ResultOperators[0]).InnerFetchRequests.Single ();
+      Assert.That (ClauseGenerationContext.GetContextInfo (node), Is.SameAs (innerFetchRequest));
+    }
+
+    [Test]
+    [ExpectedException (typeof (ParserException))]
+    public void Apply_WithoutPreviousFetchRequest ()
+    {
+      var node = new ThenFetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
+      node.Apply (QueryModel, ClauseGenerationContext);
     }
   }
 }
