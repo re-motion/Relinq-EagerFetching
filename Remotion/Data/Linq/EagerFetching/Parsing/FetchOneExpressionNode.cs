@@ -24,8 +24,6 @@ namespace Remotion.Data.Linq.EagerFetching.Parsing
 {
   public class FetchOneExpressionNode : FetchExpressionNodeBase
   {
-    public static readonly MethodInfo[] SupportedMethods = new[] { typeof (ExtensionMethods).GetMethod ("FetchOne") };
-
     public FetchOneExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
         : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {

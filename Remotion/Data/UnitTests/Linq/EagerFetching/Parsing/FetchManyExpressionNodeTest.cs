@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
+using Remotion.Data.DomainObjects.Linq;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.EagerFetching.Parsing;
 using Remotion.Data.UnitTests.Linq.Parsing.Structure.IntermediateModel;
@@ -34,13 +35,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
       base.SetUp ();
 
       _node = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
-    }
-
-    [Test]
-    public void SupportedMethod ()
-    {
-      var method = typeof (ExtensionMethods).GetMethod ("FetchMany");
-      Assert.That (FetchManyExpressionNode.SupportedMethods, List.Contains (method));
     }
 
     [Test]

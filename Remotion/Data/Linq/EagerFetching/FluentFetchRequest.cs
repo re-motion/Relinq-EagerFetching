@@ -20,7 +20,7 @@ namespace Remotion.Data.Linq.EagerFetching
 {
   /// <summary>
   /// Provides a fluent interface to recursively fetch related objects of objects which themselves are eager-fetched. All query methods
-  /// are implemented by <see cref="ExtensionMethods"/>.
+  /// are implemented as extension methods.
   /// </summary>
   /// <typeparam name="TQueried">The type of the objects returned by the query.</typeparam>
   /// <typeparam name="TFetch">The type of object from which the recursive fetch operation should be made.</typeparam>

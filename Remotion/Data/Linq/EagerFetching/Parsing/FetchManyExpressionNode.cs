@@ -15,7 +15,6 @@
 // 
 using System;
 using System.Linq.Expressions;
-using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Utilities;
@@ -24,8 +23,6 @@ namespace Remotion.Data.Linq.EagerFetching.Parsing
 {
   public class FetchManyExpressionNode : FetchExpressionNodeBase
   {
-    public static readonly MethodInfo[] SupportedMethods = new[] { typeof (ExtensionMethods).GetMethod ("FetchMany") };
-
     public FetchManyExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
         : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {

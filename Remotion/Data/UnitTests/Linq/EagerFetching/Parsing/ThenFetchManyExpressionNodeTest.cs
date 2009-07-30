@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
+using Remotion.Data.DomainObjects.Linq;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.EagerFetching.Parsing;
 using Remotion.Data.Linq.Parsing;
@@ -47,13 +48,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
       QueryModel.ResultOperators.Add (_sourceFetchRequest);
 
       _node = new ThenFetchManyExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
-    }
-
-    [Test]
-    public void SupportedMethod ()
-    {
-      var method = typeof (ExtensionMethods).GetMethod ("ThenFetchMany");
-      Assert.That (ThenFetchManyExpressionNode.SupportedMethods, List.Contains (method));
     }
 
     [Test]

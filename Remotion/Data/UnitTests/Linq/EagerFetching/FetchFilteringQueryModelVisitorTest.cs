@@ -37,7 +37,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     private DistinctResultOperator _distinctResultOperator;
     private CountResultOperator _countResultOperator;
     
-
     [SetUp]
     public void SetUp ()
     {
