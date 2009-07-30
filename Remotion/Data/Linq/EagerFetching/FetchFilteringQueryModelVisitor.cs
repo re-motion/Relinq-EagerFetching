@@ -20,6 +20,10 @@ using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
+  /// <summary>
+  /// Visits a <see cref="QueryModel"/>, removing all <see cref="FetchRequestBase"/> instances from its <see cref="QueryModel.ResultOperators"/>
+  /// collection and returning them as a list of <see cref="FetchRequests"/>.
+  /// </summary>
   public class FetchFilteringQueryModelVisitor : QueryModelVisitorBase
   {
     private readonly List<FetchRequestBase> _fetchRequests = new List<FetchRequestBase> ();
