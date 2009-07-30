@@ -15,22 +15,27 @@
 // 
 using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
+using Remotion.Utilities;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetching
+namespace Remotion.Data.Linq.EagerFetching.Parsing
 {
-  public class TestFetchExpressionNodeBase : FetchExpressionNodeBase
+  public class FetchOneExpressionNode : FetchExpressionNodeBase
   {
-    public TestFetchExpressionNodeBase (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
-        : base(parseInfo, relatedObjectSelector)
+    public static readonly MethodInfo[] SupportedMethods = new[] { typeof (ExtensionMethods).GetMethod ("FetchOne") };
+
+    public FetchOneExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
+        : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {
     }
 
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
-      throw new NotImplementedException();
+      var resultOperator = new FetchOneRequest (RelationMember);
+      clauseGenerationContext.AddContextInfo (this, resultOperator);
+      return resultOperator;
     }
   }
 }

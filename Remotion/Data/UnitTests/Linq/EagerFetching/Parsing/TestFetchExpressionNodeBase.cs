@@ -14,30 +14,23 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.EagerFetching.Parsing;
+using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
 {
-  public class FetchFilteringResult
+  public class TestFetchExpressionNodeBase : FetchExpressionNodeBase
   {
-    private readonly Expression _newExpression;
-    private readonly ReadOnlyCollection<FetchRequestBase> _fetchRequests;
-
-    public FetchFilteringResult (Expression newExpression, ReadOnlyCollection<FetchRequestBase> fetchRequests)
+    public TestFetchExpressionNodeBase (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
+        : base(parseInfo, relatedObjectSelector)
     {
-      _newExpression = newExpression;
-      _fetchRequests = fetchRequests;
     }
 
-    public Expression NewExpression
+    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
-      get { return _newExpression; }
-    }
-
-    public ReadOnlyCollection<FetchRequestBase> FetchRequests
-    {
-      get { return _fetchRequests; }
+      throw new NotImplementedException();
     }
   }
 }

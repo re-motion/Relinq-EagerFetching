@@ -19,10 +19,11 @@ using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
+using Remotion.Data.Linq.EagerFetching.Parsing;
 using Remotion.Data.UnitTests.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Data.UnitTests.Linq.TestDomain;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetching
+namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
 {
   [TestFixture]
   public class FetchExpressionNode_IntegrationTest : ExpressionNodeTestBase

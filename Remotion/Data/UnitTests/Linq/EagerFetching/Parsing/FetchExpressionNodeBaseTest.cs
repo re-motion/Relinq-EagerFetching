@@ -22,7 +22,7 @@ using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.UnitTests.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Data.UnitTests.Linq.TestDomain;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetching
+namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
 {
   [TestFixture]
   public class FetchExpressionNodeBaseTest : ExpressionNodeTestBase
@@ -38,7 +38,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression; 'new [] {1, 2, 3}' "
-        + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
+                                                                      + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
     public void Initialization_InvalidExpression ()
     {
       var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<int>> (s => new[] { 1, 2, 3 });
@@ -47,7 +47,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression of the kind "
-        + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
+                                                                      + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
     public void Initialization_InvalidExpression_MoreThanOneMember ()
     {
       var relatedObjectSelector = (Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends);

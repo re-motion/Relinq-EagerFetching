@@ -4,7 +4,7 @@ using System.Reflection;
 using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Utilities;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Data.Linq.EagerFetching.Parsing
 {
   public abstract class FetchExpressionNodeBase : ResultOperatorExpressionNodeBase
   {

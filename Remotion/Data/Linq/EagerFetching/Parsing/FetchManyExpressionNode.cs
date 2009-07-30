@@ -20,20 +20,20 @@ using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Utilities;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Data.Linq.EagerFetching.Parsing
 {
-  public class FetchOneExpressionNode : FetchExpressionNodeBase
+  public class FetchManyExpressionNode : FetchExpressionNodeBase
   {
-    public static readonly MethodInfo[] SupportedMethods = new[] { typeof (ExtensionMethods).GetMethod ("FetchOne") };
+    public static readonly MethodInfo[] SupportedMethods = new[] { typeof (ExtensionMethods).GetMethod ("FetchMany") };
 
-    public FetchOneExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
+    public FetchManyExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
         : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {
     }
 
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
-      var resultOperator = new FetchOneRequest (RelationMember);
+      var resultOperator = new FetchManyRequest (RelationMember);
       clauseGenerationContext.AddContextInfo (this, resultOperator);
       return resultOperator;
     }
