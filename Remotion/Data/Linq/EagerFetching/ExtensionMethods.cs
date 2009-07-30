@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Remotion.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
@@ -36,8 +37,11 @@ namespace Remotion.Data.Linq.EagerFetching
     public static FluentFetchRequest<TOriginating, TRelated> FetchMany<TOriginating, TRelated> (
         this IQueryable<TOriginating> query, Expression<Func<TOriginating, IEnumerable<TRelated>>> relatedObjectSelector)
     {
-      return FetchInternal<TOriginating, TRelated> (
-          query, relatedObjectSelector, new FetchManyExpression (query.Expression, relatedObjectSelector));
+      ArgumentUtility.CheckNotNull ("query", query);
+      ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
+
+      var methodInfo = ((MethodInfo) MethodBase.GetCurrentMethod ()).MakeGenericMethod (typeof (TOriginating), typeof (TRelated));
+      return CreateFluentFetchRequest<TOriginating, TRelated> (methodInfo, query, relatedObjectSelector);
     }
 
     /// <summary>
@@ -53,8 +57,11 @@ namespace Remotion.Data.Linq.EagerFetching
     public static FluentFetchRequest<TOriginating, TRelated> FetchOne<TOriginating, TRelated> (
         this IQueryable<TOriginating> query, Expression<Func<TOriginating, TRelated>> relatedObjectSelector)
     {
-      return FetchInternal<TOriginating, TRelated> (
-          query, relatedObjectSelector, new FetchOneExpression (query.Expression, relatedObjectSelector));
+      ArgumentUtility.CheckNotNull ("query", query);
+      ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
+
+      var methodInfo = ((MethodInfo) MethodBase.GetCurrentMethod ()).MakeGenericMethod (typeof (TOriginating), typeof (TRelated));
+      return CreateFluentFetchRequest<TOriginating, TRelated> (methodInfo, query, relatedObjectSelector);
     }
 
     /// <summary>
@@ -70,8 +77,11 @@ namespace Remotion.Data.Linq.EagerFetching
     /// from the related objects fetched by the fetch request created by this method.</returns>
     public static FluentFetchRequest<TQueried, TRelated> ThenFetchMany<TQueried, TFetch, TRelated> (this FluentFetchRequest<TQueried, TFetch> query, Expression<Func<TFetch, IEnumerable<TRelated>>> relatedObjectSelector)
     {
+      ArgumentUtility.CheckNotNull ("query", query);
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
-      return FetchInternal<TQueried, TRelated> (query, relatedObjectSelector, new ThenFetchManyExpression (query.Expression, relatedObjectSelector));
+
+      var methodInfo = ((MethodInfo) MethodBase.GetCurrentMethod ()).MakeGenericMethod (typeof (TQueried), typeof (TFetch), typeof (TRelated));
+      return CreateFluentFetchRequest<TQueried, TRelated> (methodInfo, query, relatedObjectSelector);
     }
 
     /// <summary>
@@ -87,17 +97,21 @@ namespace Remotion.Data.Linq.EagerFetching
     /// from the related objects fetched by the fetch request created by this method.</returns>
     public static FluentFetchRequest<TQueried, TRelated> ThenFetchOne<TQueried, TFetch, TRelated> (this FluentFetchRequest<TQueried, TFetch> query, Expression<Func<TFetch, TRelated>> relatedObjectSelector)
     {
+      ArgumentUtility.CheckNotNull ("query", query);
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
-      return FetchInternal<TQueried, TRelated> (query, relatedObjectSelector, new ThenFetchOneExpression (query.Expression, relatedObjectSelector));
+      
+      var methodInfo = ((MethodInfo) MethodBase.GetCurrentMethod ()).MakeGenericMethod (typeof (TQueried), typeof (TFetch), typeof (TRelated));
+      return CreateFluentFetchRequest<TQueried, TRelated> (methodInfo, query, relatedObjectSelector);
     }
 
-    private static FluentFetchRequest<TOriginating, TRelated> FetchInternal<TOriginating, TRelated> (
-        IQueryable<TOriginating> query, LambdaExpression relatedObjectSelector, Expression fetchExpression)
+    private static FluentFetchRequest<TOriginating, TRelated> CreateFluentFetchRequest<TOriginating, TRelated> (
+        MethodInfo currentFetchMethod, 
+        IQueryable<TOriginating> query, 
+        LambdaExpression relatedObjectSelector)
     {
       var queryProvider = ArgumentUtility.CheckNotNullAndType<QueryProviderBase> ("query.Provider", query.Provider);
-      ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);
-
-      return new FluentFetchRequest<TOriginating, TRelated> (queryProvider, fetchExpression);
+      var callExpression = Expression.Call (currentFetchMethod, query.Expression, relatedObjectSelector);
+      return new FluentFetchRequest<TOriginating, TRelated> (queryProvider, callExpression);
     }
   }
 }
