@@ -75,7 +75,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (_queryModel.ResultOperators,
           Is.EqualTo (new ResultOperatorBase[] { _distinctResultOperator, _fetchManyRequest, _countResultOperator }));
       
-      Assert.That (_visitor.FetchQueryModelBuilders.Count, Is.EqualTo (2));
+      Assert.That (_visitor.FetchQueryModelBuilders.Count, Is.EqualTo (1));
       Assert.That (_visitor.FetchQueryModelBuilders[0].FetchRequest, Is.SameAs (_fetchOneRequest));
       Assert.That (_visitor.FetchQueryModelBuilders[0].QueryModel, Is.SameAs (_queryModel));
       Assert.That (_visitor.FetchQueryModelBuilders[0].ResultOperatorPosition, Is.EqualTo (1));

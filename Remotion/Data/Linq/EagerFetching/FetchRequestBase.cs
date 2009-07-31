@@ -15,9 +15,9 @@
 // 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.Clauses.ResultOperators;
 using Remotion.Data.Linq.Clauses.StreamedData;
 using Remotion.Utilities;
@@ -59,12 +59,64 @@ namespace Remotion.Data.Linq.EagerFetching
     }
 
     /// <summary>
+    /// Gets a the fetch query model, i.e. a new <see cref="QueryModel"/> that incorporates a given <paramref name="sourceItemQueryModel"/> as a
+    /// <see cref="SubQueryExpression"/> and selects the fetched items from it.
+    /// </summary>
+    /// <param name="sourceItemQueryModel">A <see cref="QueryModel"/> that yields the source items for which items are to be fetched.</param>
+    /// <returns>A <see cref="QueryModel"/> that selects the fetched items from <paramref name="sourceItemQueryModel"/> as a subquery.</returns>
+    /// <remarks>
+    /// This method does not clone the <paramref name="sourceItemQueryModel"/>, remove result operatores, etc. Use 
+    /// <see cref="FetchQueryModelBuilder.GetOrCreateFetchQueryModel"/> (via <see cref="FetchFilteringQueryModelVisitor"/>) for the full algorithm.
+    /// </remarks>
+    public virtual QueryModel CreateFetchQueryModel (QueryModel sourceItemQueryModel)
+    {
+      ArgumentUtility.CheckNotNull ("sourceItemQueryModel", sourceItemQueryModel);
+
+      var outputDataInfo = sourceItemQueryModel.GetOutputDataInfo() as StreamedSequenceInfo;
+      if (outputDataInfo == null)
+      {
+        var message = string.Format (
+            "The given source query model selects does not select a sequence, it selects a single object of type '{0}'. In order to fetch the "
+            + "relation member '{1}', the query must yield a sequence of objects of type '{2}'.",
+            sourceItemQueryModel.GetOutputDataInfo ().DataType,
+            RelationMember.Name,
+            RelationMember.DeclaringType);
+        throw new ArgumentException (message, "sourceItemQueryModel");
+      }
+
+      if (!RelationMember.DeclaringType.IsAssignableFrom (outputDataInfo.ItemExpression.Type))
+      {
+        var message = string.Format (
+            "The given source query model selects items that do not match the fetch request. In order to fetch the relation member '{0}', the query "
+            + "must yield objects of type '{1}', but it yields '{2}'.",
+            RelationMember.Name,
+            RelationMember.DeclaringType,
+            outputDataInfo.ItemExpression.Type);
+        throw new ArgumentException (message, "sourceItemQueryModel");
+      }
+
+      // from #fetch0 in (sourceItemQuery)
+      // select #fetch0
+
+      var mainFromClause = new MainFromClause (
+          sourceItemQueryModel.GetNewName ("#fetch"), 
+          outputDataInfo.ItemExpression.Type, 
+          new SubQueryExpression (sourceItemQueryModel));
+      var selectClause = new SelectClause (new QuerySourceReferenceExpression (mainFromClause));
+      var fetchQueryModel = new QueryModel (mainFromClause, selectClause);
+
+      ModifyFetchQueryModel (fetchQueryModel);
+
+      return fetchQueryModel;
+    }
+
+    /// <summary>
     /// Modifies the given query model for fetching, adding new <see cref="AdditionalFromClause"/> instances and changing the 
     /// <see cref="SelectClause"/> as needed.
     /// This method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
     /// <param name="fetchQueryModel">The fetch query model to modify.</param>
-    public abstract void ModifyFetchQueryModel (QueryModel fetchQueryModel);
+    protected abstract void ModifyFetchQueryModel (QueryModel fetchQueryModel); // TODO 1441: Make protected
     
     /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
@@ -78,61 +130,6 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("fetchRequest", fetchRequest);
       return _innerFetchRequestCollection.GetOrAddFetchRequest (fetchRequest);
-    }
-
-    // TODO 1441: Remove
-    /// <summary>
-    /// Creates the fetch query model for this <see cref="FetchRequestBase"/> from a given <paramref name="originalQueryModel"/>.
-    /// </summary>
-    /// <param name="originalQueryModel">The original query model to create a fetch query from.</param>
-    /// <returns>
-    /// A new <see cref="QueryModel"/> which represents the same query as <paramref name="originalQueryModel"/> but selecting
-    /// the objects described by <see cref="RelationMember"/> instead of the objects selected by the <paramref name="originalQueryModel"/>.
-    /// </returns>
-    public QueryModel CreateFetchQueryModel (QueryModel originalQueryModel)
-    {
-      ArgumentUtility.CheckNotNull ("originalQueryModel", originalQueryModel);
-
-      // clone the original query model, modify it as needed by the fetch request, then copy over the result operators if needed
-      var cloneContext = new CloneContext (new QuerySourceMapping());
-      var fetchQueryModel = originalQueryModel.Clone (cloneContext.QuerySourceMapping);
-
-      foreach (var resultOperator in fetchQueryModel.ResultOperators.AsChangeResistantEnumerableWithIndex ())
-      {
-        if (resultOperator.Value is FetchRequestBase)
-          fetchQueryModel.ResultOperators.RemoveAt (resultOperator.Index);
-      }
-
-      ModifyFetchQueryModel (fetchQueryModel);
-
-      return fetchQueryModel;
-    }
-
-    /// <summary>
-    /// Gets an <see cref="Expression"/> that returns the fetched object(s).
-    /// </summary>
-    /// <param name="selectClauseToFetchFrom">The select clause yielding the objects to apply <see cref="RelationMember"/> to in order to
-    /// fetch the related object(s).</param>
-    /// <returns>An <see cref="Expression"/> that returns the fetched object(s).</returns>
-    protected MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
-    {
-      ArgumentUtility.CheckNotNull ("selectClauseToFetchFrom", selectClauseToFetchFrom);
-
-      var selector = selectClauseToFetchFrom.Selector;
-
-      if (!RelationMember.DeclaringType.IsAssignableFrom (selector.Type))
-      {
-        var message = string.Format (
-            "The given SelectClause contains an invalid selector '{0}'. In order to fetch the relation property "
-            + "'{1}', the selector must yield objects of type '{2}', but it yields '{3}'.",
-            selector,
-            RelationMember.Name,
-            RelationMember.DeclaringType.FullName,
-            selector.Type);
-        throw new ArgumentException (message, "selectClauseToFetchFrom");
-      }
-      // for a select clause with a projection of expr, we generate a fetch source expression of expr.RelationMember
-      return Expression.MakeMemberAccess (selector, RelationMember);
     }
 
     public override StreamedSequence ExecuteInMemory<T> (StreamedSequence input)

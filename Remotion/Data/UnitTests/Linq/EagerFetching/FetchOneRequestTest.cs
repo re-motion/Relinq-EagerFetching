@@ -17,12 +17,12 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.TestDomain;
 using System.Reflection;
+using Remotion.Development.UnitTesting;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
@@ -31,30 +31,29 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
   {
     private MemberInfo _otherStudentMember;
     private FetchOneRequest _otherStudentFetchRequest;
-    private IQueryable<Student> _studentFromStudentDetailQuery;
-    private QueryModel _studentFromStudentDetailQueryModel;
 
     [SetUp]
     public void SetUp ()
     {
       _otherStudentMember = typeof (Student).GetProperty ("OtherStudent");
       _otherStudentFetchRequest = new FetchOneRequest (_otherStudentMember);
-
-      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
-                                        select sd.Student);
-      _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
 
     [Test]
     public void ModifyFetchQueryModel ()
     {
-      _otherStudentFetchRequest.ModifyFetchQueryModel (_studentFromStudentDetailQueryModel);
+      var inputFetchQuery = from fetch0 in
+                              (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Student).Take (1)
+                            select fetch0;
+      var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      Assert.That (_studentFromStudentDetailQueryModel.BodyClauses.Count, Is.EqualTo (0), "no additional from clauses added");
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Student)
+      //           select fetch0.OtherStudent;
 
-      var selectClause = _studentFromStudentDetailQueryModel.SelectClause;
-      var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (
-          _studentFromStudentDetailQueryModel.MainFromClause, sd => sd.Student.OtherStudent);
+      PrivateInvoke.InvokeNonPublicMethod (_otherStudentFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
+
+      var selectClause = fetchQueryModel.SelectClause;
+      var expectedExpression = ExpressionHelper.Resolve<Student, Student> (fetchQueryModel.MainFromClause, s => s.OtherStudent);
       ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
     }
 

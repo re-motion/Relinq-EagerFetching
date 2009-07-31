@@ -14,38 +14,24 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.UnitTests.Linq.TestDomain;
 using Remotion.Utilities;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
   public class TestFetchRequest : FetchRequestBase
   {
-    public readonly Expression FakeSelectProjection = Expression.Constant (null, typeof (Student));
-
-    public IBodyClause FakeBodyClauseToAdd = null;
-
     public TestFetchRequest (MemberInfo relationMember)
         : base (relationMember)
     {
     }
 
-    public override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
+    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
-      var selectClause = fetchQueryModel.SelectClause;
-      selectClause.Selector = FakeSelectProjection;
-      if (FakeBodyClauseToAdd != null)
-        fetchQueryModel.BodyClauses.Add (FakeBodyClauseToAdd);
-    }
-
-    public new MemberExpression CreateFetchSourceExpression (SelectClause selectClauseToFetchFrom)
-    {
-      return base.CreateFetchSourceExpression (selectClauseToFetchFrom);
+      // do nothing
     }
 
     public override ResultOperatorBase Clone (CloneContext cloneContext)

@@ -14,6 +14,7 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
@@ -34,15 +35,12 @@ namespace Remotion.Data.Linq.EagerFetching
     /// Modifies the given query model for fetching, changing the <see cref="SelectClause.Selector"/> to the fetch source expression.
     /// For example, a fetch request such as <c>FetchOne (x => x.Customer)</c> will be transformed into a <see cref="SelectClause"/> selecting
     /// <c>y.Customer</c> (where <c>y</c> is what the query model originally selected).
-    /// This method is called by <see cref="ModifyFetchQueryModel"/> in the process of creating the new fetch query model.
+    /// This method is called by <see cref="FetchRequestBase.CreateFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
-    public override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
+    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
-
-      var newSelectProjection = CreateFetchSourceExpression (fetchQueryModel.SelectClause);
-      var selectClause = fetchQueryModel.SelectClause;
-      selectClause.Selector = newSelectProjection;
+      fetchQueryModel.SelectClause.Selector = Expression.MakeMemberAccess (fetchQueryModel.SelectClause.Selector, RelationMember);
     }
 
     public override ResultOperatorBase Clone (CloneContext cloneContext)

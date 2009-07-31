@@ -67,13 +67,13 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       if (_cachedFetchModel == null)
       {
-        _cachedFetchModel = QueryModel.Clone();
+        var sourceItemModel = QueryModel.Clone();
 
-        int resultOperatorsToDelete = _cachedFetchModel.ResultOperators.Count - ResultOperatorPosition;
+        int resultOperatorsToDelete = sourceItemModel.ResultOperators.Count - ResultOperatorPosition;
         for (int i = 0; i < resultOperatorsToDelete; ++i)
-          _cachedFetchModel.ResultOperators.RemoveAt (ResultOperatorPosition);
+          sourceItemModel.ResultOperators.RemoveAt (ResultOperatorPosition);
 
-        FetchRequest.ModifyFetchQueryModel (_cachedFetchModel);
+        _cachedFetchModel = FetchRequest.CreateFetchQueryModel (sourceItemModel);
       }
 
       return _cachedFetchModel;

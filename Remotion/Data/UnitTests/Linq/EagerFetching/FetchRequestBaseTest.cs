@@ -20,11 +20,13 @@ using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
-using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.Clauses.Expressions;
+using Remotion.Data.Linq.Clauses.ResultOperators;
 using Remotion.Data.Linq.Clauses.StreamedData;
 using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.UnitTests.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.TestDomain;
+using Remotion.Development.UnitTesting;
+using Rhino.Mocks;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
 {
@@ -45,7 +47,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       _friendsMember = typeof (Student).GetProperty ("Friends");
       _friendsFetchRequest = new TestFetchRequest (_friendsMember);
       _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
-                                        select sd.Student);
+                                        select sd.Student).Take (1);
       _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
 
@@ -67,88 +69,55 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    public void GetFetchSourceExpression ()
-    {
-      // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
-
-      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (selectProjection);
-
-      var fetchSourceExpression = _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
-      Assert.That (fetchSourceExpression, Is.Not.Null);
-    }
-
-    [Test]
-    public void GetFetchSourceExpression_Expression ()
-    {
-      // simulate a fetch request for the following: var query = from ... select sd.Student; query.FetchMany (s => s.Friends);
-
-      var selectProjection = (MemberExpression) ExpressionHelper.MakeExpression<Student_Detail, Student> (sd => sd.Student);
-      var selectClause = new SelectClause (selectProjection);
-
-      var fetchSourceExpression = _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
-
-      // expecting: sd => sd.Student.Friends
-
-      Assert.That (fetchSourceExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
-
-      var innerMemberExpression = (MemberExpression) fetchSourceExpression.Expression;
-      Assert.That (innerMemberExpression.Member, Is.EqualTo (typeof (Student_Detail).GetProperty ("Student")));
-      Assert.That (innerMemberExpression.Expression, Is.SameAs (selectProjection.Expression));
-    }
-
-    [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given SelectClause contains an invalid selector 'sd'. "
-        + "In order to fetch the relation property 'Friends', the selector must yield objects of type 'Remotion.Data.UnitTests.Linq.TestDomain.Student', but "
-        + "it yields 'Remotion.Data.UnitTests.Linq.TestDomain.Student_Detail'.\r\nParameter name: selectClauseToFetchFrom")]
-    public void GetFetchSourceExpression_InvalidSelectProjection_WrongInputType ()
-    {
-      var selectProjection = (ParameterExpression) ExpressionHelper.MakeExpression<Student_Detail, Student_Detail> (sd => sd);
-      var selectClause = new SelectClause (selectProjection);
-
-      _friendsFetchRequest.CreateFetchSourceExpression (selectClause);
-    }
-
-    [Test]
     public void CreateFetchQueryModel ()
     {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (fetchQueryModel, Is.Not.Null);
-      Assert.That (fetchQueryModel, Is.Not.SameAs (_studentFromStudentDetailQueryModel));
+      // expected: from <x> in (from sd in ExpressionHelper.CreateStudentDetailQueryable() select sd.Student).Take (1)
+      //           select <x>
+
+      var fetchRequestPartialMock = new MockRepository ().PartialMock<FetchRequestBase> (_friendsMember);
+      
+      QueryModel modifiedQueryModel = null;
+      fetchRequestPartialMock
+          .Expect (mock => PrivateInvoke.InvokeNonPublicMethod (mock, "ModifyFetchQueryModel", Arg<QueryModel>.Is.Anything))
+          .WhenCalled (mi => modifiedQueryModel = (QueryModel) mi.Arguments[0]);
+
+      fetchRequestPartialMock.Replay ();
+
+      var fetchQueryModel = fetchRequestPartialMock.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+
+      fetchRequestPartialMock.VerifyAllExpectations ();
+      Assert.That (modifiedQueryModel, Is.SameAs (fetchQueryModel));
+
+      Assert.That (fetchQueryModel.MainFromClause.FromExpression, Is.InstanceOfType (typeof (SubQueryExpression)));
+
+      var subQueryExpression = (SubQueryExpression) fetchQueryModel.MainFromClause.FromExpression;
+      Assert.That (subQueryExpression.QueryModel, Is.SameAs (_studentFromStudentDetailQueryModel));
+
+      Assert.That (_studentFromStudentDetailQueryModel.BodyClauses.Count, Is.EqualTo (0));
+      Assert.That (((QuerySourceReferenceExpression) fetchQueryModel.SelectClause.Selector).ReferencedQuerySource, 
+          Is.SameAs (fetchQueryModel.MainFromClause));
     }
 
     [Test]
-    public void CreateFetchQueryModel_MainFromClause ()
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects does not select a sequence, it selects a "
+        + "single object of type 'System.Int32'. In order to fetch the relation member 'Friends', the query must yield a sequence of objects of type "
+        + "'Remotion.Data.UnitTests.Linq.TestDomain.Student'.\r\nParameter name: sourceItemQueryModel")]
+    public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      // expecting:
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // (same as in original query model)
-
-      ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.FromExpression, _studentFromStudentDetailQueryModel.MainFromClause.FromExpression);
-      Assert.That (fetchQueryModel.MainFromClause.ItemName, Is.EqualTo (_studentFromStudentDetailQueryModel.MainFromClause.ItemName));
-      Assert.That (fetchQueryModel.MainFromClause.ItemType, Is.SameAs (_studentFromStudentDetailQueryModel.MainFromClause.ItemType));
+      var invalidQueryModel = ExpressionHelper.CreateQueryModel ();
+      invalidQueryModel.ResultOperators.Add (new CountResultOperator ());
+      _friendsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
 
     [Test]
-    public void CreateFetchQueryModel_SelectClause ()
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects items that do not match the fetch "
+        + "request. In order to fetch the relation member 'Friends', the query must yield objects of type "
+        + "'Remotion.Data.UnitTests.Linq.TestDomain.Student', but it yields 'Remotion.Data.UnitTests.Linq.TestDomain.Student_Detail'.\r\n"
+        + "Parameter name: sourceItemQueryModel")]
+    public void CreateFetchQueryModel_InvalidItems ()
     {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (fetchQueryModel.SelectClause.Selector, Is.SameAs (_friendsFetchRequest.FakeSelectProjection));
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_ResultOperatorsAreCloned_WithoutFetch ()
-    {
-      var resultOperator = ExpressionHelper.CreateResultOperator ();
-      _studentFromStudentDetailQueryModel.ResultOperators.Add (resultOperator);
-      _studentFromStudentDetailQueryModel.ResultOperators.Add (_friendsFetchRequest);
-
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      Assert.That (fetchQueryModel.ResultOperators.Count, Is.EqualTo (1));
-      Assert.That (fetchQueryModel.ResultOperators[0].GetType (), Is.SameAs (resultOperator.GetType ()));
+      var invalidQueryModel = ExpressionHelper.CreateQueryModel (ExpressionHelper.CreateMainFromClause_Detail());
+      _friendsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
 
     [Test]

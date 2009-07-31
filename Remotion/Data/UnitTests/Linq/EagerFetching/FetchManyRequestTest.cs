@@ -19,12 +19,12 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.TestDomain;
+using Remotion.Development.UnitTesting;
 using Remotion.Utilities;
 
 namespace Remotion.Data.UnitTests.Linq.EagerFetching
@@ -35,23 +35,17 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     private MemberInfo _friendsMember;
 
     private FetchManyRequest _friendsFetchRequest;
-    private IQueryable<Student> _studentFromStudentDetailQuery;
-    private QueryModel _studentFromStudentDetailQueryModel;
 
     [SetUp]
     public void SetUp ()
     {
       _friendsMember = typeof (Student).GetProperty ("Friends");
       _friendsFetchRequest = new FetchManyRequest (_friendsMember);
-
-      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
-                                        select sd.Student);
-      _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
 
     [Test]
     [ExpectedException (typeof (ArgumentTypeException))]
-    public void Create_InvalidExpression_NoEnumerableOfT ()
+    public void Create_InvalidRelationMember ()
     {
       var idMember = typeof (Student).GetProperty ("ID");
       new FetchManyRequest (idMember);
@@ -60,21 +54,21 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [Test]
     public void ModifyFetchQueryModel ()
     {
-      _friendsFetchRequest.ModifyFetchQueryModel (_studentFromStudentDetailQueryModel);
+      var inputFetchQuery = from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Student).Take (1)
+                            select fetch0;
+      var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      // expecting:
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // from <x> in sd.Student.Friends
-      // select <x>
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Student)
+      //           from fetch1 in fetch0.Friends
+      //           select fetch1;
 
-      Assert.That (_studentFromStudentDetailQueryModel.BodyClauses.Count, Is.EqualTo (1));
-      var memberFromClause = (AdditionalFromClause) _studentFromStudentDetailQueryModel.BodyClauses[0];
-      var expectedFromExpression =
-          ExpressionHelper.Resolve<Student_Detail, IEnumerable<Student>> (_studentFromStudentDetailQueryModel.MainFromClause, sd => sd.Student.Friends);
-      ExpressionTreeComparer.CheckAreEqualTrees (memberFromClause.FromExpression, expectedFromExpression);
+      PrivateInvoke.InvokeNonPublicMethod (_friendsFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
 
-      var selectClause = _studentFromStudentDetailQueryModel.SelectClause;
-      Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedQuerySource, Is.SameAs (memberFromClause));
+      var additionalFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses[0];
+      var expectedExpression = ExpressionHelper.Resolve<Student, IEnumerable<Student>> (fetchQueryModel.MainFromClause, s => s.Friends);
+      ExpressionTreeComparer.CheckAreEqualTrees (expectedExpression, additionalFromClause.FromExpression);
+
+      Assert.That (((QuerySourceReferenceExpression) fetchQueryModel.SelectClause.Selector).ReferencedQuerySource, Is.SameAs (additionalFromClause));
     }
 
     [Test]

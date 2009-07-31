@@ -14,6 +14,7 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
@@ -41,13 +42,13 @@ namespace Remotion.Data.Linq.EagerFetching
     /// For example, a fetch request such as <c>FetchMany (x => x.Orders)</c> will be transformed into a <see cref="AdditionalFromClause"/> selecting
     /// <c>y.Orders</c> (where <c>y</c> is what the query model originally selected) and a <see cref="SelectClause"/> selecting the result of the
     /// <see cref="AdditionalFromClause"/>.
-    /// This method is called by <see cref="ModifyFetchQueryModel"/> in the process of creating the new fetch query model.
+    /// This method is called by <see cref="FetchRequestBase.CreateFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
-    public override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
+    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
-      var fromExpression = CreateFetchSourceExpression (fetchQueryModel.SelectClause);
+      var fromExpression = Expression.MakeMemberAccess (new QuerySourceReferenceExpression (fetchQueryModel.MainFromClause), RelationMember);
       var memberFromClause = new AdditionalFromClause (fetchQueryModel.GetNewName ("#fetch"), _relatedObjectType, fromExpression);
       fetchQueryModel.BodyClauses.Add (memberFromClause);
 

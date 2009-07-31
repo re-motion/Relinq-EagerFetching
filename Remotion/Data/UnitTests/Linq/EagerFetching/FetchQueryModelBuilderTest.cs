@@ -19,6 +19,7 @@ using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
+using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.Clauses.ResultOperators;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
@@ -35,13 +36,13 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     private MemberInfo _scoresMember;
     private MemberInfo _isOldMember;
 
-    private TestFetchRequest _friendsFetchRequest;
+    private TestFetchRequest _outerFetchRequest;
     private TestFetchRequest _innerFetchRequest1;
     private TestFetchRequest _innerFetchRequest2;
     private TestFetchRequest _innerInnerFetchRequest;
 
-    private QueryModel _studentFromStudentDetailQueryModel;
-    private FetchQueryModelBuilder _friendsFetchQueryModelBuilder;
+    private QueryModel _sourceItemQueryModel;
+    private FetchQueryModelBuilder _outerFetchQueryModelBuilder;
 
     [SetUp]
     public void SetUp ()
@@ -51,57 +52,61 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       _scoresMember = typeof (Student).GetProperty ("Scores");
       _isOldMember = typeof (Student).GetProperty ("IsOld");
 
-      _friendsFetchRequest = new TestFetchRequest (_friendsMember);
+      _outerFetchRequest = new TestFetchRequest (_friendsMember);
       _innerFetchRequest1 = new TestFetchRequest (_hasDogMember);
-      _friendsFetchRequest.GetOrAddInnerFetchRequest (_innerFetchRequest1);
+      _outerFetchRequest.GetOrAddInnerFetchRequest (_innerFetchRequest1);
       _innerFetchRequest2 = new TestFetchRequest (_scoresMember);
-      _friendsFetchRequest.GetOrAddInnerFetchRequest (_innerFetchRequest2);
+      _outerFetchRequest.GetOrAddInnerFetchRequest (_innerFetchRequest2);
       _innerInnerFetchRequest = new TestFetchRequest (_isOldMember);
       _innerFetchRequest1.GetOrAddInnerFetchRequest (_innerInnerFetchRequest);
 
       var expression = ExpressionHelper.MakeExpression ( () => (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
                                                                 select sd.Student).Take (1)/*.Fetch*/.Distinct().Count());
-      _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (expression);
-      _friendsFetchQueryModelBuilder = new FetchQueryModelBuilder (_friendsFetchRequest, _studentFromStudentDetailQueryModel, 1);
+      _sourceItemQueryModel = ExpressionHelper.ParseQuery (expression);
+      _outerFetchQueryModelBuilder = new FetchQueryModelBuilder (_outerFetchRequest, _sourceItemQueryModel, 1);
     }
 
     [Test]
-    public void GetOrCreateFetchQueryModel_ClonesModel ()
-    {
-      var fetchQueryModel = _friendsFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
-      Assert.That (fetchQueryModel, Is.Not.Null);
-      Assert.That (fetchQueryModel, Is.Not.SameAs (_studentFromStudentDetailQueryModel));
-
-      ExpressionTreeComparer.CheckAreEqualTrees (fetchQueryModel.MainFromClause.FromExpression, _studentFromStudentDetailQueryModel.MainFromClause.FromExpression);
-      Assert.That (fetchQueryModel.MainFromClause.ItemName, Is.EqualTo (_studentFromStudentDetailQueryModel.MainFromClause.ItemName));
-      Assert.That (fetchQueryModel.MainFromClause.ItemType, Is.SameAs (_studentFromStudentDetailQueryModel.MainFromClause.ItemType));
-    }
-
-    [Test]
-    public void GetOrCreateFetchQueryModel_CallsModifyFetchQueryModel ()
+    public void GetOrCreateFetchQueryModel_CallsCreateFetchQueryModel ()
     {
       var fetchRequestMock = MockRepository.GenerateMock<FetchRequestBase> (_friendsMember);
+      var mockQueryModel = ExpressionHelper.CreateQueryModel ();
+      fetchRequestMock.Expect (mock => mock.CreateFetchQueryModel (Arg<QueryModel>.Is.Anything)).Return (mockQueryModel);
 
-      var builder = new FetchQueryModelBuilder (fetchRequestMock, _studentFromStudentDetailQueryModel, 1);
-      builder.GetOrCreateFetchQueryModel ();
+      var builder = new FetchQueryModelBuilder (fetchRequestMock, _sourceItemQueryModel, 1);
+      var result = builder.GetOrCreateFetchQueryModel ();
 
-      fetchRequestMock.AssertWasCalled (mock => mock.ModifyFetchQueryModel (Arg<QueryModel>.Is.NotNull));
+      Assert.That (result, Is.SameAs (mockQueryModel));
+    }
+
+    [Test]
+    public void GetOrCreateFetchQueryModel_ClonesSourceModel ()
+    {
+      var fetchQueryModel = _outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
+      var newSourceModel = ((SubQueryExpression) fetchQueryModel.MainFromClause.FromExpression).QueryModel;
+      Assert.That (newSourceModel, Is.Not.Null);
+      Assert.That (newSourceModel, Is.Not.SameAs (_sourceItemQueryModel));
+
+      ExpressionTreeComparer.CheckAreEqualTrees (newSourceModel.MainFromClause.FromExpression, _sourceItemQueryModel.MainFromClause.FromExpression);
+      Assert.That (newSourceModel.MainFromClause.ItemName, Is.EqualTo (_sourceItemQueryModel.MainFromClause.ItemName));
+      Assert.That (newSourceModel.MainFromClause.ItemType, Is.SameAs (_sourceItemQueryModel.MainFromClause.ItemType));
     }
 
     [Test]
     public void GetOrCreateFetchQueryModel_RemovesResultOperators_StartingFromPosition ()
     {
-      var fetchQueryModel = _friendsFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
+      var fetchQueryModel = _outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
+      var newSourceModel = ((SubQueryExpression) fetchQueryModel.MainFromClause.FromExpression).QueryModel;
 
-      Assert.That (fetchQueryModel.ResultOperators.Count, Is.EqualTo (1));
-      Assert.That (fetchQueryModel.ResultOperators[0], Is.InstanceOfType (typeof (TakeResultOperator)));
+      Assert.That (newSourceModel.ResultOperators.Count, Is.EqualTo (1));
+      Assert.That (newSourceModel.ResultOperators[0], Is.InstanceOfType (typeof (TakeResultOperator)));
     }
 
     [Test]
     public void GetOrCreateFetchQueryModel_CachesResult ()
     {
-      var fetchQueryModel1 = _friendsFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
-      var fetchQueryModel2 = _friendsFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
+      var fetchQueryModel1 = _outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
+      var fetchQueryModel2 = _outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
 
       Assert.That (fetchQueryModel1, Is.SameAs (fetchQueryModel2));
     }
@@ -109,32 +114,32 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [Test]
     public void CreateInnerBuilders ()
     {
-      var innerBuilders = _friendsFetchQueryModelBuilder.CreateInnerBuilders ();
+      var innerBuilders = _outerFetchQueryModelBuilder.CreateInnerBuilders ();
       Assert.That (innerBuilders.Length, Is.EqualTo (2));
 
-      Assert.That (innerBuilders[0].QueryModel, Is.SameAs (_friendsFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
-      Assert.That (innerBuilders[0].ResultOperatorPosition, Is.EqualTo (_friendsFetchQueryModelBuilder.ResultOperatorPosition));
+      Assert.That (innerBuilders[0].QueryModel, Is.SameAs (_outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
+      Assert.That (innerBuilders[0].ResultOperatorPosition, Is.EqualTo (_outerFetchQueryModelBuilder.ResultOperatorPosition));
 
-      Assert.That (innerBuilders[1].QueryModel, Is.SameAs (_friendsFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
-      Assert.That (innerBuilders[1].ResultOperatorPosition, Is.EqualTo (_friendsFetchQueryModelBuilder.ResultOperatorPosition));
+      Assert.That (innerBuilders[1].QueryModel, Is.SameAs (_outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
+      Assert.That (innerBuilders[1].ResultOperatorPosition, Is.EqualTo (_outerFetchQueryModelBuilder.ResultOperatorPosition));
     }
 
     [Test]
     public void CreateInnerBuilders_OnInnerBuilders ()
     {
-      var innerBuilders = _friendsFetchQueryModelBuilder.CreateInnerBuilders ();
+      var innerBuilders = _outerFetchQueryModelBuilder.CreateInnerBuilders ();
       var innerInnerBuilders = innerBuilders[0].CreateInnerBuilders ();
 
       Assert.That (innerInnerBuilders.Length, Is.EqualTo (1));
 
       Assert.That (innerInnerBuilders[0].QueryModel, Is.SameAs (innerBuilders[0].GetOrCreateFetchQueryModel ()));
-      Assert.That (innerInnerBuilders[0].ResultOperatorPosition, Is.EqualTo (_friendsFetchQueryModelBuilder.ResultOperatorPosition));
+      Assert.That (innerInnerBuilders[0].ResultOperatorPosition, Is.EqualTo (_outerFetchQueryModelBuilder.ResultOperatorPosition));
     }
 
     [Test]
     public void CreateInnerBuilders_WithoutInnerRequests ()
     {
-      var innerBuilders = _friendsFetchQueryModelBuilder.CreateInnerBuilders ();
+      var innerBuilders = _outerFetchQueryModelBuilder.CreateInnerBuilders ();
       var innerInnerBuilders = innerBuilders[1].CreateInnerBuilders ();
 
       Assert.That (innerInnerBuilders.Length, Is.EqualTo (0));
