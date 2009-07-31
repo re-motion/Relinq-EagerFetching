@@ -116,7 +116,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// This method is called by <see cref="CreateFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
     /// <param name="fetchQueryModel">The fetch query model to modify.</param>
-    protected abstract void ModifyFetchQueryModel (QueryModel fetchQueryModel); // TODO 1441: Make protected
+    protected abstract void ModifyFetchQueryModel (QueryModel fetchQueryModel);
     
     /// <summary>
     /// Gets or adds an inner eager-fetch request for this <see cref="FetchRequestBase"/>.
