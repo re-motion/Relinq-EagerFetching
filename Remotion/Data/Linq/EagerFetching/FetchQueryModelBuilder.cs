@@ -21,12 +21,12 @@ using System.Linq;
 namespace Remotion.Data.Linq.EagerFetching
 {
   /// <summary>
-  /// Holds a <see cref="FetchRequestBase"/>, a <see cref="QueryModel"/> for which the fetch request was created, and the position
-  /// where the <see cref="FetchRequestBase"/> occurred in the <see cref="Linq.QueryModel.ResultOperators"/> list of the <see cref="QueryModel"/>. From
-  /// this information, it builds a new <see cref="QueryModel"/> that represents the <see cref="FetchRequestBase"/> as a query.
+  /// Holds a <see cref="FetchRequestBase"/>, a <see cref="SourceItemQueryModel"/> for which the fetch request was created, and the position
+  /// where the <see cref="FetchRequestBase"/> occurred in the <see cref="Linq.QueryModel.ResultOperators"/> list of the <see cref="SourceItemQueryModel"/>. From
+  /// this information, it builds a new <see cref="SourceItemQueryModel"/> that represents the <see cref="FetchRequestBase"/> as a query.
   /// </summary>
   /// <remarks>
-  /// Use <see cref="FetchFilteringQueryModelVisitor"/> to retrieve the <see cref="FetchQueryModelBuilder"/> instances for a <see cref="QueryModel"/>.
+  /// Use <see cref="FetchFilteringQueryModelVisitor"/> to retrieve the <see cref="FetchQueryModelBuilder"/> instances for a <see cref="SourceItemQueryModel"/>.
   /// </remarks>
   public class FetchQueryModelBuilder
   {
@@ -38,7 +38,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <param name="fetchRequest">The fetch request.</param>
     /// <param name="queryModel">The query model for which the <paramref name="fetchRequest"/> was originally defined.</param>
     /// <param name="resultOperatorPosition">The result operator position where the <paramref name="fetchRequest"/> was originally located.
-    /// The <see cref="FetchQueryModelBuilder"/> will include all result operators prior to this position into the fetch <see cref="QueryModel"/>,
+    /// The <see cref="FetchQueryModelBuilder"/> will include all result operators prior to this position into the fetch <see cref="SourceItemQueryModel"/>,
     /// but it will not include any result operators occurring after (or at) that position.</param>
     public FetchQueryModelBuilder (FetchRequestBase fetchRequest, QueryModel queryModel, int resultOperatorPosition)
     {
@@ -46,28 +46,28 @@ namespace Remotion.Data.Linq.EagerFetching
       ArgumentUtility.CheckNotNull ("queryModel", queryModel);
 
       FetchRequest = fetchRequest;
-      QueryModel = queryModel;
+      SourceItemQueryModel = queryModel;
       ResultOperatorPosition = resultOperatorPosition;
     }
 
     public FetchRequestBase FetchRequest { get; private set; }
-    public QueryModel QueryModel { get; private set; }
+    public QueryModel SourceItemQueryModel { get; private set; }
     public int ResultOperatorPosition { get; private set; }
 
     /// <summary>
     /// Creates the fetch query model for the <see cref="FetchRequestBase"/>, caching the result.
     /// </summary>
     /// <returns>
-    /// A new <see cref="QueryModel"/> which represents the same query as <see cref="QueryModel"/> but selecting
+    /// A new <see cref="SourceItemQueryModel"/> which represents the same query as <see cref="SourceItemQueryModel"/> but selecting
     /// the objects described by <see cref="FetchRequestBase.RelationMember"/> instead of the objects selected by the 
-    /// <see cref="QueryModel"/>. From the original <see cref="QueryModel"/>, only those result operators are included that occur
+    /// <see cref="SourceItemQueryModel"/>. From the original <see cref="SourceItemQueryModel"/>, only those result operators are included that occur
     /// prior to <see cref="ResultOperatorPosition"/>.
     /// </returns>
     public QueryModel GetOrCreateFetchQueryModel ()
     {
       if (_cachedFetchModel == null)
       {
-        var sourceItemModel = QueryModel.Clone();
+        var sourceItemModel = SourceItemQueryModel.Clone();
 
         int resultOperatorsToDelete = sourceItemModel.ResultOperators.Count - ResultOperatorPosition;
         for (int i = 0; i < resultOperatorsToDelete; ++i)
@@ -82,14 +82,14 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <summary>
     /// Creates <see cref="FetchQueryModelBuilder"/> objects for the <see cref="FetchRequestBase.InnerFetchRequests"/> of the 
     /// <see cref="FetchRequest"/>. Inner fetch requests start from the fetch query model of the outer fetch request, and they have
-    /// the same <see cref="ResultOperatorPosition"/> as the outer fetch request.
+    /// a <see cref="ResultOperatorPosition"/> of 0.
     /// </summary>
     /// <returns>An array of <see cref="FetchQueryModelBuilder"/> objects for the <see cref="FetchRequestBase.InnerFetchRequests"/> of the
     /// <see cref="FetchRequest"/>.</returns>
     public FetchQueryModelBuilder[] CreateInnerBuilders ()
     {
       var innerBuilders = FetchRequest.InnerFetchRequests.Select (
-          request => new FetchQueryModelBuilder (request, GetOrCreateFetchQueryModel(), ResultOperatorPosition));
+          request => new FetchQueryModelBuilder (request, GetOrCreateFetchQueryModel(), 0));
       return innerBuilders.ToArray ();
     }
   }

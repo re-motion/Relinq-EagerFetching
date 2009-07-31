@@ -77,7 +77,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       
       Assert.That (_visitor.FetchQueryModelBuilders.Count, Is.EqualTo (1));
       Assert.That (_visitor.FetchQueryModelBuilders[0].FetchRequest, Is.SameAs (_fetchOneRequest));
-      Assert.That (_visitor.FetchQueryModelBuilders[0].QueryModel, Is.SameAs (_queryModel));
+      Assert.That (_visitor.FetchQueryModelBuilders[0].SourceItemQueryModel, Is.SameAs (_queryModel));
       Assert.That (_visitor.FetchQueryModelBuilders[0].ResultOperatorPosition, Is.EqualTo (1));
     }
 
@@ -90,11 +90,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       Assert.That (_visitor.FetchQueryModelBuilders.Count, Is.EqualTo (2));
 
       Assert.That (_visitor.FetchQueryModelBuilders[0].FetchRequest, Is.SameAs (_fetchOneRequest));
-      Assert.That (_visitor.FetchQueryModelBuilders[0].QueryModel, Is.SameAs (_queryModel));
+      Assert.That (_visitor.FetchQueryModelBuilders[0].SourceItemQueryModel, Is.SameAs (_queryModel));
       Assert.That (_visitor.FetchQueryModelBuilders[0].ResultOperatorPosition, Is.EqualTo (1)); // Distinct included, Count not
 
       Assert.That (_visitor.FetchQueryModelBuilders[1].FetchRequest, Is.SameAs (_fetchManyRequest));
-      Assert.That (_visitor.FetchQueryModelBuilders[1].QueryModel, Is.SameAs (_queryModel));
+      Assert.That (_visitor.FetchQueryModelBuilders[1].SourceItemQueryModel, Is.SameAs (_queryModel));
       Assert.That (_visitor.FetchQueryModelBuilders[1].ResultOperatorPosition, Is.EqualTo (1)); // Distinct included, Count not
     }
   }

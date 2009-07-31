@@ -117,11 +117,11 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
       var innerBuilders = _outerFetchQueryModelBuilder.CreateInnerBuilders ();
       Assert.That (innerBuilders.Length, Is.EqualTo (2));
 
-      Assert.That (innerBuilders[0].QueryModel, Is.SameAs (_outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
-      Assert.That (innerBuilders[0].ResultOperatorPosition, Is.EqualTo (_outerFetchQueryModelBuilder.ResultOperatorPosition));
+      Assert.That (innerBuilders[0].SourceItemQueryModel, Is.SameAs (_outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
+      Assert.That (innerBuilders[0].ResultOperatorPosition, Is.EqualTo (0));
 
-      Assert.That (innerBuilders[1].QueryModel, Is.SameAs (_outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
-      Assert.That (innerBuilders[1].ResultOperatorPosition, Is.EqualTo (_outerFetchQueryModelBuilder.ResultOperatorPosition));
+      Assert.That (innerBuilders[1].SourceItemQueryModel, Is.SameAs (_outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ()));
+      Assert.That (innerBuilders[1].ResultOperatorPosition, Is.EqualTo (0));
     }
 
     [Test]
@@ -132,8 +132,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
 
       Assert.That (innerInnerBuilders.Length, Is.EqualTo (1));
 
-      Assert.That (innerInnerBuilders[0].QueryModel, Is.SameAs (innerBuilders[0].GetOrCreateFetchQueryModel ()));
-      Assert.That (innerInnerBuilders[0].ResultOperatorPosition, Is.EqualTo (_outerFetchQueryModelBuilder.ResultOperatorPosition));
+      Assert.That (innerInnerBuilders[0].SourceItemQueryModel, Is.SameAs (innerBuilders[0].GetOrCreateFetchQueryModel ()));
+      Assert.That (innerInnerBuilders[0].ResultOperatorPosition, Is.EqualTo (0));
     }
 
     [Test]
