@@ -43,7 +43,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <see cref="AdditionalFromClause"/>.
     /// This method is called by <see cref="ModifyFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
-    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
+    public override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 

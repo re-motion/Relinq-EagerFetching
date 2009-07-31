@@ -36,7 +36,7 @@ namespace Remotion.Data.Linq.EagerFetching
     /// <c>y.Customer</c> (where <c>y</c> is what the query model originally selected).
     /// This method is called by <see cref="ModifyFetchQueryModel"/> in the process of creating the new fetch query model.
     /// </summary>
-    protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
+    public override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 

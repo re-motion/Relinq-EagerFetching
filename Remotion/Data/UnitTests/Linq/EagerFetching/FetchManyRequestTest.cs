@@ -16,7 +16,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
@@ -33,7 +32,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
   [TestFixture]
   public class FetchManyRequestTest
   {
-    private MemberInfo _scoresMember;
     private MemberInfo _friendsMember;
 
     private FetchManyRequest _friendsFetchRequest;
@@ -43,7 +41,6 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [SetUp]
     public void SetUp ()
     {
-      _scoresMember = typeof (Student).GetProperty ("Scores");
       _friendsMember = typeof (Student).GetProperty ("Friends");
       _friendsFetchRequest = new FetchManyRequest (_friendsMember);
 
@@ -61,89 +58,23 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    public void CreateFetchQueryModel ()
+    public void ModifyFetchQueryModel ()
     {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (fetchQueryModel, Is.Not.Null);
-      Assert.That (fetchQueryModel, Is.Not.SameAs (_studentFromStudentDetailQueryModel));
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_MemberFromClause ()
-    {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      _friendsFetchRequest.ModifyFetchQueryModel (_studentFromStudentDetailQueryModel);
 
       // expecting:
       // from sd in ExpressionHelper.CreateStudentDetailQueryable()
       // from <x> in sd.Student.Friends
       // select <x>
 
-      Assert.That (fetchQueryModel.BodyClauses.Count, Is.EqualTo (1));
-      var memberFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses.Single ();
-
-      var expectedFromExpression = 
-          ExpressionHelper.Resolve<Student_Detail, IEnumerable<Student>> (fetchQueryModel.MainFromClause, sd => sd.Student.Friends);
-      
+      Assert.That (_studentFromStudentDetailQueryModel.BodyClauses.Count, Is.EqualTo (1));
+      var memberFromClause = (AdditionalFromClause) _studentFromStudentDetailQueryModel.BodyClauses[0];
+      var expectedFromExpression =
+          ExpressionHelper.Resolve<Student_Detail, IEnumerable<Student>> (_studentFromStudentDetailQueryModel.MainFromClause, sd => sd.Student.Friends);
       ExpressionTreeComparer.CheckAreEqualTrees (memberFromClause.FromExpression, expectedFromExpression);
-    }
 
-    [Test]
-    public void CreateFetchQueryModel_SelectClause ()
-    {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      // expecting:
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // from <x> in sd.Student.Friends
-      // select <x>
-
-      var selectClause = fetchQueryModel.SelectClause;
-      var memberFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses.Single ();
+      var selectClause = _studentFromStudentDetailQueryModel.SelectClause;
       Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedQuerySource, Is.SameAs (memberFromClause));
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_Twice_MemberFromClause ()
-    {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      var fetchRequest2 = new FetchManyRequest (_scoresMember);
-      var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
-
-      // expecting:
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // from <x> in sd.Student.Friends
-      // from <y> in <x>.Scores
-      // select <y>
-
-      Assert.That (fetchQueryModel2.BodyClauses.Count, Is.EqualTo (2));
-      var memberFromClause1 = (AdditionalFromClause) fetchQueryModel2.BodyClauses[0];
-      var memberFromClause2 = (AdditionalFromClause) fetchQueryModel2.BodyClauses[1];
-
-      Assert.That (memberFromClause1.ItemName, Is.Not.EqualTo (memberFromClause2.ItemName));
-
-      var memberFromExpression = (MemberExpression) memberFromClause2.FromExpression;
-      Assert.That (((QuerySourceReferenceExpression) memberFromExpression.Expression).ReferencedQuerySource, Is.SameAs (memberFromClause1));
-      Assert.That (memberFromExpression.Member, Is.EqualTo (typeof (Student).GetProperty ("Scores")));
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_Twice_SelectClause ()
-    {
-      var fetchQueryModel = _friendsFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      var fetchRequest2 = new FetchManyRequest (_scoresMember);
-      var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
-
-      // expecting:
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // from <x> in sd.Student.Friends
-      // from <y> in <x>.Scores
-      // select <y>
-
-      var memberFromClause2 = fetchQueryModel2.BodyClauses.Last();
-      var selectClause = fetchQueryModel2.SelectClause;
-      Assert.That (((QuerySourceReferenceExpression) selectClause.Selector).ReferencedQuerySource, Is.SameAs (memberFromClause2));
     }
 
     [Test]

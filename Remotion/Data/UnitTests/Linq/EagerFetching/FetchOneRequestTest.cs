@@ -15,12 +15,10 @@
 // 
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.UnitTests.Linq.Parsing;
 using Remotion.Data.UnitTests.Linq.TestDomain;
@@ -48,57 +46,15 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     }
 
     [Test]
-    public void CreateFetchQueryModel ()
+    public void ModifyFetchQueryModel ()
     {
-      var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-      Assert.That (fetchQueryModel, Is.Not.Null);
-      Assert.That (fetchQueryModel, Is.Not.SameAs (_studentFromStudentDetailQueryModel));
+      _otherStudentFetchRequest.ModifyFetchQueryModel (_studentFromStudentDetailQueryModel);
 
-      // no additional from clauses here
-      Assert.That (fetchQueryModel.BodyClauses.Count, Is.EqualTo (_studentFromStudentDetailQueryModel.BodyClauses.Count));
-    }
+      Assert.That (_studentFromStudentDetailQueryModel.BodyClauses.Count, Is.EqualTo (0), "no additional from clauses added");
 
-    [Test]
-    public void CreateFetchQueryModel_ObjectFetch_SelectClause ()
-    {
-      var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      // expecting:
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // select sd.Student.OtherStudent
-
-      var selectClause = fetchQueryModel.SelectClause;
-      var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (fetchQueryModel.MainFromClause, sd => sd.Student.OtherStudent);
-      ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_ObjectFetch_SelectClausee_PreviousClauseIsClauseInNewQueryModel ()
-    {
-      var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // select sd.Student.OtherStudent
-
-      var selectClause = fetchQueryModel.SelectClause;
-      var innerMemberExpression = (MemberExpression)((MemberExpression) selectClause.Selector).Expression; // sd.Student
-      Assert.That (((QuerySourceReferenceExpression) innerMemberExpression.Expression).ReferencedQuerySource,  Is.SameAs (fetchQueryModel.MainFromClause));
-    }
-
-    [Test]
-    public void CreateFetchQueryModel_Twice_SelectClause ()
-    {
-      var fetchQueryModel = _otherStudentFetchRequest.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
-
-      var fetchRequest2 = new FetchOneRequest (_otherStudentMember);
-      var fetchQueryModel2 = fetchRequest2.CreateFetchQueryModel (fetchQueryModel);
-
-      // expecting:
-      // from sd in ExpressionHelper.CreateStudentDetailQueryable()
-      // select sd.Student.OtherStudent.OtherStudent
-
-      var selectClause = fetchQueryModel2.SelectClause;
-      var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (fetchQueryModel2.MainFromClause, sd => sd.Student.OtherStudent.OtherStudent);
+      var selectClause = _studentFromStudentDetailQueryModel.SelectClause;
+      var expectedExpression = ExpressionHelper.Resolve<Student_Detail, Student> (
+          _studentFromStudentDetailQueryModel.MainFromClause, sd => sd.Student.OtherStudent);
       ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
     }
 
