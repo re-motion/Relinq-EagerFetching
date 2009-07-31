@@ -17,20 +17,34 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Utilities;
+using System.Linq;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
   /// <summary>
   /// Visits a <see cref="QueryModel"/>, removing all <see cref="FetchRequestBase"/> instances from its <see cref="QueryModel.ResultOperators"/>
-  /// collection and returning them as a list of <see cref="FetchRequests"/>.
+  /// collection and returning <see cref="FetchQueryModelBuilder"/> objects for them.
   /// </summary>
   public class FetchFilteringQueryModelVisitor : QueryModelVisitorBase
   {
-    private readonly List<FetchRequestBase> _fetchRequests = new List<FetchRequestBase> ();
+    public static FetchQueryModelBuilder[] RemoveFetchRequestsFromQueryModel (QueryModel queryModel)
+    {
+      ArgumentUtility.CheckNotNull ("queryModel", queryModel);
 
-    public ReadOnlyCollection<FetchRequestBase> FetchRequests 
-    { 
-      get { return _fetchRequests.AsReadOnly(); } 
+      var visitor = new FetchFilteringQueryModelVisitor ();
+      queryModel.Accept (visitor);
+      return visitor.FetchQueryModelBuilders.ToArray();
+    }
+
+    private readonly List<FetchQueryModelBuilder> _fetchQueryModelBuilders = new List<FetchQueryModelBuilder> ();
+
+    protected FetchFilteringQueryModelVisitor ()
+    {
+    }
+
+    protected ReadOnlyCollection<FetchQueryModelBuilder> FetchQueryModelBuilders
+    {
+      get { return _fetchQueryModelBuilders.AsReadOnly (); }
     }
 
     public override void VisitResultOperator (ResultOperatorBase resultOperator, QueryModel queryModel, int index)
@@ -42,7 +56,7 @@ namespace Remotion.Data.Linq.EagerFetching
       if (fetchRequest != null)
       {
         queryModel.ResultOperators.RemoveAt (index);
-        _fetchRequests.Add (fetchRequest);
+        _fetchQueryModelBuilders.Add (new FetchQueryModelBuilder (fetchRequest, queryModel, index));
       }
     }
   }
