@@ -41,7 +41,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void SetUp ()
     {
       _visitor = new TestFetchFilteringQueryModelVisitor ();
-      _queryModel = ExpressionHelper.CreateQueryModel ();
+      _queryModel = ExpressionHelper.CreateQueryModel_Student ();
 
       _distinctResultOperator = new DistinctResultOperator ();
       _countResultOperator = new CountResultOperator ();

@@ -70,7 +70,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     public void GetOrCreateFetchQueryModel_CallsCreateFetchQueryModel ()
     {
       var fetchRequestMock = MockRepository.GenerateMock<FetchRequestBase> (_friendsMember);
-      var mockQueryModel = ExpressionHelper.CreateQueryModel ();
+      var mockQueryModel = ExpressionHelper.CreateQueryModel_Student ();
       fetchRequestMock.Expect (mock => mock.CreateFetchQueryModel (Arg<QueryModel>.Is.Anything)).Return (mockQueryModel);
 
       var builder = new FetchQueryModelBuilder (fetchRequestMock, _sourceItemQueryModel, 1);

@@ -104,7 +104,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
         + "'Remotion.Data.UnitTests.Linq.TestDomain.Student'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
-      var invalidQueryModel = ExpressionHelper.CreateQueryModel ();
+      var invalidQueryModel = ExpressionHelper.CreateQueryModel_Student ();
       invalidQueryModel.ResultOperators.Add (new CountResultOperator ());
       _friendsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
