@@ -15,10 +15,8 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.DomainObjects.Linq;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.EagerFetching.Parsing;
 using Remotion.Data.UnitTests.Linq.Parsing.Structure.IntermediateModel;
@@ -27,15 +25,15 @@ using Remotion.Data.UnitTests.Linq.TestDomain;
 namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
 {
   [TestFixture]
-  public class FetchManyExpressionNodeTest : ExpressionNodeTestBase
+  public class FetchOneExpressionNodeTest : ExpressionNodeTestBase
   {
-    private FetchManyExpressionNode _node;
+    private FetchOneExpressionNode _node;
 
     public override void SetUp ()
     {
       base.SetUp ();
 
-      _node = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
+      _node = new FetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
     }
 
     [Test]
@@ -44,8 +42,8 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
       _node.Apply (QueryModel, ClauseGenerationContext);
 
       Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
-      Assert.That (QueryModel.ResultOperators[0], Is.InstanceOfType (typeof (FetchManyRequest)));
-      Assert.That (((FetchManyRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Student).GetProperty ("Friends")));
+      Assert.That (QueryModel.ResultOperators[0], Is.InstanceOfType (typeof (FetchOneRequest)));
+      Assert.That (((FetchOneRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Student).GetProperty ("OtherStudent")));
     }
 
     [Test]
