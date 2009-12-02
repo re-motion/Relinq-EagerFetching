@@ -20,12 +20,12 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.UnitTests.Linq.Parsing;
-using Remotion.Data.UnitTests.Linq.TestDomain;
+using Remotion.Data.Linq.UnitTests.Parsing;
+using Remotion.Data.Linq.UnitTests.TestDomain;
 using System.Reflection;
 using Remotion.Development.UnitTesting;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetching
+namespace Remotion.Data.Linq.UnitTests.EagerFetching
 {
   [TestFixture]
   public class FetchOneRequestTest

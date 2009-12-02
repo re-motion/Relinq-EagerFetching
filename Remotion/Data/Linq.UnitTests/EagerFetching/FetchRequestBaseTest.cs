@@ -25,11 +25,11 @@ using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.Clauses.ResultOperators;
 using Remotion.Data.Linq.Clauses.StreamedData;
 using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.UnitTests.Linq.TestDomain;
+using Remotion.Data.Linq.UnitTests.TestDomain;
 using Remotion.Development.UnitTesting;
 using Rhino.Mocks;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetching
+namespace Remotion.Data.Linq.UnitTests.EagerFetching
 {
   [TestFixture]
   public class FetchRequestBaseTest
@@ -102,7 +102,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects does not select a sequence, it selects a "
         + "single object of type 'System.Int32'. In order to fetch the relation member 'Friends', the query must yield a sequence of objects of type "
-        + "'Remotion.Data.UnitTests.Linq.TestDomain.Student'.\r\nParameter name: sourceItemQueryModel")]
+        + "'Remotion.Data.Linq.UnitTests.TestDomain.Student'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
       var invalidQueryModel = ExpressionHelper.CreateQueryModel_Student ();
@@ -113,7 +113,7 @@ namespace Remotion.Data.UnitTests.Linq.EagerFetching
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects items that do not match the fetch "
         + "request. In order to fetch the relation member 'Friends', the query must yield objects of type "
-        + "'Remotion.Data.UnitTests.Linq.TestDomain.Student', but it yields 'Remotion.Data.UnitTests.Linq.TestDomain.Student_Detail'.\r\n"
+        + "'Remotion.Data.Linq.UnitTests.TestDomain.Student', but it yields 'Remotion.Data.Linq.UnitTests.TestDomain.Student_Detail'.\r\n"
         + "Parameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_InvalidItems ()
     {

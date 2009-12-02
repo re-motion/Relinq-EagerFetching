@@ -20,7 +20,7 @@ using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.EagerFetching.Parsing;
 using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 
-namespace Remotion.Data.UnitTests.Linq.EagerFetching.Parsing
+namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
 {
   public class TestFetchExpressionNodeBase : FetchExpressionNodeBase
   {
