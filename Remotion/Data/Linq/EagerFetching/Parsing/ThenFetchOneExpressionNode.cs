@@ -20,7 +20,7 @@ using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Parsing;
 using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
-using Remotion.Utilities;
+using Remotion.Data.Linq.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching.Parsing
 {
@@ -31,6 +31,7 @@ namespace Remotion.Data.Linq.EagerFetching.Parsing
     {
     }
 
+    //TODO: Seems not to be used. Possibly redesign
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
       throw new NotImplementedException ("Call ApplyNodeSpecificSemantics instead.");

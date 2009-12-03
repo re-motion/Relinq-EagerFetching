@@ -16,7 +16,7 @@
 // 
 using System;
 using Remotion.Data.Linq.Clauses;
-using Remotion.Utilities;
+using Remotion.Data.Linq.Utilities;
 using System.Linq;
 
 namespace Remotion.Data.Linq.EagerFetching

@@ -19,7 +19,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
-using Remotion.Utilities;
+using Remotion.Data.Linq.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
@@ -33,7 +33,7 @@ namespace Remotion.Data.Linq.EagerFetching
     public FetchManyRequest (MemberInfo relationMember)
         : base (ArgumentUtility.CheckNotNull ("relationMember", relationMember))
     {
-      var memberType = Utilities.ReflectionUtility.GetFieldOrPropertyType (relationMember);
+      var memberType = Remotion.Utilities.ReflectionUtility.GetFieldOrPropertyType (relationMember);
       _relatedObjectType = ReflectionUtility.GetItemTypeOfIEnumerable (memberType, "relationMember");
     }
 

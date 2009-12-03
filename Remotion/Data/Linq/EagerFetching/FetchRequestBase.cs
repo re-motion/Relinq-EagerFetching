@@ -21,7 +21,7 @@ using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.Clauses.ResultOperators;
 using Remotion.Data.Linq.Clauses.StreamedData;
-using Remotion.Utilities;
+using Remotion.Data.Linq.Utilities;
 
 namespace Remotion.Data.Linq.EagerFetching
 {
@@ -47,6 +47,7 @@ namespace Remotion.Data.Linq.EagerFetching
     public MemberInfo RelationMember
     {
       get { return _relationMember; }
+      //TODO: Seems not to be used. Possibly delete?
       set { _relationMember = ArgumentUtility.CheckNotNull ("value", value); }
     }
 

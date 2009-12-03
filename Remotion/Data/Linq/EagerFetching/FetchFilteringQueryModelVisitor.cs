@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Remotion.Data.Linq.Clauses;
-using Remotion.Utilities;
+using Remotion.Data.Linq.Utilities;
 using System.Linq;
 
 namespace Remotion.Data.Linq.EagerFetching
@@ -28,6 +28,7 @@ namespace Remotion.Data.Linq.EagerFetching
   /// </summary>
   public class FetchFilteringQueryModelVisitor : QueryModelVisitorBase
   {
+    //TODO: Seems not to be used. Possibly delete?
     public static FetchQueryModelBuilder[] RemoveFetchRequestsFromQueryModel (QueryModel queryModel)
     {
       ArgumentUtility.CheckNotNull ("queryModel", queryModel);

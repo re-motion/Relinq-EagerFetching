@@ -15,22 +15,29 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Linq.Expressions;
+using System.Runtime.Serialization;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Data.Linq.Utilities
 {
   /// <summary>
-  /// Provides a fluent interface to recursively fetch related objects of objects which themselves are eager-fetched. All query methods
-  /// are implemented as extension methods.
+  /// This exception is thrown if an argument is empty although it must have a content.
   /// </summary>
-  /// <typeparam name="TQueried">The type of the objects returned by the query.</typeparam>
-  /// <typeparam name="TFetch">The type of object from which the recursive fetch operation should be made.</typeparam>
-  //TODO: Tests were movede to re-store. Add separate tests in re-linq.
-  public class FluentFetchRequest<TQueried, TFetch> : QueryableBase<TQueried>
+  [Serializable]
+  public class ArgumentEmptyException : ArgumentException
   {
-    public FluentFetchRequest (QueryProviderBase provider, Expression expression)
-        : base (provider, expression)
+    public ArgumentEmptyException (string paramName)
+      : base (FormatMessage (paramName), paramName)
     {
+    }
+
+    public ArgumentEmptyException (SerializationInfo info, StreamingContext context)
+        : base (info, context)
+    {
+    }
+
+    private static string FormatMessage (string paramName)
+    {
+      return string.Format ("Parameter '{0}' cannot be empty.", paramName);
     }
   }
 }
