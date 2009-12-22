@@ -58,6 +58,7 @@ namespace Remotion.Data.Linq.EagerFetching
       fetchQueryModel.SelectClause = newSelectClause;
     }
 
+    /// <inheritdoc />
     public override ResultOperatorBase Clone (CloneContext cloneContext)
     {
       ArgumentUtility.CheckNotNull ("cloneContext", cloneContext);
@@ -67,7 +68,12 @@ namespace Remotion.Data.Linq.EagerFetching
         clone.GetOrAddInnerFetchRequest ((FetchRequestBase) innerFetchRequest.Clone (cloneContext));
 
       return clone;
+    }
 
+    /// <inheritdoc />
+    public override void TransformExpressions (Func<Expression, Expression> transformation)
+    {
+      //nothing to do here
     }
   }
 }

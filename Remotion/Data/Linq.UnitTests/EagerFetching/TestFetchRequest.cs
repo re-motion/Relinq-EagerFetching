@@ -45,5 +45,10 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
 
       return clone;
     }
+
+    public override void TransformExpressions (Func<System.Linq.Expressions.Expression, System.Linq.Expressions.Expression> transformation)
+    {
+      throw new NotImplementedException ();
+    }
   }
 }

@@ -47,7 +47,6 @@ namespace Remotion.Data.Linq.EagerFetching
     public MemberInfo RelationMember
     {
       get { return _relationMember; }
-      //TODO: Seems not to be used. Possibly delete?
       set { _relationMember = ArgumentUtility.CheckNotNull ("value", value); }
     }
 
