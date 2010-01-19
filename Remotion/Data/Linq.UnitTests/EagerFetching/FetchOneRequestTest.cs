@@ -23,7 +23,7 @@ using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.UnitTests.Parsing;
 using Remotion.Data.Linq.UnitTests.TestDomain;
 using System.Reflection;
-using Remotion.Data.Linq.UnitTests.Utilities;
+using Remotion.Data.Linq.UnitTests.TestUtilities;
 
 namespace Remotion.Data.Linq.UnitTests.EagerFetching
 {
