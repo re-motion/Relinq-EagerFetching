@@ -38,8 +38,9 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     }
 
     [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression; 'new [] {1, 2, 3}' "
-                                                                      + "is a NewArrayExpression instead.\r\nParameter name: relatedObjectSelector")]
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = 
+        @"A fetch request must be a simple member access expression; 'new \[\] \{1, 2, 3\}' is a .* instead\.",
+        MatchType = MessageMatch.Regex)]
     public void Initialization_InvalidExpression ()
     {
       var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<int>> (s => new[] { 1, 2, 3 });
