@@ -36,7 +36,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       var node2 = new ThenFetchManyExpressionNode (
           CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
       var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.IsStarredCook));
-      var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, List<int>> (s => s.Scores));
+      var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, List<int>> (s => s.Holidays));
 
       node1.Apply (QueryModel, ClauseGenerationContext);
       node2.Apply (QueryModel, ClauseGenerationContext);
@@ -58,7 +58,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       Assert.That (fetchRequest3.InnerFetchRequests.Count(), Is.EqualTo (0));
 
       var fetchRequest4 = ((FetchManyRequest) QueryModel.ResultOperators[1]);
-      Assert.That (fetchRequest4.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Scores")));
+      Assert.That (fetchRequest4.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Holidays")));
       Assert.That (fetchRequest4.InnerFetchRequests.Count(), Is.EqualTo (0));
     }
   }

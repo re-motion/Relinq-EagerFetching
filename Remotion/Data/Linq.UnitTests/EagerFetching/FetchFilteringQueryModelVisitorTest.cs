@@ -50,7 +50,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       _fetchOneRequest = new FetchOneRequest (typeof (Cook).GetProperty ("Substitution"));
       _fetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Assistants"));
 
-      _innerFetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Scores"));
+      _innerFetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Holidays"));
       _fetchOneRequest.GetOrAddInnerFetchRequest (_innerFetchManyRequest);
 
       _queryModel.ResultOperators.Add (_distinctResultOperator);

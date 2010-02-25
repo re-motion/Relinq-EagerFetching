@@ -43,7 +43,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [SetUp]
     public void SetUp ()
     {
-      _scoresMember = typeof (Cook).GetProperty ("Scores");
+      _scoresMember = typeof (Cook).GetProperty ("Holidays");
       _friendsMember = typeof (Cook).GetProperty ("Assistants");
       _friendsFetchRequest = new TestFetchRequest (_friendsMember);
       _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
