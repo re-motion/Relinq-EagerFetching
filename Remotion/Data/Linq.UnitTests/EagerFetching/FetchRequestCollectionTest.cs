@@ -35,7 +35,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     public void SetUp ()
     {
       _collection = new FetchRequestCollection ();
-      _scoresMember = typeof (Student).GetProperty ("Scores");
+      _scoresMember = typeof (Chef).GetProperty ("Scores");
     }
 
     [Test]

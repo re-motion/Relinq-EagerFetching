@@ -36,7 +36,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [SetUp]
     public void SetUp ()
     {
-      _otherStudentMember = typeof (Student).GetProperty ("BuddyStudent");
+      _otherStudentMember = typeof (Chef).GetProperty ("BuddyChef");
       _otherStudentFetchRequest = new FetchOneRequest (_otherStudentMember);
     }
 
@@ -44,17 +44,17 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     public void ModifyFetchQueryModel ()
     {
       var inputFetchQuery = from fetch0 in
-                              (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Student).Take (1)
+                              (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Chef).Take (1)
                             select fetch0;
       var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      // expected: from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Student)
-      //           select fetch0.BuddyStudent;
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Chef)
+      //           select fetch0.BuddyChef;
 
       PrivateInvoke.InvokeNonPublicMethod (_otherStudentFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
 
       var selectClause = fetchQueryModel.SelectClause;
-      var expectedExpression = ExpressionHelper.Resolve<Student, Student> (fetchQueryModel.MainFromClause, s => s.BuddyStudent);
+      var expectedExpression = ExpressionHelper.Resolve<Chef, Chef> (fetchQueryModel.MainFromClause, s => s.BuddyChef);
       ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
     }
 
