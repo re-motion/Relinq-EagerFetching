@@ -104,7 +104,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
         + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
-      var invalidQueryModel = ExpressionHelper.CreateQueryModel_Student ();
+      var invalidQueryModel = ExpressionHelper.CreateQueryModel_Cook ();
       invalidQueryModel.ResultOperators.Add (new CountResultOperator ());
       _friendsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
@@ -116,7 +116,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
         + "Parameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_InvalidItems ()
     {
-      var invalidQueryModel = ExpressionHelper.CreateQueryModel (ExpressionHelper.CreateMainFromClause_Detail());
+      var invalidQueryModel = ExpressionHelper.CreateQueryModel (ExpressionHelper.CreateMainFromClause_Kitchen());
       _friendsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
 
