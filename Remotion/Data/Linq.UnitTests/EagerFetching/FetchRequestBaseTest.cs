@@ -33,39 +33,39 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
   [TestFixture]
   public class FetchRequestBaseTest
   {
-    private MemberInfo _scoresMember;
-    private MemberInfo _friendsMember;
+    private MemberInfo _holidaysMember;
+    private MemberInfo _assistantsMember;
 
-    private TestFetchRequest _friendsFetchRequest;
-    private IQueryable<Cook> _studentFromStudentDetailQuery;
-    private QueryModel _studentFromStudentDetailQueryModel;
+    private TestFetchRequest _assistantsFetchRequest;
+    private IQueryable<Cook> _cookFromKitchenQuery;
+    private QueryModel _cookFromKitchenQueryModel;
 
     [SetUp]
     public void SetUp ()
     {
-      _scoresMember = typeof (Cook).GetProperty ("Holidays");
-      _friendsMember = typeof (Cook).GetProperty ("Assistants");
-      _friendsFetchRequest = new TestFetchRequest (_friendsMember);
-      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateKitchenQueryable ()
+      _holidaysMember = typeof (Cook).GetProperty ("Holidays");
+      _assistantsMember = typeof (Cook).GetProperty ("Assistants");
+      _assistantsFetchRequest = new TestFetchRequest (_assistantsMember);
+      _cookFromKitchenQuery = (from sd in ExpressionHelper.CreateKitchenQueryable ()
                                         select sd.Cook).Take (1);
-      _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
+      _cookFromKitchenQueryModel = ExpressionHelper.ParseQuery (_cookFromKitchenQuery);
     }
 
     [Test]
     public void GetOrAddInnerFetchRequest ()
     {
-      Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.Empty);
+      Assert.That (_assistantsFetchRequest.InnerFetchRequests, Is.Empty);
 
-      var result = _friendsFetchRequest.GetOrAddInnerFetchRequest (new FetchManyRequest (_scoresMember));
+      var result = _assistantsFetchRequest.GetOrAddInnerFetchRequest (new FetchManyRequest (_holidaysMember));
 
-      Assert.That (result.RelationMember, Is.SameAs (_scoresMember));
-      Assert.That (_friendsFetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));
+      Assert.That (result.RelationMember, Is.SameAs (_holidaysMember));
+      Assert.That (_assistantsFetchRequest.InnerFetchRequests, Is.EqualTo (new[] { result }));
     }
 
     [Test]
     public void RelationMember ()
     {
-      Assert.That (_friendsFetchRequest.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (_assistantsFetchRequest.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
     }
 
     [Test]
@@ -74,7 +74,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       // expected: from <x> in (from sd in ExpressionHelper.CreateKitchenQueryable() select sd.Cook).Take (1)
       //           select <x>
 
-      var fetchRequestPartialMock = new MockRepository ().PartialMock<FetchRequestBase> (_friendsMember);
+      var fetchRequestPartialMock = new MockRepository ().PartialMock<FetchRequestBase> (_assistantsMember);
       
       QueryModel modifiedQueryModel = null;
       fetchRequestPartialMock
@@ -83,7 +83,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
 
       fetchRequestPartialMock.Replay ();
 
-      var fetchQueryModel = fetchRequestPartialMock.CreateFetchQueryModel (_studentFromStudentDetailQueryModel);
+      var fetchQueryModel = fetchRequestPartialMock.CreateFetchQueryModel (_cookFromKitchenQueryModel);
 
       fetchRequestPartialMock.VerifyAllExpectations ();
       Assert.That (modifiedQueryModel, Is.SameAs (fetchQueryModel));
@@ -91,9 +91,9 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       Assert.That (fetchQueryModel.MainFromClause.FromExpression, Is.InstanceOfType (typeof (SubQueryExpression)));
 
       var subQueryExpression = (SubQueryExpression) fetchQueryModel.MainFromClause.FromExpression;
-      Assert.That (subQueryExpression.QueryModel, Is.SameAs (_studentFromStudentDetailQueryModel));
+      Assert.That (subQueryExpression.QueryModel, Is.SameAs (_cookFromKitchenQueryModel));
 
-      Assert.That (_studentFromStudentDetailQueryModel.BodyClauses.Count, Is.EqualTo (0));
+      Assert.That (_cookFromKitchenQueryModel.BodyClauses.Count, Is.EqualTo (0));
       Assert.That (((QuerySourceReferenceExpression) fetchQueryModel.SelectClause.Selector).ReferencedQuerySource, 
           Is.SameAs (fetchQueryModel.MainFromClause));
     }
@@ -106,7 +106,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     {
       var invalidQueryModel = ExpressionHelper.CreateQueryModel_Cook ();
       invalidQueryModel.ResultOperators.Add (new CountResultOperator ());
-      _friendsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
+      _assistantsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
 
     [Test]
@@ -117,14 +117,14 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     public void CreateFetchQueryModel_InvalidItems ()
     {
       var invalidQueryModel = ExpressionHelper.CreateQueryModel (ExpressionHelper.CreateMainFromClause_Kitchen());
-      _friendsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
+      _assistantsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
 
     [Test]
     public void ExecuteInMemory ()
     {
       var input = new StreamedSequence (new[] { 1, 2, 3 }, new StreamedSequenceInfo (typeof (int[]), Expression.Constant (0)));
-      var result = _friendsFetchRequest.ExecuteInMemory (input);
+      var result = _assistantsFetchRequest.ExecuteInMemory (input);
 
       Assert.That (result, Is.SameAs (input));
     }

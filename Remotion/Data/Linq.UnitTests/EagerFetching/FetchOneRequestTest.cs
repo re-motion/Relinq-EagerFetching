@@ -30,14 +30,14 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
   [TestFixture]
   public class FetchOneRequestTest
   {
-    private MemberInfo _otherStudentMember;
-    private FetchOneRequest _otherStudentFetchRequest;
+    private MemberInfo _substitutionMember;
+    private FetchOneRequest _substitutionFetchRequest;
 
     [SetUp]
     public void SetUp ()
     {
-      _otherStudentMember = typeof (Cook).GetProperty ("Substitution");
-      _otherStudentFetchRequest = new FetchOneRequest (_otherStudentMember);
+      _substitutionMember = typeof (Cook).GetProperty ("Substitution");
+      _substitutionFetchRequest = new FetchOneRequest (_substitutionMember);
     }
 
     [Test]
@@ -51,7 +51,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook)
       //           select fetch0.Substitution;
 
-      PrivateInvoke.InvokeNonPublicMethod (_otherStudentFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
+      PrivateInvoke.InvokeNonPublicMethod (_substitutionFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
 
       var selectClause = fetchQueryModel.SelectClause;
       var expectedExpression = ExpressionHelper.Resolve<Cook, Cook> (fetchQueryModel.MainFromClause, s => s.Substitution);
@@ -61,21 +61,21 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     public void Clone ()
     {
-      var clone = _otherStudentFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
+      var clone = _substitutionFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
 
-      Assert.That (clone, Is.Not.SameAs (_otherStudentFetchRequest));
+      Assert.That (clone, Is.Not.SameAs (_substitutionFetchRequest));
       Assert.That (clone, Is.InstanceOfType (typeof (FetchOneRequest)));
-      Assert.That (((FetchOneRequest) clone).RelationMember, Is.SameAs (_otherStudentFetchRequest.RelationMember));
+      Assert.That (((FetchOneRequest) clone).RelationMember, Is.SameAs (_substitutionFetchRequest.RelationMember));
       Assert.That (((FetchOneRequest) clone).InnerFetchRequests.ToArray(), Is.Empty);
     }
 
     [Test]
     public void Clone_WithInnerFetchRequests ()
     {
-      var innerRequest = new FetchOneRequest (_otherStudentMember);
-      _otherStudentFetchRequest.GetOrAddInnerFetchRequest (innerRequest);
+      var innerRequest = new FetchOneRequest (_substitutionMember);
+      _substitutionFetchRequest.GetOrAddInnerFetchRequest (innerRequest);
 
-      var clone = _otherStudentFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
+      var clone = _substitutionFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
       var innerClones = ((FetchOneRequest) clone).InnerFetchRequests.ToArray ();
       Assert.That (innerClones.Length, Is.EqualTo (1));
       Assert.That (innerClones[0], Is.InstanceOfType (typeof (FetchOneRequest)));
