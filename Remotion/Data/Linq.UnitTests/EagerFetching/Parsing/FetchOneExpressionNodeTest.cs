@@ -33,7 +33,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       base.SetUp ();
 
-      _node = new FetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Chef, Chef> (s => s.BuddyChef));
+      _node = new FetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.BuddyCook));
     }
 
     [Test]
@@ -43,7 +43,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
 
       Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
       Assert.That (QueryModel.ResultOperators[0], Is.InstanceOfType (typeof (FetchOneRequest)));
-      Assert.That (((FetchOneRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Chef).GetProperty ("BuddyChef")));
+      Assert.That (((FetchOneRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("BuddyCook")));
     }
 
     [Test]

@@ -48,10 +48,10 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [SetUp]
     public void SetUp ()
     {
-      _friendsMember = typeof (Chef).GetProperty ("Friends");
-      _hasDogMember = typeof (Chef).GetProperty ("HasDegree");
-      _scoresMember = typeof (Chef).GetProperty ("Scores");
-      _isOldMember = typeof (Chef).GetProperty ("IsExchangeStudent");
+      _friendsMember = typeof (Cook).GetProperty ("Friends");
+      _hasDogMember = typeof (Cook).GetProperty ("HasDegree");
+      _scoresMember = typeof (Cook).GetProperty ("Scores");
+      _isOldMember = typeof (Cook).GetProperty ("IsExchangeStudent");
 
       _outerFetchRequest = new TestFetchRequest (_friendsMember);
       _innerFetchRequest1 = new TestFetchRequest (_hasDogMember);
@@ -62,7 +62,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       _innerFetchRequest1.GetOrAddInnerFetchRequest (_innerInnerFetchRequest);
 
       var expression = ExpressionHelper.MakeExpression ( () => (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
-                                                                select sd.Chef).Take (1)/*.Fetch*/.Distinct().Count());
+                                                                select sd.Cook).Take (1)/*.Fetch*/.Distinct().Count());
       _sourceItemQueryModel = ExpressionHelper.ParseQuery (expression);
       _outerFetchQueryModelBuilder = new FetchQueryModelBuilder (_outerFetchRequest, _sourceItemQueryModel, 1);
     }

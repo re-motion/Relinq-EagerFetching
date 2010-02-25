@@ -32,11 +32,11 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     [Test]
     public void IntegrationTest_ApplySeveralRequests ()
     {
-      var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Chef, Chef> (s => s.BuddyChef));
+      var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.BuddyCook));
       var node2 = new ThenFetchManyExpressionNode (
-          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Chef, IEnumerable<Chef>> (s => s.Friends));
-      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Chef, bool> (s => s.HasDegree));
-      var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Chef, List<int>> (s => s.Scores));
+          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Friends));
+      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.HasDegree));
+      var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, List<int>> (s => s.Scores));
 
       node1.Apply (QueryModel, ClauseGenerationContext);
       node2.Apply (QueryModel, ClauseGenerationContext);
@@ -46,19 +46,19 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (2));
 
       var fetchRequest1 = ((FetchOneRequest) QueryModel.ResultOperators[0]);
-      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Chef).GetProperty ("BuddyChef")));
+      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("BuddyCook")));
       Assert.That (fetchRequest1.InnerFetchRequests.Count(), Is.EqualTo (1));
 
       var fetchRequest2 = ((FetchManyRequest) fetchRequest1.InnerFetchRequests.Single());
-      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Chef).GetProperty ("Friends")));
+      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Friends")));
       Assert.That (fetchRequest2.InnerFetchRequests.Count(), Is.EqualTo (1));
 
       var fetchRequest3 = ((FetchOneRequest) fetchRequest2.InnerFetchRequests.Single());
-      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Chef).GetProperty ("HasDegree")));
+      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("HasDegree")));
       Assert.That (fetchRequest3.InnerFetchRequests.Count(), Is.EqualTo (0));
 
       var fetchRequest4 = ((FetchManyRequest) QueryModel.ResultOperators[1]);
-      Assert.That (fetchRequest4.RelationMember, Is.EqualTo (typeof (Chef).GetProperty ("Scores")));
+      Assert.That (fetchRequest4.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Scores")));
       Assert.That (fetchRequest4.InnerFetchRequests.Count(), Is.EqualTo (0));
     }
   }

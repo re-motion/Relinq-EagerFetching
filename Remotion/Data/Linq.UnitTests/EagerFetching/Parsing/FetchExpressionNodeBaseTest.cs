@@ -34,7 +34,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       base.SetUp ();
 
-      _node = new TestFetchExpressionNodeBase (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Chef, Chef> (s => s.BuddyChef));
+      _node = new TestFetchExpressionNodeBase (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.BuddyCook));
     }
 
     [Test]
@@ -43,23 +43,23 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
         MatchType = MessageMatch.Regex)]
     public void Initialization_InvalidExpression ()
     {
-      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Chef, IEnumerable<int>> (s => new[] { 1, 2, 3 });
+      var relatedObjectSelector = ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<int>> (s => new[] { 1, 2, 3 });
       new TestFetchExpressionNodeBase (CreateParseInfo (), relatedObjectSelector);
     }
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression of the kind "
-                                                                      + "o => o.Related; 's.BuddyChef.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
+                                                                      + "o => o.Related; 's.BuddyCook.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
     public void Initialization_InvalidExpression_MoreThanOneMember ()
     {
-      var relatedObjectSelector = (Expression<Func<Chef, IEnumerable<Chef>>>) (s => s.BuddyChef.Friends);
+      var relatedObjectSelector = (Expression<Func<Cook, IEnumerable<Cook>>>) (s => s.BuddyCook.Friends);
       new TestFetchExpressionNodeBase (CreateParseInfo (), relatedObjectSelector);
     }
 
     [Test]
     public void Resolve ()
     {
-      var expression = ExpressionHelper.CreateLambdaExpression<Chef, Chef> (s => s);
+      var expression = ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s);
 
       var result = _node.Resolve (expression.Parameters[0], expression.Body, ClauseGenerationContext);
       Assert.That (((QuerySourceReferenceExpression) result).ReferencedQuerySource, Is.SameAs (SourceClause));

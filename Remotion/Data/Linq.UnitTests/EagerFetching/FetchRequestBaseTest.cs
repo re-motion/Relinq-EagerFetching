@@ -37,17 +37,17 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     private MemberInfo _friendsMember;
 
     private TestFetchRequest _friendsFetchRequest;
-    private IQueryable<Chef> _studentFromStudentDetailQuery;
+    private IQueryable<Cook> _studentFromStudentDetailQuery;
     private QueryModel _studentFromStudentDetailQueryModel;
 
     [SetUp]
     public void SetUp ()
     {
-      _scoresMember = typeof (Chef).GetProperty ("Scores");
-      _friendsMember = typeof (Chef).GetProperty ("Friends");
+      _scoresMember = typeof (Cook).GetProperty ("Scores");
+      _friendsMember = typeof (Cook).GetProperty ("Friends");
       _friendsFetchRequest = new TestFetchRequest (_friendsMember);
       _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
-                                        select sd.Chef).Take (1);
+                                        select sd.Cook).Take (1);
       _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
 
@@ -65,13 +65,13 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     public void RelationMember ()
     {
-      Assert.That (_friendsFetchRequest.RelationMember, Is.EqualTo (typeof (Chef).GetProperty ("Friends")));
+      Assert.That (_friendsFetchRequest.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Friends")));
     }
 
     [Test]
     public void CreateFetchQueryModel ()
     {
-      // expected: from <x> in (from sd in ExpressionHelper.CreateStudentDetailQueryable() select sd.Chef).Take (1)
+      // expected: from <x> in (from sd in ExpressionHelper.CreateStudentDetailQueryable() select sd.Cook).Take (1)
       //           select <x>
 
       var fetchRequestPartialMock = new MockRepository ().PartialMock<FetchRequestBase> (_friendsMember);
@@ -101,7 +101,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects does not select a sequence, it selects a "
         + "single object of type 'System.Int32'. In order to fetch the relation member 'Friends', the query must yield a sequence of objects of type "
-        + "'Remotion.Data.Linq.UnitTests.TestDomain.Chef'.\r\nParameter name: sourceItemQueryModel")]
+        + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
       var invalidQueryModel = ExpressionHelper.CreateQueryModel_Student ();
@@ -112,7 +112,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects items that do not match the fetch "
         + "request. In order to fetch the relation member 'Friends', the query must yield objects of type "
-        + "'Remotion.Data.Linq.UnitTests.TestDomain.Chef', but it yields 'Remotion.Data.Linq.UnitTests.TestDomain.Student_Detail'.\r\n"
+        + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook', but it yields 'Remotion.Data.Linq.UnitTests.TestDomain.Student_Detail'.\r\n"
         + "Parameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_InvalidItems ()
     {

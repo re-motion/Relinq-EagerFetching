@@ -47,10 +47,10 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       _distinctResultOperator = new DistinctResultOperator ();
       _countResultOperator = new CountResultOperator ();
 
-      _fetchOneRequest = new FetchOneRequest (typeof (Chef).GetProperty ("BuddyChef"));
-      _fetchManyRequest = new FetchManyRequest (typeof (Chef).GetProperty ("Friends"));
+      _fetchOneRequest = new FetchOneRequest (typeof (Cook).GetProperty ("BuddyCook"));
+      _fetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Friends"));
 
-      _innerFetchManyRequest = new FetchManyRequest (typeof (Chef).GetProperty ("Scores"));
+      _innerFetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Scores"));
       _fetchOneRequest.GetOrAddInnerFetchRequest (_innerFetchManyRequest);
 
       _queryModel.ResultOperators.Add (_distinctResultOperator);
