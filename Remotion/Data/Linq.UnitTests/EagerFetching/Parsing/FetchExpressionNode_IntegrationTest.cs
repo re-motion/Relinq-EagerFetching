@@ -35,7 +35,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
       var node2 = new ThenFetchManyExpressionNode (
           CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
-      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Student, bool> (s => s.HasDog));
+      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Student, bool> (s => s.HasDegree));
       var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Student, List<int>> (s => s.Scores));
 
       node1.Apply (QueryModel, ClauseGenerationContext);
@@ -54,7 +54,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       Assert.That (fetchRequest2.InnerFetchRequests.Count(), Is.EqualTo (1));
 
       var fetchRequest3 = ((FetchOneRequest) fetchRequest2.InnerFetchRequests.Single());
-      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("HasDog")));
+      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("HasDegree")));
       Assert.That (fetchRequest3.InnerFetchRequests.Count(), Is.EqualTo (0));
 
       var fetchRequest4 = ((FetchManyRequest) QueryModel.ResultOperators[1]);

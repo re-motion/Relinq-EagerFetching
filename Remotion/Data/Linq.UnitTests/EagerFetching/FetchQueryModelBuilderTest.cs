@@ -49,7 +49,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     public void SetUp ()
     {
       _friendsMember = typeof (Student).GetProperty ("Friends");
-      _hasDogMember = typeof (Student).GetProperty ("HasDog");
+      _hasDogMember = typeof (Student).GetProperty ("HasDegree");
       _scoresMember = typeof (Student).GetProperty ("Scores");
       _isOldMember = typeof (Student).GetProperty ("IsExchangeStudent");
 
