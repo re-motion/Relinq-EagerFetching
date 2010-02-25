@@ -112,7 +112,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects items that do not match the fetch "
         + "request. In order to fetch the relation member 'Assistants', the query must yield objects of type "
-        + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook', but it yields 'Remotion.Data.Linq.UnitTests.TestDomain.Student_Detail'.\r\n"
+        + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook', but it yields 'Remotion.Data.Linq.UnitTests.TestDomain.Kitchen'.\r\n"
         + "Parameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_InvalidItems ()
     {
