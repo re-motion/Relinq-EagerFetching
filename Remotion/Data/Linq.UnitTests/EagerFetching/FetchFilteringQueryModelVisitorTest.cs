@@ -47,7 +47,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       _distinctResultOperator = new DistinctResultOperator ();
       _countResultOperator = new CountResultOperator ();
 
-      _fetchOneRequest = new FetchOneRequest (typeof (Student).GetProperty ("OtherStudent"));
+      _fetchOneRequest = new FetchOneRequest (typeof (Student).GetProperty ("BuddyStudent"));
       _fetchManyRequest = new FetchManyRequest (typeof (Student).GetProperty ("Friends"));
 
       _innerFetchManyRequest = new FetchManyRequest (typeof (Student).GetProperty ("Scores"));

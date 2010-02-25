@@ -41,7 +41,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       base.SetUp ();
 
-      _sourceFetchRequest = new TestFetchRequest (typeof (Student).GetProperty ("OtherStudent"));
+      _sourceFetchRequest = new TestFetchRequest (typeof (Student).GetProperty ("BuddyStudent"));
       _sourceFetchRequestNode = new MainSourceExpressionNode ("x", Expression.Constant (new Student[0]));
       ClauseGenerationContext.AddContextInfo (_sourceFetchRequestNode, _sourceFetchRequest);
 

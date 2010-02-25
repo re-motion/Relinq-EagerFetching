@@ -40,13 +40,13 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       base.SetUp ();
 
-      _sourceFetchRequest = new TestFetchRequest (typeof (Student).GetProperty ("OtherStudent"));
+      _sourceFetchRequest = new TestFetchRequest (typeof (Student).GetProperty ("BuddyStudent"));
       _sourceFetchRequestNode = new MainSourceExpressionNode ("x", Expression.Constant (new Student[0]));
       ClauseGenerationContext.AddContextInfo (_sourceFetchRequestNode, _sourceFetchRequest);
 
       QueryModel.ResultOperators.Add (_sourceFetchRequest);
 
-      _node = new ThenFetchOneExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
+      _node = new ThenFetchOneExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.BuddyStudent));
     }
 
     [Test]
@@ -59,7 +59,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       var innerFetchRequests = _sourceFetchRequest.InnerFetchRequests.ToArray();
       Assert.That (innerFetchRequests.Length, Is.EqualTo (1));
       Assert.That (innerFetchRequests[0], Is.InstanceOfType (typeof (FetchOneRequest)));
-      Assert.That (innerFetchRequests[0].RelationMember, Is.SameAs (typeof (Student).GetProperty ("OtherStudent")));
+      Assert.That (innerFetchRequests[0].RelationMember, Is.SameAs (typeof (Student).GetProperty ("BuddyStudent")));
     }
 
     [Test]
@@ -76,7 +76,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       _node.Apply (QueryModel, ClauseGenerationContext);
 
-      var node = new ThenFetchOneExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
+      var node = new ThenFetchOneExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.BuddyStudent));
       node.Apply (QueryModel, ClauseGenerationContext);
 
       var innerFetchRequest = ((FetchRequestBase) QueryModel.ResultOperators[0]).InnerFetchRequests.Single ();
@@ -87,7 +87,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     [ExpectedException (typeof (ParserException))]
     public void Apply_WithoutPreviousFetchRequest ()
     {
-      var node = new ThenFetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
+      var node = new ThenFetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.BuddyStudent));
       node.Apply (QueryModel, ClauseGenerationContext);
     }
   }

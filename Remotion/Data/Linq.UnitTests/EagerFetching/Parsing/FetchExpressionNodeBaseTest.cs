@@ -34,7 +34,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       base.SetUp ();
 
-      _node = new TestFetchExpressionNodeBase (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
+      _node = new TestFetchExpressionNodeBase (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.BuddyStudent));
     }
 
     [Test]
@@ -49,10 +49,10 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression of the kind "
-                                                                      + "o => o.Related; 's.OtherStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
+                                                                      + "o => o.Related; 's.BuddyStudent.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
     public void Initialization_InvalidExpression_MoreThanOneMember ()
     {
-      var relatedObjectSelector = (Expression<Func<Student, IEnumerable<Student>>>) (s => s.OtherStudent.Friends);
+      var relatedObjectSelector = (Expression<Func<Student, IEnumerable<Student>>>) (s => s.BuddyStudent.Friends);
       new TestFetchExpressionNodeBase (CreateParseInfo (), relatedObjectSelector);
     }
 

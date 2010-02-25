@@ -32,7 +32,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     [Test]
     public void IntegrationTest_ApplySeveralRequests ()
     {
-      var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.OtherStudent));
+      var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Student, Student> (s => s.BuddyStudent));
       var node2 = new ThenFetchManyExpressionNode (
           CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Student, IEnumerable<Student>> (s => s.Friends));
       var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Student, bool> (s => s.HasDegree));
@@ -46,7 +46,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (2));
 
       var fetchRequest1 = ((FetchOneRequest) QueryModel.ResultOperators[0]);
-      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("OtherStudent")));
+      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Student).GetProperty ("BuddyStudent")));
       Assert.That (fetchRequest1.InnerFetchRequests.Count(), Is.EqualTo (1));
 
       var fetchRequest2 = ((FetchManyRequest) fetchRequest1.InnerFetchRequests.Single());
