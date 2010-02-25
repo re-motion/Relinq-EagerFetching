@@ -44,11 +44,11 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     public void ModifyFetchQueryModel ()
     {
       var inputFetchQuery = from fetch0 in
-                              (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Cook).Take (1)
+                              (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook).Take (1)
                             select fetch0;
       var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      // expected: from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Cook)
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook)
       //           select fetch0.Substitution;
 
       PrivateInvoke.InvokeNonPublicMethod (_otherStudentFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);

@@ -61,7 +61,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       _innerInnerFetchRequest = new TestFetchRequest (_isOldMember);
       _innerFetchRequest1.GetOrAddInnerFetchRequest (_innerInnerFetchRequest);
 
-      var expression = ExpressionHelper.MakeExpression ( () => (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
+      var expression = ExpressionHelper.MakeExpression ( () => (from sd in ExpressionHelper.CreateKitchenQueryable ()
                                                                 select sd.Cook).Take (1)/*.Fetch*/.Distinct().Count());
       _sourceItemQueryModel = ExpressionHelper.ParseQuery (expression);
       _outerFetchQueryModelBuilder = new FetchQueryModelBuilder (_outerFetchRequest, _sourceItemQueryModel, 1);

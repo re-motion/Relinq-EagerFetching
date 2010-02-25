@@ -46,7 +46,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       _scoresMember = typeof (Cook).GetProperty ("Holidays");
       _friendsMember = typeof (Cook).GetProperty ("Assistants");
       _friendsFetchRequest = new TestFetchRequest (_friendsMember);
-      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
+      _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateKitchenQueryable ()
                                         select sd.Cook).Take (1);
       _studentFromStudentDetailQueryModel = ExpressionHelper.ParseQuery (_studentFromStudentDetailQuery);
     }
@@ -71,7 +71,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     public void CreateFetchQueryModel ()
     {
-      // expected: from <x> in (from sd in ExpressionHelper.CreateStudentDetailQueryable() select sd.Cook).Take (1)
+      // expected: from <x> in (from sd in ExpressionHelper.CreateKitchenQueryable() select sd.Cook).Take (1)
       //           select <x>
 
       var fetchRequestPartialMock = new MockRepository ().PartialMock<FetchRequestBase> (_friendsMember);

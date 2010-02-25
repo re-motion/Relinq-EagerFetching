@@ -55,11 +55,11 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     public void ModifyFetchQueryModel ()
     {
-      var inputFetchQuery = from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Cook).Take (1)
+      var inputFetchQuery = from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook).Take (1)
                             select fetch0;
       var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      // expected: from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Cook)
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook)
       //           from fetch1 in fetch0.Assistants
       //           select fetch1;
 
