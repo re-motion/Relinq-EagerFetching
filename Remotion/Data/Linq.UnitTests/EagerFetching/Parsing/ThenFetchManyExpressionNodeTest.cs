@@ -41,7 +41,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       base.SetUp ();
 
-      _sourceFetchRequest = new TestFetchRequest (typeof (Cook).GetProperty ("BuddyCook"));
+      _sourceFetchRequest = new TestFetchRequest (typeof (Cook).GetProperty ("Substitution"));
       _sourceFetchRequestNode = new MainSourceExpressionNode ("x", Expression.Constant (new Cook[0]));
       ClauseGenerationContext.AddContextInfo (_sourceFetchRequestNode, _sourceFetchRequest);
 
