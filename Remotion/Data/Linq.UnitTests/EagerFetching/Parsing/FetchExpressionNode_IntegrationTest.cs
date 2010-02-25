@@ -35,7 +35,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.Substitution));
       var node2 = new ThenFetchManyExpressionNode (
           CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
-      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.HasDegree));
+      var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.IsStarredCook));
       var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, List<int>> (s => s.Scores));
 
       node1.Apply (QueryModel, ClauseGenerationContext);
@@ -54,7 +54,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       Assert.That (fetchRequest2.InnerFetchRequests.Count(), Is.EqualTo (1));
 
       var fetchRequest3 = ((FetchOneRequest) fetchRequest2.InnerFetchRequests.Single());
-      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("HasDegree")));
+      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("IsStarredCook")));
       Assert.That (fetchRequest3.InnerFetchRequests.Count(), Is.EqualTo (0));
 
       var fetchRequest4 = ((FetchManyRequest) QueryModel.ResultOperators[1]);

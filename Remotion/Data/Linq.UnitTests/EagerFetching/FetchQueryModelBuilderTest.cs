@@ -49,9 +49,9 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     public void SetUp ()
     {
       _friendsMember = typeof (Cook).GetProperty ("Assistants");
-      _hasDogMember = typeof (Cook).GetProperty ("HasDegree");
+      _hasDogMember = typeof (Cook).GetProperty ("IsStarredCook");
       _scoresMember = typeof (Cook).GetProperty ("Scores");
-      _isOldMember = typeof (Cook).GetProperty ("IsExchangeStudent");
+      _isOldMember = typeof (Cook).GetProperty ("IsFullTimeCook");
 
       _outerFetchRequest = new TestFetchRequest (_friendsMember);
       _innerFetchRequest1 = new TestFetchRequest (_hasDogMember);
