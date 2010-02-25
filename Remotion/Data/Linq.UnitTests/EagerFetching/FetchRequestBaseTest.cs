@@ -44,7 +44,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     public void SetUp ()
     {
       _scoresMember = typeof (Cook).GetProperty ("Scores");
-      _friendsMember = typeof (Cook).GetProperty ("Friends");
+      _friendsMember = typeof (Cook).GetProperty ("Assistants");
       _friendsFetchRequest = new TestFetchRequest (_friendsMember);
       _studentFromStudentDetailQuery = (from sd in ExpressionHelper.CreateStudentDetailQueryable ()
                                         select sd.Cook).Take (1);
@@ -65,7 +65,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     public void RelationMember ()
     {
-      Assert.That (_friendsFetchRequest.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Friends")));
+      Assert.That (_friendsFetchRequest.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
     }
 
     [Test]
@@ -100,7 +100,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects does not select a sequence, it selects a "
-        + "single object of type 'System.Int32'. In order to fetch the relation member 'Friends', the query must yield a sequence of objects of type "
+        + "single object of type 'System.Int32'. In order to fetch the relation member 'Assistants', the query must yield a sequence of objects of type "
         + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
@@ -111,7 +111,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects items that do not match the fetch "
-        + "request. In order to fetch the relation member 'Friends', the query must yield objects of type "
+        + "request. In order to fetch the relation member 'Assistants', the query must yield objects of type "
         + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook', but it yields 'Remotion.Data.Linq.UnitTests.TestDomain.Student_Detail'.\r\n"
         + "Parameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_InvalidItems ()

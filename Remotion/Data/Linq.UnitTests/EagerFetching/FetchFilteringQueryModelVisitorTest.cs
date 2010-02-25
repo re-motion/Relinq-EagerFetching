@@ -48,7 +48,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       _countResultOperator = new CountResultOperator ();
 
       _fetchOneRequest = new FetchOneRequest (typeof (Cook).GetProperty ("BuddyCook"));
-      _fetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Friends"));
+      _fetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Assistants"));
 
       _innerFetchManyRequest = new FetchManyRequest (typeof (Cook).GetProperty ("Scores"));
       _fetchOneRequest.GetOrAddInnerFetchRequest (_innerFetchManyRequest);

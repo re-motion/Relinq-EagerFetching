@@ -49,10 +49,10 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "A fetch request must be a simple member access expression of the kind "
-                                                                      + "o => o.Related; 's.BuddyCook.Friends' is too complex.\r\nParameter name: relatedObjectSelector")]
+                                                                      + "o => o.Related; 's.BuddyCook.Assistants' is too complex.\r\nParameter name: relatedObjectSelector")]
     public void Initialization_InvalidExpression_MoreThanOneMember ()
     {
-      var relatedObjectSelector = (Expression<Func<Cook, IEnumerable<Cook>>>) (s => s.BuddyCook.Friends);
+      var relatedObjectSelector = (Expression<Func<Cook, IEnumerable<Cook>>>) (s => s.BuddyCook.Assistants);
       new TestFetchExpressionNodeBase (CreateParseInfo (), relatedObjectSelector);
     }
 

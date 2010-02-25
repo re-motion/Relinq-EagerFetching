@@ -34,7 +34,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       var node1 = new FetchOneExpressionNode (CreateParseInfo(), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.BuddyCook));
       var node2 = new ThenFetchManyExpressionNode (
-          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Friends));
+          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
       var node3 = new ThenFetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.HasDegree));
       var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, List<int>> (s => s.Scores));
 
@@ -50,7 +50,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       Assert.That (fetchRequest1.InnerFetchRequests.Count(), Is.EqualTo (1));
 
       var fetchRequest2 = ((FetchManyRequest) fetchRequest1.InnerFetchRequests.Single());
-      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Friends")));
+      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
       Assert.That (fetchRequest2.InnerFetchRequests.Count(), Is.EqualTo (1));
 
       var fetchRequest3 = ((FetchOneRequest) fetchRequest2.InnerFetchRequests.Single());

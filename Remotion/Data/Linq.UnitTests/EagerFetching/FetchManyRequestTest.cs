@@ -40,7 +40,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [SetUp]
     public void SetUp ()
     {
-      _friendsMember = typeof (Cook).GetProperty ("Friends");
+      _friendsMember = typeof (Cook).GetProperty ("Assistants");
       _friendsFetchRequest = new FetchManyRequest (_friendsMember);
     }
 
@@ -60,13 +60,13 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
       var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
       // expected: from fetch0 in (from sd in ExpressionHelper.CreateStudentDetailQueryable () select sd.Cook)
-      //           from fetch1 in fetch0.Friends
+      //           from fetch1 in fetch0.Assistants
       //           select fetch1;
 
       PrivateInvoke.InvokeNonPublicMethod (_friendsFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
 
       var additionalFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses[0];
-      var expectedExpression = ExpressionHelper.Resolve<Cook, IEnumerable<Cook>> (fetchQueryModel.MainFromClause, s => s.Friends);
+      var expectedExpression = ExpressionHelper.Resolve<Cook, IEnumerable<Cook>> (fetchQueryModel.MainFromClause, s => s.Assistants);
       ExpressionTreeComparer.CheckAreEqualTrees (expectedExpression, additionalFromClause.FromExpression);
 
       Assert.That (((QuerySourceReferenceExpression) fetchQueryModel.SelectClause.Selector).ReferencedQuerySource, Is.SameAs (additionalFromClause));

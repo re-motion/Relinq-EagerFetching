@@ -47,7 +47,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
 
       QueryModel.ResultOperators.Add (_sourceFetchRequest);
 
-      _node = new ThenFetchManyExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Friends));
+      _node = new ThenFetchManyExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
     }
 
     [Test]
@@ -60,7 +60,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       var innerFetchRequests = _sourceFetchRequest.InnerFetchRequests.ToArray ();
       Assert.That (innerFetchRequests.Length, Is.EqualTo (1));
       Assert.That (innerFetchRequests[0], Is.InstanceOfType (typeof (FetchManyRequest)));
-      Assert.That (innerFetchRequests[0].RelationMember, Is.SameAs (typeof (Cook).GetProperty ("Friends")));
+      Assert.That (innerFetchRequests[0].RelationMember, Is.SameAs (typeof (Cook).GetProperty ("Assistants")));
     }
 
     [Test]
@@ -77,7 +77,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     {
       _node.Apply (QueryModel, ClauseGenerationContext);
 
-      var node = new ThenFetchManyExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Friends));
+      var node = new ThenFetchManyExpressionNode (CreateParseInfo (_sourceFetchRequestNode), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
       node.Apply (QueryModel, ClauseGenerationContext);
 
       var innerFetchRequest = ((FetchRequestBase) QueryModel.ResultOperators[0]).InnerFetchRequests.Single ();
@@ -88,7 +88,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
     [ExpectedException (typeof (ParserException))]
     public void Apply_WithoutPreviousFetchRequest ()
     {
-      var node = new ThenFetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Friends));
+      var node = new ThenFetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
       node.Apply (QueryModel, ClauseGenerationContext);
     }
   }
