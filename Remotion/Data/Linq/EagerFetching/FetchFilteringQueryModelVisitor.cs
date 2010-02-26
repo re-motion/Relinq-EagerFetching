@@ -28,7 +28,6 @@ namespace Remotion.Data.Linq.EagerFetching
   /// </summary>
   public class FetchFilteringQueryModelVisitor : QueryModelVisitorBase
   {
-    //TODO: Seems not to be used. Possibly delete?
     public static FetchQueryModelBuilder[] RemoveFetchRequestsFromQueryModel (QueryModel queryModel)
     {
       ArgumentUtility.CheckNotNull ("queryModel", queryModel);
