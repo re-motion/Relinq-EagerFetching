@@ -24,11 +24,11 @@ using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.Clauses.ResultOperators;
 using Remotion.Data.Linq.Clauses.StreamedData;
 using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.Linq.UnitTests.TestDomain;
-using Remotion.Data.Linq.UnitTests.TestUtilities;
+using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
+using Remotion.Data.Linq.UnitTests.Linq.Core.TestUtilities;
 using Rhino.Mocks;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 {
   [TestFixture]
   public class FetchRequestBaseTest
@@ -101,7 +101,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects does not select a sequence, it selects a "
         + "single object of type 'System.Int32'. In order to fetch the relation member 'Assistants', the query must yield a sequence of objects of type "
-        + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook'.\r\nParameter name: sourceItemQueryModel")]
+        + "'Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain.Cook'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
       var invalidQueryModel = ExpressionHelper.CreateQueryModel_Cook ();
@@ -112,7 +112,7 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects items that do not match the fetch "
         + "request. In order to fetch the relation member 'Assistants', the query must yield objects of type "
-        + "'Remotion.Data.Linq.UnitTests.TestDomain.Cook', but it yields 'Remotion.Data.Linq.UnitTests.TestDomain.Kitchen'.\r\n"
+        + "'Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain.Cook', but it yields 'Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain.Kitchen'.\r\n"
         + "Parameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_InvalidItems ()
     {

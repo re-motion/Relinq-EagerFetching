@@ -15,25 +15,26 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.EagerFetching.Parsing;
-using Remotion.Data.Linq.UnitTests.Parsing.Structure.IntermediateModel;
-using Remotion.Data.Linq.UnitTests.TestDomain;
+using Remotion.Data.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
+using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
 {
   [TestFixture]
-  public class FetchOneExpressionNodeTest : ExpressionNodeTestBase
+  public class FetchManyExpressionNodeTest : ExpressionNodeTestBase
   {
-    private FetchOneExpressionNode _node;
+    private FetchManyExpressionNode _node;
 
     public override void SetUp ()
     {
       base.SetUp ();
 
-      _node = new FetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.Substitution));
+      _node = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
     }
 
     [Test]
@@ -42,8 +43,8 @@ namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
       _node.Apply (QueryModel, ClauseGenerationContext);
 
       Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
-      Assert.That (QueryModel.ResultOperators[0], Is.InstanceOfType (typeof (FetchOneRequest)));
-      Assert.That (((FetchOneRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Substitution")));
+      Assert.That (QueryModel.ResultOperators[0], Is.InstanceOfType (typeof (FetchManyRequest)));
+      Assert.That (((FetchManyRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
     }
 
     [Test]

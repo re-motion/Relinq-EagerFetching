@@ -20,10 +20,10 @@ using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.Clauses.Expressions;
-using Remotion.Data.Linq.UnitTests.Parsing.Structure.IntermediateModel;
-using Remotion.Data.Linq.UnitTests.TestDomain;
+using Remotion.Data.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
+using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
 {
   [TestFixture]
   public class FetchExpressionNodeBaseTest : ExpressionNodeTestBase

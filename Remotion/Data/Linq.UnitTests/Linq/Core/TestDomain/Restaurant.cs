@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Remotion.Data.Linq.UnitTests.TestDomain
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain
 {
   public class Restaurant
   {

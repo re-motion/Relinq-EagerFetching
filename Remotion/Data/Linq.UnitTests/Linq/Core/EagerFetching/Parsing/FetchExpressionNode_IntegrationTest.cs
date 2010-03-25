@@ -21,10 +21,10 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.EagerFetching.Parsing;
-using Remotion.Data.Linq.UnitTests.Parsing.Structure.IntermediateModel;
-using Remotion.Data.Linq.UnitTests.TestDomain;
+using Remotion.Data.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
+using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
 {
   [TestFixture]
   public class FetchExpressionNode_IntegrationTest : ExpressionNodeTestBase

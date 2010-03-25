@@ -20,7 +20,7 @@ using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.Utilities;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 {
   public class TestFetchRequest : FetchRequestBase
   {

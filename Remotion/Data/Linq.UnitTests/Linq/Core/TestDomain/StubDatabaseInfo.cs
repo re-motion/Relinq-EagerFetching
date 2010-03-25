@@ -20,7 +20,7 @@ using Remotion.Data.Linq.Backend;
 using Remotion.Data.Linq.Backend.DataObjectModel;
 using Remotion.Data.Linq.Clauses;
 
-namespace Remotion.Data.Linq.UnitTests.TestDomain
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain
 {
   public class StubDatabaseInfo : IDatabaseInfo
   {

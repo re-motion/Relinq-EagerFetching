@@ -14,41 +14,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+using System.Collections.ObjectModel;
+using Remotion.Data.Linq.EagerFetching;
 
-namespace Remotion.Data.Linq.UnitTests.TestDomain
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 {
-// ReSharper disable UnusedTypeParameter
-  public class QueryableWithTooManyArguments<T1, T2> : IQueryable<T1>
-// ReSharper restore UnusedTypeParameter
+  public class TestFetchFilteringQueryModelVisitor : FetchFilteringQueryModelVisitor
   {
-    public IEnumerator<T1> GetEnumerator ()
+    public new ReadOnlyCollection<FetchQueryModelBuilder> FetchQueryModelBuilders
     {
-      throw new NotImplementedException();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator ()
-    {
-      return GetEnumerator();
-    }
-
-    public Expression Expression
-    {
-      get { throw new NotImplementedException(); }
-    }
-
-    public Type ElementType
-    {
-      get { throw new NotImplementedException(); }
-    }
-
-    public IQueryProvider Provider
-    {
-      get { throw new NotImplementedException(); }
+      get { return base.FetchQueryModelBuilders; }
     }
   }
 }

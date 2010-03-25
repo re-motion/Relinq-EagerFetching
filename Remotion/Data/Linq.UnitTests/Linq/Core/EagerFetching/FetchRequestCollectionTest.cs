@@ -21,9 +21,9 @@ using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.Linq.UnitTests.TestDomain;
+using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 {
   [TestFixture]
   public class FetchRequestCollectionTest

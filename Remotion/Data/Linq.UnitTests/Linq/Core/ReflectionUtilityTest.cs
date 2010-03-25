@@ -21,7 +21,7 @@ using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 
-namespace Remotion.Data.Linq.UnitTests
+namespace Remotion.Data.Linq.UnitTests.Linq.Core
 {
   [TestFixture]
   public class ReflectionUtilityTest

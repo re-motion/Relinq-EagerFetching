@@ -14,16 +14,24 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
-using System.Collections.ObjectModel;
-using Remotion.Data.Linq.EagerFetching;
+using System;
+using System.Linq.Expressions;
+using Remotion.Data.Linq.Clauses;
+using Remotion.Data.Linq.EagerFetching.Parsing;
+using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
 {
-  public class TestFetchFilteringQueryModelVisitor : FetchFilteringQueryModelVisitor
+  public class TestFetchExpressionNodeBase : FetchExpressionNodeBase
   {
-    public new ReadOnlyCollection<FetchQueryModelBuilder> FetchQueryModelBuilders
+    public TestFetchExpressionNodeBase (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
+        : base(parseInfo, relatedObjectSelector)
     {
-      get { return base.FetchQueryModelBuilders; }
+    }
+
+    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
+    {
+      throw new NotImplementedException();
     }
   }
 }

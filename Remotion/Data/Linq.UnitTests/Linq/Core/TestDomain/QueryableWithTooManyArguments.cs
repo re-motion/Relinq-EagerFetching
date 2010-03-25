@@ -15,23 +15,40 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.EagerFetching.Parsing;
-using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 
-namespace Remotion.Data.Linq.UnitTests.EagerFetching.Parsing
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain
 {
-  public class TestFetchExpressionNodeBase : FetchExpressionNodeBase
+// ReSharper disable UnusedTypeParameter
+  public class QueryableWithTooManyArguments<T1, T2> : IQueryable<T1>
+// ReSharper restore UnusedTypeParameter
   {
-    public TestFetchExpressionNodeBase (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
-        : base(parseInfo, relatedObjectSelector)
-    {
-    }
-
-    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
+    public IEnumerator<T1> GetEnumerator ()
     {
       throw new NotImplementedException();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator ()
+    {
+      return GetEnumerator();
+    }
+
+    public Expression Expression
+    {
+      get { throw new NotImplementedException(); }
+    }
+
+    public Type ElementType
+    {
+      get { throw new NotImplementedException(); }
+    }
+
+    public IQueryProvider Provider
+    {
+      get { throw new NotImplementedException(); }
     }
   }
 }

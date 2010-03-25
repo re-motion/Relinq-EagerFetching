@@ -18,7 +18,7 @@ using System;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Collections;
 
-namespace Remotion.Data.Linq.UnitTests.TestDomain
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain
 {
   public class TestQueryModelVisitor : QueryModelVisitorBase
   {

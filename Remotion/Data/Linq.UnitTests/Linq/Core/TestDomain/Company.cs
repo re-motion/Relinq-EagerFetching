@@ -15,32 +15,12 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Remotion.Data.Linq;
 
-namespace Remotion.Data.Linq.UnitTests.TestDomain
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain
 {
-  public class TestQueryable<T> : QueryableBase<T>
+  public class Company
   {
-    public TestQueryable (IQueryProvider provider, Expression expression)
-        : base (provider, expression)
-    {
-    }
-
-    public TestQueryable (IQueryExecutor executor)
-        : base (executor)
-    {
-    }
-
-    public TestQueryable (IQueryProvider provider)
-        : base (provider)
-    {
-    }
-
-    public override string ToString ()
-    {
-      return "TestQueryable<" + typeof (T).Name + ">()";
-    }
+    public Kitchen MainKitchen { get; set; }
+    public Restaurant Restaurant { get; set; }
   }
 }

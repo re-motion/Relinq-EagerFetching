@@ -16,11 +16,10 @@
 // 
 using System;
 
-namespace Remotion.Data.Linq.UnitTests.TestDomain
+namespace Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain
 {
-  public class Company
+  public class Chef : Cook
   {
-    public Kitchen MainKitchen { get; set; }
-    public Restaurant Restaurant { get; set; }
+    public string LetterOfRecommendation { get; set; }
   }
 }
