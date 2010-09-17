@@ -69,6 +69,7 @@ namespace Remotion.Data.Linq.EagerFetching
       if (_cachedFetchModel == null)
       {
         var sourceItemModel = SourceItemQueryModel.Clone();
+        sourceItemModel.ResultTypeOverride = null;
 
         int resultOperatorsToDelete = sourceItemModel.ResultOperators.Count - ResultOperatorPosition;
         for (int i = 0; i < resultOperatorsToDelete; ++i)

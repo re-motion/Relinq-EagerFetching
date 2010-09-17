@@ -15,11 +15,11 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq;
 using Remotion.Data.Linq.Clauses.Expressions;
 using Remotion.Data.Linq.Clauses.ResultOperators;
 using Remotion.Data.Linq.EagerFetching;
@@ -81,12 +81,14 @@ namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
     }
 
     [Test]
-    public void GetOrCreateFetchQueryModel_ClonesSourceModel ()
+    public void GetOrCreateFetchQueryModel_ClonesSourceModel_AndResetsResultTypeOverride ()
     {
       var fetchQueryModel = _outerFetchQueryModelBuilder.GetOrCreateFetchQueryModel ();
+      fetchQueryModel.ResultTypeOverride = typeof (List<>);
       var newSourceModel = ((SubQueryExpression) fetchQueryModel.MainFromClause.FromExpression).QueryModel;
       Assert.That (newSourceModel, Is.Not.Null);
       Assert.That (newSourceModel, Is.Not.SameAs (_sourceItemQueryModel));
+      Assert.That (newSourceModel.ResultTypeOverride, Is.Null);
 
       ExpressionTreeComparer.CheckAreEqualTrees (newSourceModel.MainFromClause.FromExpression, _sourceItemQueryModel.MainFromClause.FromExpression);
       Assert.That (newSourceModel.MainFromClause.ItemName, Is.EqualTo (_sourceItemQueryModel.MainFromClause.ItemName));

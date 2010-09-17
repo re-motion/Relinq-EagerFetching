@@ -96,6 +96,8 @@ namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
       Assert.That (_cookFromKitchenQueryModel.BodyClauses.Count, Is.EqualTo (0));
       Assert.That (((QuerySourceReferenceExpression) fetchQueryModel.SelectClause.Selector).ReferencedQuerySource, 
           Is.SameAs (fetchQueryModel.MainFromClause));
+
+      Assert.That (fetchQueryModel.ResultTypeOverride, Is.Null);
     }
 
     [Test]
