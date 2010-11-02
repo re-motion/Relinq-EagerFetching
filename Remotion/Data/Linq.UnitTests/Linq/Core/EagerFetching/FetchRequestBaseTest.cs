@@ -130,5 +130,25 @@ namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 
       Assert.That (result, Is.SameAs (input));
     }
+
+    [Test]
+    public new void ToString ()
+    {
+      var result = _assistantsFetchRequest.ToString ();
+
+      Assert.That (result, Is.EqualTo ("Fetch (Cook.Assistants)"));
+    }
+
+    [Test]
+    public void ToString_ThenFetch ()
+    {
+      var cookMember = typeof (Kitchen).GetProperty ("Cook");
+      var outerFetchRequest = new TestFetchRequest (cookMember);
+      outerFetchRequest.GetOrAddInnerFetchRequest (_assistantsFetchRequest);
+      
+      var result = outerFetchRequest.ToString ();
+
+      Assert.That (result, Is.EqualTo ("Fetch (Kitchen.Cook).ThenFetch (Cook.Assistants)"));
+    }
   }
 }

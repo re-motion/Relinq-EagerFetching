@@ -26,6 +26,9 @@ namespace Remotion.Data.Linq.EagerFetching
   /// Visits a <see cref="QueryModel"/>, removing all <see cref="FetchRequestBase"/> instances from its <see cref="QueryModel.ResultOperators"/>
   /// collection and returning <see cref="FetchQueryModelBuilder"/> objects for them.
   /// </summary>
+  /// <remarks>
+  /// Note that this visitor does not remove fetch requests from sub-queries.
+  /// </remarks>
   public class FetchFilteringQueryModelVisitor : QueryModelVisitorBase
   {
     public static FetchQueryModelBuilder[] RemoveFetchRequestsFromQueryModel (QueryModel queryModel)

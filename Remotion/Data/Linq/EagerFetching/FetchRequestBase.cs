@@ -16,6 +16,7 @@
 // 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Remotion.Data.Linq.Clauses;
 using Remotion.Data.Linq.Clauses.Expressions;
@@ -137,6 +138,13 @@ namespace Remotion.Data.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("input", input);
       return input;
+    }
+
+    public override string ToString ()
+    {
+      var result = string.Format ("Fetch ({0}.{1})", _relationMember.DeclaringType.Name, _relationMember.Name);
+      var innerResults = InnerFetchRequests.Select (request => request.ToString ());
+      return SeparatedStringBuilder.Build (".Then", new[] { result }.Concat (innerResults));
     }
   }
 }
