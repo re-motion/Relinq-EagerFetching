@@ -33,7 +33,7 @@ namespace Remotion.Data.Linq.EagerFetching
     public FetchManyRequest (MemberInfo relationMember)
         : base (ArgumentUtility.CheckNotNull ("relationMember", relationMember))
     {
-      var memberType = ReflectionUtility.GetFieldOrPropertyType (relationMember);
+      var memberType = ReflectionUtility.GetMemberReturnType (relationMember);
       _relatedObjectType = ReflectionUtility.GetItemTypeOfIEnumerable (memberType, "relationMember");
     }
 
