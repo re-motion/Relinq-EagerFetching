@@ -16,9 +16,10 @@
 // 
 using System;
 using System.Reflection;
-using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.Linq.Utilities;
+using Remotion.Linq;
+using Remotion.Linq.Clauses;
+using Remotion.Linq.EagerFetching;
+using Remotion.Linq.Utilities;
 
 namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 {

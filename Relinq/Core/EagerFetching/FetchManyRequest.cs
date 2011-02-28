@@ -17,11 +17,11 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.Clauses.Expressions;
-using Remotion.Data.Linq.Utilities;
+using Remotion.Linq.Clauses;
+using Remotion.Linq.Clauses.Expressions;
+using Remotion.Linq.Utilities;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Linq.EagerFetching
 {
   /// <summary>
   /// Represents a relation collection property that should be eager-fetched by means of a lambda expression.

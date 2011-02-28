@@ -16,11 +16,11 @@
 // 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.Utilities;
 using System.Linq;
+using Remotion.Linq.Clauses;
+using Remotion.Linq.Utilities;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Linq.EagerFetching
 {
   /// <summary>
   /// Visits a <see cref="QueryModel"/>, removing all <see cref="FetchRequestBase"/> instances from its <see cref="QueryModel.ResultOperators"/>

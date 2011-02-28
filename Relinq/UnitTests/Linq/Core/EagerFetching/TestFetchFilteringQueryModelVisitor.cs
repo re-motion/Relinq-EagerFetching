@@ -15,7 +15,7 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System.Collections.ObjectModel;
-using Remotion.Data.Linq.EagerFetching;
+using Remotion.Linq.EagerFetching;
 
 namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 {

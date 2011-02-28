@@ -17,10 +17,10 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.Utilities;
+using Remotion.Linq.Clauses;
+using Remotion.Linq.Utilities;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Linq.EagerFetching
 {
   /// <summary>
   /// Represents a property holding one object that should be eager-fetched when a query is executed.

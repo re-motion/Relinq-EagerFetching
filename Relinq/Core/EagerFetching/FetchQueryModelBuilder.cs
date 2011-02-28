@@ -14,16 +14,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
-using System;
-using Remotion.Data.Linq.Clauses;
-using Remotion.Data.Linq.Utilities;
 using System.Linq;
+using Remotion.Linq.Utilities;
 
-namespace Remotion.Data.Linq.EagerFetching
+namespace Remotion.Linq.EagerFetching
 {
   /// <summary>
   /// Holds a <see cref="FetchRequestBase"/>, a <see cref="SourceItemQueryModel"/> for which the fetch request was created, and the position
-  /// where the <see cref="FetchRequestBase"/> occurred in the <see cref="Linq.QueryModel.ResultOperators"/> list of the <see cref="SourceItemQueryModel"/>. From
+  /// where the <see cref="FetchRequestBase"/> occurred in the <see cref="Remotion.Linq.QueryModel.ResultOperators"/> list of the <see cref="SourceItemQueryModel"/>. From
   /// this information, it builds a new <see cref="SourceItemQueryModel"/> that represents the <see cref="FetchRequestBase"/> as a query.
   /// </summary>
   /// <remarks>

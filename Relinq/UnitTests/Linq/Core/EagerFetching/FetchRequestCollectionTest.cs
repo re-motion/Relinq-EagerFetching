@@ -20,8 +20,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq.EagerFetching;
 using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
+using Remotion.Linq.EagerFetching;
 
 namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
 {

@@ -17,10 +17,10 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
-using Remotion.Data.Linq.Utilities;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
+using Remotion.Linq.Utilities;
 
-namespace Remotion.Data.Linq.EagerFetching.Parsing
+namespace Remotion.Linq.EagerFetching.Parsing
 {
   public abstract class FetchExpressionNodeBase : ResultOperatorExpressionNodeBase
   {

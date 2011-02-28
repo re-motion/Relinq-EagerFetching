@@ -19,13 +19,13 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq.EagerFetching;
-using Remotion.Data.Linq.EagerFetching.Parsing;
-using Remotion.Data.Linq.Parsing;
-using Remotion.Data.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Data.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
 using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
 using System.Linq;
+using Remotion.Linq.EagerFetching;
+using Remotion.Linq.EagerFetching.Parsing;
+using Remotion.Linq.Parsing;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
 namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
 {
