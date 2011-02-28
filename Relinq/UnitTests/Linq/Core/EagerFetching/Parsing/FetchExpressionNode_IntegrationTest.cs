@@ -19,12 +19,12 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
-using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
+using Remotion.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
+using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.EagerFetching.Parsing;
 
-namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
+namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
 {
   [TestFixture]
   public class FetchExpressionNode_IntegrationTest : ExpressionNodeTestBase

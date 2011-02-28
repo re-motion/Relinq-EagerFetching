@@ -20,10 +20,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
+using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using Remotion.Linq.EagerFetching;
 
-namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
+namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 {
   [TestFixture]
   public class FetchRequestCollectionTest

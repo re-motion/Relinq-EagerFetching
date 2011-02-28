@@ -18,14 +18,14 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Remotion.Data.Linq.UnitTests.Linq.Core.Parsing;
-using Remotion.Data.Linq.UnitTests.Linq.Core.TestDomain;
+using Remotion.Linq.UnitTests.Linq.Core.Parsing;
+using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using System.Reflection;
-using Remotion.Data.Linq.UnitTests.Linq.Core.TestUtilities;
+using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.EagerFetching;
 
-namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
+namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 {
   [TestFixture]
   public class FetchOneRequestTest

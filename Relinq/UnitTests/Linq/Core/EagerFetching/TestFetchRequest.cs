@@ -21,7 +21,7 @@ using Remotion.Linq.Clauses;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.Utilities;
 
-namespace Remotion.Data.Linq.UnitTests.Linq.Core.EagerFetching
+namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 {
   public class TestFetchRequest : FetchRequestBase
   {
