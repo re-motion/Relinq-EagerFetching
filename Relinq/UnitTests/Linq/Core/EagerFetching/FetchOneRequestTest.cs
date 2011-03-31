@@ -17,7 +17,6 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Remotion.Linq.UnitTests.Linq.Core.Parsing;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using System.Reflection;
@@ -64,7 +63,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
       var clone = _substitutionFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
 
       Assert.That (clone, Is.Not.SameAs (_substitutionFetchRequest));
-      Assert.That (clone, Is.InstanceOfType (typeof (FetchOneRequest)));
+      Assert.That (clone, Is.InstanceOf (typeof (FetchOneRequest)));
       Assert.That (((FetchOneRequest) clone).RelationMember, Is.SameAs (_substitutionFetchRequest.RelationMember));
       Assert.That (((FetchOneRequest) clone).InnerFetchRequests.ToArray(), Is.Empty);
     }
@@ -78,7 +77,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
       var clone = _substitutionFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));
       var innerClones = ((FetchOneRequest) clone).InnerFetchRequests.ToArray ();
       Assert.That (innerClones.Length, Is.EqualTo (1));
-      Assert.That (innerClones[0], Is.InstanceOfType (typeof (FetchOneRequest)));
+      Assert.That (innerClones[0], Is.InstanceOf (typeof (FetchOneRequest)));
       Assert.That (innerClones[0], Is.Not.SameAs (innerRequest));
       Assert.That (innerClones[0].RelationMember, Is.SameAs (innerRequest.RelationMember));
     }

@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Remotion.Linq.UnitTests.Linq.Core.Parsing;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using Remotion.Linq;
@@ -103,7 +102,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
       var newSourceModel = ((SubQueryExpression) fetchQueryModel.MainFromClause.FromExpression).QueryModel;
 
       Assert.That (newSourceModel.ResultOperators.Count, Is.EqualTo (1));
-      Assert.That (newSourceModel.ResultOperators[0], Is.InstanceOfType (typeof (TakeResultOperator)));
+      Assert.That (newSourceModel.ResultOperators[0], Is.InstanceOf (typeof (TakeResultOperator)));
     }
 
     [Test]

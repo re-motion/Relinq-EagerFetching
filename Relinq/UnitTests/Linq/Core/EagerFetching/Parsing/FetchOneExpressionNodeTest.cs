@@ -16,7 +16,6 @@
 // 
 using System;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Remotion.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using Remotion.Linq.EagerFetching;
@@ -42,7 +41,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
       _node.Apply (QueryModel, ClauseGenerationContext);
 
       Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
-      Assert.That (QueryModel.ResultOperators[0], Is.InstanceOfType (typeof (FetchOneRequest)));
+      Assert.That (QueryModel.ResultOperators[0], Is.InstanceOf (typeof (FetchOneRequest)));
       Assert.That (((FetchOneRequest) QueryModel.ResultOperators[0]).RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Substitution")));
     }
 

@@ -17,7 +17,6 @@
 using System;
 using System.Linq.Expressions;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Remotion.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using System.Linq;
@@ -58,7 +57,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
       Assert.That (QueryModel.ResultOperators, Is.EqualTo (new[] { _sourceFetchRequest }));
       var innerFetchRequests = _sourceFetchRequest.InnerFetchRequests.ToArray();
       Assert.That (innerFetchRequests.Length, Is.EqualTo (1));
-      Assert.That (innerFetchRequests[0], Is.InstanceOfType (typeof (FetchOneRequest)));
+      Assert.That (innerFetchRequests[0], Is.InstanceOf (typeof (FetchOneRequest)));
       Assert.That (innerFetchRequests[0].RelationMember, Is.SameAs (typeof (Cook).GetProperty ("Substitution")));
     }
 

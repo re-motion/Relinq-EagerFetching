@@ -19,7 +19,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
 using Remotion.Linq;
@@ -89,7 +88,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
       fetchRequestPartialMock.VerifyAllExpectations ();
       Assert.That (modifiedQueryModel, Is.SameAs (fetchQueryModel));
 
-      Assert.That (fetchQueryModel.MainFromClause.FromExpression, Is.InstanceOfType (typeof (SubQueryExpression)));
+      Assert.That (fetchQueryModel.MainFromClause.FromExpression, Is.InstanceOf (typeof (SubQueryExpression)));
 
       var subQueryExpression = (SubQueryExpression) fetchQueryModel.MainFromClause.FromExpression;
       Assert.That (subQueryExpression.QueryModel, Is.SameAs (_cookFromKitchenQueryModel));
