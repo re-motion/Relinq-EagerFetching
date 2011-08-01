@@ -21,7 +21,6 @@ using System.Reflection;
 using NUnit.Framework;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
-using Remotion.Linq;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
 using Remotion.Linq.Clauses.StreamedData;
@@ -101,9 +100,9 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     }
 
     [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects does not select a sequence, it selects a "
-        + "single object of type 'System.Int32'. In order to fetch the relation member 'Assistants', the query must yield a sequence of objects of type "
-        + "'Remotion.Linq.UnitTests.Linq.Core.TestDomain.Cook'.\r\nParameter name: sourceItemQueryModel")]
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = 
+        "The given source query model cannot be used to fetch the relation member 'Assistants': The query must return a sequence of items, but it "
+        + "selects a single object of type 'System.Int32'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
       var invalidQueryModel = ExpressionHelper.CreateQueryModel_Cook ();

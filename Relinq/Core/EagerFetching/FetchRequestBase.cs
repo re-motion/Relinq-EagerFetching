@@ -74,38 +74,31 @@ namespace Remotion.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("sourceItemQueryModel", sourceItemQueryModel);
 
-      var outputDataInfo = sourceItemQueryModel.GetOutputDataInfo() as StreamedSequenceInfo;
-      if (outputDataInfo == null)
+      var sourceItemName = sourceItemQueryModel.GetNewName ("#fetch");
+      QueryModel fetchQueryModel;
+      try
+      {
+        fetchQueryModel = sourceItemQueryModel.ConvertToSubQuery (sourceItemName);
+      }
+      catch (InvalidOperationException ex)
       {
         var message = string.Format (
-            "The given source query model selects does not select a sequence, it selects a single object of type '{0}'. In order to fetch the "
-            + "relation member '{1}', the query must yield a sequence of objects of type '{2}'.",
-            sourceItemQueryModel.GetOutputDataInfo ().DataType,
+            "The given source query model cannot be used to fetch the relation member '{0}': {1}",
             RelationMember.Name,
-            RelationMember.DeclaringType);
-        throw new ArgumentException (message, "sourceItemQueryModel");
+            ex.Message);
+        throw new ArgumentException (message, "sourceItemQueryModel", ex);
       }
 
-      if (!RelationMember.DeclaringType.IsAssignableFrom (outputDataInfo.ItemExpression.Type))
+      if (!RelationMember.DeclaringType.IsAssignableFrom (fetchQueryModel.MainFromClause.ItemType))
       {
         var message = string.Format (
             "The given source query model selects items that do not match the fetch request. In order to fetch the relation member '{0}', the query "
             + "must yield objects of type '{1}', but it yields '{2}'.",
             RelationMember.Name,
             RelationMember.DeclaringType,
-            outputDataInfo.ItemExpression.Type);
+            fetchQueryModel.MainFromClause.ItemType);
         throw new ArgumentException (message, "sourceItemQueryModel");
       }
-
-      // from #fetch0 in (sourceItemQuery)
-      // select #fetch0
-
-      var mainFromClause = new MainFromClause (
-          sourceItemQueryModel.GetNewName ("#fetch"), 
-          outputDataInfo.ItemExpression.Type, 
-          new SubQueryExpression (sourceItemQueryModel));
-      var selectClause = new SelectClause (new QuerySourceReferenceExpression (mainFromClause));
-      var fetchQueryModel = new QueryModel (mainFromClause, selectClause);
 
       ModifyFetchQueryModel (fetchQueryModel);
 
