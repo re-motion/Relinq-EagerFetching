@@ -29,19 +29,21 @@ namespace Remotion.Linq.EagerFetching.Parsing
     {
     }
 
-    // TODO 4564
-    //protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
-    //{
-    //  var existingMatchingFetchRequest =
-    //      queryModel.ResultOperators.OfType<FetchOneRequest>().FirstOrDefault (r => r.RelationMember.Equals (RelationMember));
-    //  if (existingMatchingFetchRequest != null)
-    //  {
-    //    clauseGenerationContext.AddContextInfo (this, existingMatchingFetchRequest);
-    //    return queryModel;
-    //  }
-    //  else
-    //    return base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
-    //}
+    protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    {
+      ArgumentUtility.CheckNotNull ("queryModel", queryModel);
+
+      var existingMatchingFetchRequest =
+          queryModel.ResultOperators.OfType<FetchOneRequest> ().FirstOrDefault (r => r.RelationMember.Equals (RelationMember));
+      if (existingMatchingFetchRequest != null)
+      {
+        // Store a mapping between this node and the existing resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
+        clauseGenerationContext.AddContextInfo (this, existingMatchingFetchRequest);
+        return queryModel;
+      }
+      else
+        return base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
+    }
 
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {

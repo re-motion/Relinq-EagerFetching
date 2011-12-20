@@ -62,7 +62,6 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
     }
 
     [Test]
-    [Ignore ("TODO 4564")]
     public void IntegrationTest_ApplyRequestsAtSameLevel_FetchOne ()
     {
       var node1 = new FetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.Substitution));
@@ -92,7 +91,6 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
     }
 
     [Test]
-    [Ignore ("TODO 4564")]
     public void IntegrationTest_ApplyRequestsAtSameLevel_FetchMany ()
     {
       var node1 = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
@@ -122,7 +120,6 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
     }
 
     [Test]
-    [Ignore ("TODO 4564")]
     public void IntegrationTest_ApplyRequestsAtSameLevel_ThenFetchOne ()
     {
       var node1 = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
@@ -160,7 +157,6 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
     }
 
     [Test]
-    [Ignore ("TODO 4564")]
     public void IntegrationTest_ApplyRequestsAtSameLevel_ThenFetchMany ()
     {
       var node1 = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));

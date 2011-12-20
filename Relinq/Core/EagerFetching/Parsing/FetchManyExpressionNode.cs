@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-linq; if not, see http://www.gnu.org/licenses.
 // 
+using System.Linq;
 using System.Linq.Expressions;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
@@ -26,6 +27,22 @@ namespace Remotion.Linq.EagerFetching.Parsing
     public FetchManyExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
         : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {
+    }
+
+    protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    {
+      ArgumentUtility.CheckNotNull ("queryModel", queryModel);
+
+      var existingMatchingFetchRequest =
+          queryModel.ResultOperators.OfType<FetchManyRequest> ().FirstOrDefault (r => r.RelationMember.Equals (RelationMember));
+      if (existingMatchingFetchRequest != null)
+      {
+        // Store a mapping between this node and the existing resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
+        clauseGenerationContext.AddContextInfo (this, existingMatchingFetchRequest);
+        return queryModel;
+      }
+      else
+        return base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
     }
 
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)

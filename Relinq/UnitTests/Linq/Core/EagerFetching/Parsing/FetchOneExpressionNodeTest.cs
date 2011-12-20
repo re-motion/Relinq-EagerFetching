@@ -51,5 +51,18 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
       _node.Apply (QueryModel, ClauseGenerationContext);
       Assert.That (ClauseGenerationContext.GetContextInfo (_node), Is.SameAs (QueryModel.ResultOperators[0]));
     }
+
+    [Test]
+    public void Apply_WithExistingFetchOneRequest ()
+    {
+      var request = new FetchOneRequest (_node.RelationMember);
+      QueryModel.ResultOperators.Add (request);
+
+      _node.Apply (QueryModel, ClauseGenerationContext);
+
+      Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
+      Assert.That (QueryModel.ResultOperators[0], Is.SameAs (request));
+      Assert.That (ClauseGenerationContext.GetContextInfo (_node), Is.SameAs (QueryModel.ResultOperators[0]));
+    }
   }
 }
