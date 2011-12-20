@@ -22,9 +22,12 @@ using Remotion.Linq.Utilities;
 
 namespace Remotion.Linq.EagerFetching.Parsing
 {
+  /// <summary>
+  /// Provides common functionality used by all expression nodes representing fetch operations.
+  /// </summary>
   public abstract class FetchExpressionNodeBase : ResultOperatorExpressionNodeBase
   {
-    public FetchExpressionNodeBase (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
+    protected FetchExpressionNodeBase (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
         : base (parseInfo, null, null)
     {
       ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector);

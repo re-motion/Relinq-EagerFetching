@@ -16,37 +16,30 @@
 // 
 using System;
 using System.Linq.Expressions;
-using Remotion.Linq.Clauses;
-using Remotion.Linq.Parsing;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.Utilities;
 
 namespace Remotion.Linq.EagerFetching.Parsing
 {
-  public class ThenFetchManyExpressionNode : FetchExpressionNodeBase
+  /// <summary>
+  /// Parses query operators that instruct the LINQ provider to fetch a collection-valued relationship starting from another fetch operation. The node 
+  /// creates <see cref="FetchManyRequest"/> instances and attaches them to the preceding fetch operation (unless the previous fetch operation already 
+  /// has an equivalent fetch request).
+  /// </summary>
+  /// <remarks>
+  /// This class is not automatically configured for any query operator methods. LINQ provider implementations must explicitly provide and register 
+  /// these methods in order for <see cref="ThenFetchManyExpressionNode"/> to be used. See also <see cref="FluentFetchRequest{TQueried,TFetch}"/>.
+  /// </remarks>
+  public class ThenFetchManyExpressionNode : ThenFetchExpressionNodeBase
   {
     public ThenFetchManyExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
         : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {
     }
 
-    //TODO: Seems not to be used. Possibly redesign
-    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
+    protected override FetchRequestBase CreateFetchRequest ()
     {
-      throw new NotImplementedException ("Call ApplyNodeSpecificSemantics instead.");
-    }
-
-    protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
-    {
-      var previousFetchRequest = clauseGenerationContext.GetContextInfo (Source) as FetchRequestBase;
-      if (previousFetchRequest == null)
-        throw new ParserException ("ThenFetchMany must directly follow another Fetch request.");
-
-      FetchRequestBase innerFetchRequest = new FetchManyRequest (RelationMember);
-      innerFetchRequest = previousFetchRequest.GetOrAddInnerFetchRequest (innerFetchRequest);
-      clauseGenerationContext.AddContextInfo (this, innerFetchRequest);
-
-      return queryModel;
+      return new FetchManyRequest (RelationMember);
     }
   }
 }

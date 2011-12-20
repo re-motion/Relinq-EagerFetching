@@ -14,43 +14,31 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-linq; if not, see http://www.gnu.org/licenses.
 // 
-using System.Linq;
 using System.Linq.Expressions;
-using Remotion.Linq.Clauses;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.Utilities;
 
 namespace Remotion.Linq.EagerFetching.Parsing
 {
-  public class FetchManyExpressionNode : FetchExpressionNodeBase
+  /// <summary>
+  /// Parses query operators that instruct the LINQ provider to fetch a collection-valued relationship starting from the values selected by the query. 
+  /// The node creates <see cref="FetchManyRequest"/> instances and adds them to the <see cref="QueryModel"/> as 
+  /// <see cref="QueryModel.ResultOperators"/> (unless the <see cref="QueryModel"/> already has an equivalent fetch request).
+  /// </summary>
+  /// <remarks>
+  /// This class is not automatically configured for any query operator methods. LINQ provider implementations must explicitly provide and register 
+  /// these  methods in order for <see cref="FetchManyExpressionNode"/> to be used. See also <see cref="FluentFetchRequest{TQueried,TFetch}"/>.
+  /// </remarks>
+  public class FetchManyExpressionNode : OuterFetchExpressionNodeBase
   {
     public FetchManyExpressionNode (MethodCallExpressionParseInfo parseInfo, LambdaExpression relatedObjectSelector)
         : base (parseInfo, ArgumentUtility.CheckNotNull ("relatedObjectSelector", relatedObjectSelector))
     {
     }
 
-    protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    protected override FetchRequestBase CreateFetchRequest ()
     {
-      ArgumentUtility.CheckNotNull ("queryModel", queryModel);
-
-      var existingMatchingFetchRequest =
-          queryModel.ResultOperators.OfType<FetchManyRequest> ().FirstOrDefault (r => r.RelationMember.Equals (RelationMember));
-      if (existingMatchingFetchRequest != null)
-      {
-        // Store a mapping between this node and the existing resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
-        clauseGenerationContext.AddContextInfo (this, existingMatchingFetchRequest);
-        return queryModel;
-      }
-      else
-        return base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
-    }
-
-    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
-    {
-      var resultOperator = new FetchManyRequest (RelationMember);
-      // Store a mapping between this node and the resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
-      clauseGenerationContext.AddContextInfo (this, resultOperator);
-      return resultOperator;
+      return new FetchManyRequest (RelationMember);
     }
   }
 }
