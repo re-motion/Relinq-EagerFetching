@@ -18,6 +18,7 @@ using System.Linq.Expressions;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.Utilities;
+using System.Linq;
 
 namespace Remotion.Linq.EagerFetching.Parsing
 {
@@ -28,9 +29,24 @@ namespace Remotion.Linq.EagerFetching.Parsing
     {
     }
 
+    // TODO 4564
+    //protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    //{
+    //  var existingMatchingFetchRequest =
+    //      queryModel.ResultOperators.OfType<FetchOneRequest>().FirstOrDefault (r => r.RelationMember.Equals (RelationMember));
+    //  if (existingMatchingFetchRequest != null)
+    //  {
+    //    clauseGenerationContext.AddContextInfo (this, existingMatchingFetchRequest);
+    //    return queryModel;
+    //  }
+    //  else
+    //    return base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
+    //}
+
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
       var resultOperator = new FetchOneRequest (RelationMember);
+      // Store a mapping between this node and the resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
       clauseGenerationContext.AddContextInfo (this, resultOperator);
       return resultOperator;
     }

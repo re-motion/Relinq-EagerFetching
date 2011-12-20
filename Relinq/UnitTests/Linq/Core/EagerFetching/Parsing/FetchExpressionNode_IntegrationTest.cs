@@ -60,5 +60,141 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
       Assert.That (fetchRequest4.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Holidays")));
       Assert.That (fetchRequest4.InnerFetchRequests.Count(), Is.EqualTo (0));
     }
+
+    [Test]
+    [Ignore ("TODO 4564")]
+    public void IntegrationTest_ApplyRequestsAtSameLevel_FetchOne ()
+    {
+      var node1 = new FetchOneExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.Substitution));
+      var node2 = new ThenFetchManyExpressionNode (
+          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node3 = new FetchOneExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.Substitution));
+      var node4 = new ThenFetchOneExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.IsStarredCook));
+
+      node1.Apply (QueryModel, ClauseGenerationContext);
+      node2.Apply (QueryModel, ClauseGenerationContext);
+      node3.Apply (QueryModel, ClauseGenerationContext);
+      node4.Apply (QueryModel, ClauseGenerationContext);
+
+      Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
+
+      var fetchRequest1 = ((FetchOneRequest) QueryModel.ResultOperators[0]);
+      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Substitution")));
+      Assert.That (fetchRequest1.InnerFetchRequests.Count (), Is.EqualTo (2));
+
+      var fetchRequest2 = ((FetchManyRequest) fetchRequest1.InnerFetchRequests.First());
+      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest2.InnerFetchRequests.Count (), Is.EqualTo (0));
+
+      var fetchRequest3 = ((FetchOneRequest) fetchRequest1.InnerFetchRequests.Skip(1).Single ());
+      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("IsStarredCook")));
+      Assert.That (fetchRequest3.InnerFetchRequests.Count (), Is.EqualTo (0));
+    }
+
+    [Test]
+    [Ignore ("TODO 4564")]
+    public void IntegrationTest_ApplyRequestsAtSameLevel_FetchMany ()
+    {
+      var node1 = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node2 = new ThenFetchManyExpressionNode (
+          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node3 = new FetchManyExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node4 = new ThenFetchOneExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.IsStarredCook));
+
+      node1.Apply (QueryModel, ClauseGenerationContext);
+      node2.Apply (QueryModel, ClauseGenerationContext);
+      node3.Apply (QueryModel, ClauseGenerationContext);
+      node4.Apply (QueryModel, ClauseGenerationContext);
+
+      Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
+
+      var fetchRequest1 = ((FetchManyRequest) QueryModel.ResultOperators[0]);
+      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest1.InnerFetchRequests.Count (), Is.EqualTo (2));
+
+      var fetchRequest2 = ((FetchManyRequest) fetchRequest1.InnerFetchRequests.First ());
+      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest2.InnerFetchRequests.Count (), Is.EqualTo (0));
+
+      var fetchRequest3 = ((FetchOneRequest) fetchRequest1.InnerFetchRequests.Skip (1).Single ());
+      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("IsStarredCook")));
+      Assert.That (fetchRequest3.InnerFetchRequests.Count (), Is.EqualTo (0));
+    }
+
+    [Test]
+    [Ignore ("TODO 4564")]
+    public void IntegrationTest_ApplyRequestsAtSameLevel_ThenFetchOne ()
+    {
+      var node1 = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node2 = new ThenFetchOneExpressionNode (
+          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.Substitution));
+      var node3 = new ThenFetchManyExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node5 = new ThenFetchOneExpressionNode (CreateParseInfo (node4), ExpressionHelper.CreateLambdaExpression<Cook, Cook> (s => s.Substitution));
+      var node6 = new ThenFetchOneExpressionNode (CreateParseInfo (node5), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.IsStarredCook));
+
+      node1.Apply (QueryModel, ClauseGenerationContext);
+      node2.Apply (QueryModel, ClauseGenerationContext);
+      node3.Apply (QueryModel, ClauseGenerationContext);
+      node4.Apply (QueryModel, ClauseGenerationContext);
+      node5.Apply (QueryModel, ClauseGenerationContext);
+      node6.Apply (QueryModel, ClauseGenerationContext);
+
+      Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
+
+      var fetchRequest1 = ((FetchManyRequest) QueryModel.ResultOperators[0]);
+      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest1.InnerFetchRequests.Count (), Is.EqualTo (1));
+
+      var fetchRequest2 = ((FetchOneRequest) fetchRequest1.InnerFetchRequests.Single ());
+      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Substitution")));
+      Assert.That (fetchRequest2.InnerFetchRequests.Count (), Is.EqualTo (2));
+
+      var fetchRequest3 = ((FetchManyRequest) fetchRequest2.InnerFetchRequests.First());
+      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest3.InnerFetchRequests.Count (), Is.EqualTo (0));
+
+      var fetchRequest4 = ((FetchOneRequest) fetchRequest2.InnerFetchRequests.Skip (1).Single ());
+      Assert.That (fetchRequest4.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("IsStarredCook")));
+      Assert.That (fetchRequest4.InnerFetchRequests.Count (), Is.EqualTo (0));
+    }
+
+    [Test]
+    [Ignore ("TODO 4564")]
+    public void IntegrationTest_ApplyRequestsAtSameLevel_ThenFetchMany ()
+    {
+      var node1 = new FetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node2 = new ThenFetchManyExpressionNode (
+          CreateParseInfo (node1), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node3 = new ThenFetchManyExpressionNode (CreateParseInfo (node2), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node4 = new FetchManyExpressionNode (CreateParseInfo (node3), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node5 = new ThenFetchManyExpressionNode (CreateParseInfo (node4), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));
+      var node6 = new ThenFetchOneExpressionNode (CreateParseInfo (node5), ExpressionHelper.CreateLambdaExpression<Cook, bool> (s => s.IsStarredCook));
+
+      node1.Apply (QueryModel, ClauseGenerationContext);
+      node2.Apply (QueryModel, ClauseGenerationContext);
+      node3.Apply (QueryModel, ClauseGenerationContext);
+      node4.Apply (QueryModel, ClauseGenerationContext);
+      node5.Apply (QueryModel, ClauseGenerationContext);
+      node6.Apply (QueryModel, ClauseGenerationContext);
+
+      Assert.That (QueryModel.ResultOperators.Count, Is.EqualTo (1));
+
+      var fetchRequest1 = ((FetchManyRequest) QueryModel.ResultOperators[0]);
+      Assert.That (fetchRequest1.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest1.InnerFetchRequests.Count (), Is.EqualTo (1));
+
+      var fetchRequest2 = ((FetchManyRequest) fetchRequest1.InnerFetchRequests.Single ());
+      Assert.That (fetchRequest2.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest2.InnerFetchRequests.Count (), Is.EqualTo (2));
+
+      var fetchRequest3 = ((FetchManyRequest) fetchRequest2.InnerFetchRequests.First ());
+      Assert.That (fetchRequest3.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Assistants")));
+      Assert.That (fetchRequest3.InnerFetchRequests.Count (), Is.EqualTo (0));
+
+      var fetchRequest4 = ((FetchOneRequest) fetchRequest2.InnerFetchRequests.Skip (1).Single ());
+      Assert.That (fetchRequest4.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("IsStarredCook")));
+      Assert.That (fetchRequest4.InnerFetchRequests.Count (), Is.EqualTo (0));
+    }
   }
 }
