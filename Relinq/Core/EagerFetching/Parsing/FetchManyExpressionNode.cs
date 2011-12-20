@@ -28,10 +28,8 @@ namespace Remotion.Linq.EagerFetching.Parsing
     {
     }
 
-    protected override ResultOperatorBase CreateResultOperator (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
     {
-      ArgumentUtility.CheckNotNull ("queryModel", queryModel);
-
       var resultOperator = new FetchManyRequest (RelationMember);
       // Store a mapping between this node and the resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
       clauseGenerationContext.AddContextInfo (this, resultOperator);

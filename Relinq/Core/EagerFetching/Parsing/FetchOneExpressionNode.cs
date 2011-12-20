@@ -42,11 +42,9 @@ namespace Remotion.Linq.EagerFetching.Parsing
     //  else
     //    return base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
     //}
-    
-    protected override ResultOperatorBase CreateResultOperator (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
-    {
-      ArgumentUtility.CheckNotNull ("queryModel", queryModel);
 
+    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
+    {
       var resultOperator = new FetchOneRequest (RelationMember);
       // Store a mapping between this node and the resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
       clauseGenerationContext.AddContextInfo (this, resultOperator);
