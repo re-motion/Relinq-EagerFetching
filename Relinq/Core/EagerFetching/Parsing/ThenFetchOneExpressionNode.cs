@@ -31,13 +31,15 @@ namespace Remotion.Linq.EagerFetching.Parsing
     }
 
     //TODO: Seems not to be used. Possibly redesign
-    protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
+    protected override ResultOperatorBase CreateResultOperator (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
     {
       throw new NotImplementedException ("Call ApplyNodeSpecificSemantics instead.");
     }
 
     protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
     {
+      ArgumentUtility.CheckNotNull ("queryModel", queryModel);
+
       var previousFetchRequest = clauseGenerationContext.GetContextInfo (Source) as FetchRequestBase;
       if (previousFetchRequest == null)
         throw new ParserException ("ThenFetchOne must directly follow another Fetch request.");
