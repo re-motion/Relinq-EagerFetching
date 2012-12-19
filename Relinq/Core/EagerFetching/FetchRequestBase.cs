@@ -16,7 +16,9 @@
 // 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
@@ -89,20 +91,19 @@ namespace Remotion.Linq.EagerFetching
         throw new ArgumentException (message, "sourceItemQueryModel", ex);
       }
 
-      if (!RelationMember.DeclaringType.IsAssignableFrom (fetchQueryModel.MainFromClause.ItemType))
-      {
-        var message = string.Format (
-            "The given source query model selects items that do not match the fetch request. In order to fetch the relation member '{0}', the query "
-            + "must yield objects of type '{1}', but it yields '{2}'.",
-            RelationMember.Name,
-            RelationMember.DeclaringType,
-            fetchQueryModel.MainFromClause.ItemType);
-        throw new ArgumentException (message, "sourceItemQueryModel");
-      }
-
       ModifyFetchQueryModel (fetchQueryModel);
 
       return fetchQueryModel;
+    }
+
+    protected Expression GetFetchedMemberExpression (Expression source)
+    {
+      ArgumentUtility.CheckNotNull ("source", source);
+
+      Debug.Assert (RelationMember.DeclaringType != null);
+      if (!RelationMember.DeclaringType.IsAssignableFrom (source.Type))
+        source = Expression.Convert (source, RelationMember.DeclaringType);
+      return Expression.MakeMemberAccess (source, RelationMember);
     }
 
     /// <summary>

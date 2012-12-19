@@ -42,7 +42,8 @@ namespace Remotion.Linq.EagerFetching.Parsing
         throw new ArgumentException (message, "relatedObjectSelector");
       }
 
-      if (memberExpression.Expression.NodeType != ExpressionType.Parameter)
+      var owner = StripConverts (memberExpression.Expression);
+      if (owner.NodeType != ExpressionType.Parameter)
       {
         var message = string.Format (
             "A fetch request must be a simple member access expression of the kind o => o.Related; '{0}' is too complex.",
@@ -51,6 +52,13 @@ namespace Remotion.Linq.EagerFetching.Parsing
       }
 
       RelationMember = memberExpression.Member;
+    }
+
+    private Expression StripConverts (Expression expression)
+    {
+      while (expression.NodeType == ExpressionType.Convert)
+        expression = ((UnaryExpression) expression).Operand;
+      return expression;
     }
 
     public MemberInfo RelationMember { get; private set; }

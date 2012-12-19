@@ -19,6 +19,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using NUnit.Framework;
+using Remotion.Linq.UnitTests.Linq.Core.Parsing;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
 using Remotion.Linq.Clauses.Expressions;
@@ -111,14 +112,32 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     }
 
     [Test]
-    [ExpectedException (typeof (ArgumentException), ExpectedMessage = "The given source query model selects items that do not match the fetch "
-        + "request. In order to fetch the relation member 'Assistants', the query must yield objects of type "
-        + "'Remotion.Linq.UnitTests.Linq.Core.TestDomain.Cook', but it yields 'Remotion.Linq.UnitTests.Linq.Core.TestDomain.Kitchen'.\r\n"
-        + "Parameter name: sourceItemQueryModel")]
-    public void CreateFetchQueryModel_InvalidItems ()
+    public void CreateFetchQueryModel_NonMatchingItems_Works ()
     {
       var invalidQueryModel = ExpressionHelper.CreateQueryModel (ExpressionHelper.CreateMainFromClause_Kitchen());
-      _assistantsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
+      Assert.That (() => _assistantsFetchRequest.CreateFetchQueryModel (invalidQueryModel), Throws.Nothing);
+    }
+
+    [Test]
+    public void GetFetchedMemberExpression ()
+    {
+      var cookSource = ExpressionHelper.CreateExpression (typeof (Cook));
+      
+      var result = _assistantsFetchRequest.GetFetchedMemberExpression (cookSource);
+
+      var expectedExpression = Expression.MakeMemberAccess (cookSource, _assistantsMember);
+      ExpressionTreeComparer.CheckAreEqualTrees (expectedExpression, result);
+    }
+
+    [Test]
+    public void GetFetchedMemberExpression_ConversionNeeded ()
+    {
+      var objectSource = ExpressionHelper.CreateExpression (typeof (object));
+
+      var result = _assistantsFetchRequest.GetFetchedMemberExpression (objectSource);
+
+      var expectedExpression = Expression.MakeMemberAccess (Expression.Convert (objectSource, typeof (Cook)), _assistantsMember);
+      ExpressionTreeComparer.CheckAreEqualTrees (expectedExpression, result);
     }
 
     [Test]

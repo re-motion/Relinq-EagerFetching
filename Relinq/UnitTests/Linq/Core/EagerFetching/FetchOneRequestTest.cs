@@ -58,6 +58,24 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     }
 
     [Test]
+    public void ModifyFetchQueryModel_WithConversion ()
+    {
+      var inputFetchQuery = from fetch0 in
+                              (from sd in ExpressionHelper.CreateKitchenQueryable () select (object) sd.Cook).Take (1)
+                            select fetch0;
+      var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
+
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook).Take(1)
+      //           select ((Cook) fetch0).Substitution;
+
+      PrivateInvoke.InvokeNonPublicMethod (_substitutionFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
+
+      var selectClause = fetchQueryModel.SelectClause;
+      var expectedExpression = ExpressionHelper.Resolve<object, Cook> (fetchQueryModel.MainFromClause, s => ((Cook) s).Substitution);
+      ExpressionTreeComparer.CheckAreEqualTrees (selectClause.Selector, expectedExpression);
+    }
+
+    [Test]
     public void Clone ()
     {
       var clone = _substitutionFetchRequest.Clone (new CloneContext (new QuerySourceMapping ()));

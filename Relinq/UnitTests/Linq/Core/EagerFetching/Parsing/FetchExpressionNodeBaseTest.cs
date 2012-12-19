@@ -37,6 +37,23 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
     }
 
     [Test]
+    public void Initialization ()
+    {
+      Assert.That (_node.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Substitution")));
+    }
+
+    [Test]
+    public void Initialization_WithConversions ()
+    {
+// ReSharper disable RedundantCast
+// ReSharper disable PossibleInvalidCastException
+      var node = new TestFetchExpressionNodeBase (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<object, Cook> (s => ((Cook) (object) (string) s).Substitution));
+// ReSharper restore PossibleInvalidCastException
+// ReSharper restore RedundantCast
+      Assert.That (node.RelationMember, Is.EqualTo (typeof (Cook).GetProperty ("Substitution")));
+    }
+
+    [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = 
         @"A fetch request must be a simple member access expression; 'new \[\] \{1, 2, 3\}' is a .* instead\.",
         MatchType = MessageMatch.Regex)]

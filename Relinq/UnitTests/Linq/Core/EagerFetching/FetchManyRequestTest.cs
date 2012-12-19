@@ -58,7 +58,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
                             select fetch0;
       var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook)
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook).Take (1)
       //           from fetch1 in fetch0.Assistants
       //           select fetch1;
 
@@ -66,6 +66,26 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 
       var additionalFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses[0];
       var expectedExpression = ExpressionHelper.Resolve<Cook, IEnumerable<Cook>> (fetchQueryModel.MainFromClause, s => s.Assistants);
+      ExpressionTreeComparer.CheckAreEqualTrees (expectedExpression, additionalFromClause.FromExpression);
+
+      Assert.That (((QuerySourceReferenceExpression) fetchQueryModel.SelectClause.Selector).ReferencedQuerySource, Is.SameAs (additionalFromClause));
+    }
+
+    [Test]
+    public void ModifyFetchQueryModel_WithConversion ()
+    {
+      var inputFetchQuery = from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select (object) sd.Cook).Take (1)
+                            select fetch0;
+      var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
+
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select (object) sd.Cook).Take (1)
+      //           from fetch1 in ((Cook) fetch0).Assistants
+      //           select fetch1;
+
+      PrivateInvoke.InvokeNonPublicMethod (_friendsFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
+
+      var additionalFromClause = (AdditionalFromClause) fetchQueryModel.BodyClauses[0];
+      var expectedExpression = ExpressionHelper.Resolve<object, IEnumerable<Cook>> (fetchQueryModel.MainFromClause, s => ((Cook) s).Assistants);
       ExpressionTreeComparer.CheckAreEqualTrees (expectedExpression, additionalFromClause.FromExpression);
 
       Assert.That (((QuerySourceReferenceExpression) fetchQueryModel.SelectClause.Selector).ReferencedQuerySource, Is.SameAs (additionalFromClause));

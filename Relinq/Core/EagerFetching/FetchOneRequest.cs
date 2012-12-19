@@ -41,7 +41,7 @@ namespace Remotion.Linq.EagerFetching
     protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
-      fetchQueryModel.SelectClause.Selector = Expression.MakeMemberAccess (fetchQueryModel.SelectClause.Selector, RelationMember);
+      fetchQueryModel.SelectClause.Selector = GetFetchedMemberExpression (fetchQueryModel.SelectClause.Selector);
     }
 
     /// <inheritdoc />

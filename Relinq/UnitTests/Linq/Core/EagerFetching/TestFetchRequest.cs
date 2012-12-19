@@ -15,6 +15,7 @@
 // along with re-linq; if not, see http://www.gnu.org/licenses.
 // 
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq;
 using Remotion.Linq.Clauses;
@@ -28,6 +29,11 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     public TestFetchRequest (MemberInfo relationMember)
         : base (relationMember)
     {
+    }
+
+    public new Expression GetFetchedMemberExpression (Expression source)
+    {
+      return base.GetFetchedMemberExpression (source);
     }
 
     protected override void ModifyFetchQueryModel (QueryModel fetchQueryModel)

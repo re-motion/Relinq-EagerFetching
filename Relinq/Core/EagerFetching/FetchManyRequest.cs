@@ -49,7 +49,7 @@ namespace Remotion.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("fetchQueryModel", fetchQueryModel);
 
-      var fromExpression = Expression.MakeMemberAccess (new QuerySourceReferenceExpression (fetchQueryModel.MainFromClause), RelationMember);
+      var fromExpression = GetFetchedMemberExpression (new QuerySourceReferenceExpression (fetchQueryModel.MainFromClause));
       var memberFromClause = new AdditionalFromClause (fetchQueryModel.GetNewName ("#fetch"), _relatedObjectType, fromExpression);
       fetchQueryModel.BodyClauses.Add (memberFromClause);
 
