@@ -25,7 +25,6 @@ using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.EagerFetching;
-using Remotion.Linq.Utilities;
 
 namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 {
@@ -44,7 +43,8 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     }
 
     [Test]
-    [ExpectedException (typeof (ArgumentTypeException))]
+    [ExpectedException (typeof (ArgumentException), ExpectedMessage = 
+        "Expected a type implementing IEnumerable<T>, but found 'System.Int32'.\r\nParameter name: relationMember")]
     public void Create_InvalidRelationMember ()
     {
       var idMember = typeof (Cook).GetProperty ("ID");

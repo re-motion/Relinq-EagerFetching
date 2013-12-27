@@ -20,7 +20,7 @@ using System.Reflection;
 using Remotion.Linq;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.EagerFetching;
-using Remotion.Linq.Utilities;
+using Remotion.Utilities;
 
 namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 {

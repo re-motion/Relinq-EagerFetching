@@ -25,6 +25,7 @@ using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
 using Remotion.Linq.Clauses.StreamedData;
 using Remotion.Linq.Utilities;
+using Remotion.Utilities;
 
 namespace Remotion.Linq.EagerFetching
 {
@@ -138,7 +139,7 @@ namespace Remotion.Linq.EagerFetching
     {
       var result = string.Format ("Fetch ({0}.{1})", _relationMember.DeclaringType.Name, _relationMember.Name);
       var innerResults = InnerFetchRequests.Select (request => request.ToString ());
-      return SeparatedStringBuilder.Build (".Then", new[] { result }.Concat (innerResults));
+      return string.Join (".Then", new[] { result }.Concat (innerResults));
     }
   }
 }
