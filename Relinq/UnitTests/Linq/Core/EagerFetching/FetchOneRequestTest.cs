@@ -16,13 +16,13 @@
 // 
 using System;
 using System.Linq;
-using NUnit.Framework;
-using Remotion.Linq.UnitTests.Linq.Core.Parsing;
-using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 using System.Reflection;
-using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
+using NUnit.Framework;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.EagerFetching;
+using Remotion.Linq.UnitTests.Linq.Core.Parsing;
+using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
+using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
 
 namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 {
