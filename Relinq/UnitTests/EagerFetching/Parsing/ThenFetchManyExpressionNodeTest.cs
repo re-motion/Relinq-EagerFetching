@@ -23,7 +23,6 @@ using NUnit.Framework;
 using Remotion.Linq.Development.UnitTesting;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.EagerFetching.Parsing;
-using Remotion.Linq.Parsing;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.UnitTests.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.UnitTests.TestDomain;
@@ -86,7 +85,7 @@ namespace Remotion.Linq.UnitTests.EagerFetching.Parsing
     }
 
     [Test]
-    [ExpectedException (typeof (ParserException))]
+    [ExpectedException (typeof (NotSupportedException), ExpectedMessage = "ThenFetchMany must directly follow another Fetch request.")]
     public void Apply_WithoutPreviousFetchRequest ()
     {
       var node = new ThenFetchManyExpressionNode (CreateParseInfo (), ExpressionHelper.CreateLambdaExpression<Cook, IEnumerable<Cook>> (s => s.Assistants));

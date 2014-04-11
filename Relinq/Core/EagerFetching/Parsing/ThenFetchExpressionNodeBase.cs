@@ -46,7 +46,7 @@ namespace Remotion.Linq.EagerFetching.Parsing
 
       var previousFetchRequest = clauseGenerationContext.GetContextInfo (Source) as FetchRequestBase;
       if (previousFetchRequest == null)
-        throw new ParserException ("ThenFetchMany must directly follow another Fetch request.");
+        throw new NotSupportedException ("ThenFetchMany must directly follow another Fetch request.");
 
       var innerFetchRequest = CreateFetchRequest();
       innerFetchRequest = previousFetchRequest.GetOrAddInnerFetchRequest (innerFetchRequest);
