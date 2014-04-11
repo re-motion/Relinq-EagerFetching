@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Remotion.Linq.Development.UnitTesting;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.EagerFetching.Parsing;
 using Remotion.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;

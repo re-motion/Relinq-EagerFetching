@@ -18,6 +18,7 @@ using System;
 using NUnit.Framework;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.ResultOperators;
+using Remotion.Linq.Development.UnitTesting;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
 
@@ -40,7 +41,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     public void SetUp ()
     {
       _visitor = new TestFetchFilteringQueryModelVisitor ();
-      _queryModel = ExpressionHelper.CreateQueryModel_Cook ();
+      _queryModel = ExpressionHelper.CreateQueryModel<Cook> ();
 
       _distinctResultOperator = new DistinctResultOperator ();
       _countResultOperator = new CountResultOperator ();

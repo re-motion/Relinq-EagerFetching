@@ -60,7 +60,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
       _innerInnerFetchRequest = new TestFetchRequest (_isOldMember);
       _innerFetchRequest1.GetOrAddInnerFetchRequest (_innerInnerFetchRequest);
 
-      var expression = ExpressionHelper.MakeExpression ( () => (from sd in ExpressionHelper.CreateKitchenQueryable ()
+      var expression = ExpressionHelper.MakeExpression ( () => (from sd in ExpressionHelper.CreateQueryable<Kitchen> ()
                                                                 select sd.Cook).Take (1)/*.Fetch*/.Distinct().Count());
       _sourceItemQueryModel = ExpressionHelper.ParseQuery (expression);
       _outerFetchQueryModelBuilder = new FetchQueryModelBuilder (_outerFetchRequest, _sourceItemQueryModel, 1);
@@ -70,7 +70,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     public void GetOrCreateFetchQueryModel_CallsCreateFetchQueryModel ()
     {
       var fetchRequestMock = MockRepository.GenerateMock<FetchRequestBase> (_friendsMember);
-      var mockQueryModel = ExpressionHelper.CreateQueryModel_Cook ();
+      var mockQueryModel = ExpressionHelper.CreateQueryModel<Cook> ();
       fetchRequestMock.Expect (mock => mock.CreateFetchQueryModel (Arg<QueryModel>.Is.Anything)).Return (mockQueryModel);
 
       var builder = new FetchQueryModelBuilder (fetchRequestMock, _sourceItemQueryModel, 1);

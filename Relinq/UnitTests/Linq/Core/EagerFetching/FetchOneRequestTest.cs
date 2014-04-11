@@ -18,11 +18,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Remotion.Development.UnitTesting;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Development.UnitTesting;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
-using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
 
 namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
 {
@@ -43,11 +43,11 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     public void ModifyFetchQueryModel ()
     {
       var inputFetchQuery = from fetch0 in
-                              (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook).Take (1)
+                              (from sd in ExpressionHelper.CreateQueryable<Kitchen> () select sd.Cook).Take (1)
                             select fetch0;
       var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook)
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateQueryable<Kitchen> () select sd.Cook)
       //           select fetch0.Substitution;
 
       PrivateInvoke.InvokeNonPublicMethod (_substitutionFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);
@@ -61,11 +61,11 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     public void ModifyFetchQueryModel_WithConversion ()
     {
       var inputFetchQuery = from fetch0 in
-                              (from sd in ExpressionHelper.CreateKitchenQueryable () select (object) sd.Cook).Take (1)
+                              (from sd in ExpressionHelper.CreateQueryable<Kitchen> () select (object) sd.Cook).Take (1)
                             select fetch0;
       var fetchQueryModel = ExpressionHelper.ParseQuery (inputFetchQuery);
 
-      // expected: from fetch0 in (from sd in ExpressionHelper.CreateKitchenQueryable () select sd.Cook).Take(1)
+      // expected: from fetch0 in (from sd in ExpressionHelper.CreateQueryable<Kitchen> () select sd.Cook).Take(1)
       //           select ((Cook) fetch0).Substitution;
 
       PrivateInvoke.InvokeNonPublicMethod (_substitutionFetchRequest, "ModifyFetchQueryModel", fetchQueryModel);

@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
+using Remotion.Linq.Development.UnitTesting;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.EagerFetching.Parsing;
 using Remotion.Linq.Parsing;

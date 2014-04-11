@@ -19,13 +19,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using NUnit.Framework;
+using Remotion.Development.UnitTesting;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
 using Remotion.Linq.Clauses.StreamedData;
 using Remotion.Linq.Development.UnitTesting;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
-using Remotion.Linq.UnitTests.Linq.Core.TestUtilities;
 using Rhino.Mocks;
 
 namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
@@ -46,7 +46,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
       _holidaysMember = typeof (Cook).GetProperty ("Holidays");
       _assistantsMember = typeof (Cook).GetProperty ("Assistants");
       _assistantsFetchRequest = new TestFetchRequest (_assistantsMember);
-      _cookFromKitchenQuery = (from sd in ExpressionHelper.CreateKitchenQueryable ()
+      _cookFromKitchenQuery = (from sd in ExpressionHelper.CreateQueryable<Kitchen> ()
                                         select sd.Cook).Take (1);
       _cookFromKitchenQueryModel = ExpressionHelper.ParseQuery (_cookFromKitchenQuery);
     }
@@ -106,7 +106,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
         + "selects a single object of type 'System.Int32'.\r\nParameter name: sourceItemQueryModel")]
     public void CreateFetchQueryModel_NonSequenceQueryModel ()
     {
-      var invalidQueryModel = ExpressionHelper.CreateQueryModel_Cook ();
+      var invalidQueryModel = ExpressionHelper.CreateQueryModel<Cook> ();
       invalidQueryModel.ResultOperators.Add (new CountResultOperator ());
       _assistantsFetchRequest.CreateFetchQueryModel (invalidQueryModel);
     }
@@ -114,7 +114,7 @@ namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
     [Test]
     public void CreateFetchQueryModel_NonMatchingItems_Works ()
     {
-      var invalidQueryModel = ExpressionHelper.CreateQueryModel (ExpressionHelper.CreateMainFromClause_Kitchen());
+      var invalidQueryModel = ExpressionHelper.CreateQueryModel (ExpressionHelper.CreateMainFromClause<Kitchen>());
       Assert.That (() => _assistantsFetchRequest.CreateFetchQueryModel (invalidQueryModel), Throws.Nothing);
     }
 
