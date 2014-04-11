@@ -14,16 +14,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-linq; if not, see http://www.gnu.org/licenses.
 // 
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Remotion.Linq.Development.UnitTesting;
 using Remotion.Linq.EagerFetching;
 using Remotion.Linq.EagerFetching.Parsing;
-using Remotion.Linq.UnitTests.Linq.Core.Parsing.Structure.IntermediateModel;
-using Remotion.Linq.UnitTests.Linq.Core.TestDomain;
+using Remotion.Linq.UnitTests.Parsing.Structure.IntermediateModel;
+using Remotion.Linq.UnitTests.TestDomain;
 
-namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching.Parsing
+namespace Remotion.Linq.UnitTests.EagerFetching.Parsing
 {
   [TestFixture]
   public class FetchManyExpressionNodeTest : ExpressionNodeTestBase

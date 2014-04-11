@@ -19,7 +19,7 @@ using System;
 using System.Collections.ObjectModel;
 using Remotion.Linq.EagerFetching;
 
-namespace Remotion.Linq.UnitTests.Linq.Core.EagerFetching
+namespace Remotion.Linq.UnitTests.EagerFetching
 {
   public class TestFetchFilteringQueryModelVisitor : FetchFilteringQueryModelVisitor
   {
