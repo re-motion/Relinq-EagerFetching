@@ -29,7 +29,7 @@ namespace Remotion.Linq.EagerFetching
   /// <remarks>
   /// Use <see cref="FetchFilteringQueryModelVisitor"/> to retrieve the <see cref="FetchQueryModelBuilder"/> instances for a <see cref="SourceItemQueryModel"/>.
   /// </remarks>
-  public class FetchQueryModelBuilder
+  public sealed class FetchQueryModelBuilder
   {
     private QueryModel _cachedFetchModel;
 

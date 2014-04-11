@@ -26,7 +26,7 @@ namespace Remotion.Linq.EagerFetching
   /// Holds a number of <see cref="FetchManyRequest"/> instances keyed by the <see cref="MemberInfo"/> instances representing the relation members
   /// to be eager-fetched.
   /// </summary>
-  public class FetchRequestCollection
+  public sealed class FetchRequestCollection
   {
     private readonly Dictionary<MemberInfo, FetchRequestBase> _fetchRequests = new Dictionary<MemberInfo, FetchRequestBase>();
 
