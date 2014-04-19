@@ -44,7 +44,7 @@ namespace Remotion.Linq.UnitTests.EagerFetching
 
     [Test]
     [ExpectedException (typeof (ArgumentException), ExpectedMessage = 
-        "Expected a type implementing IEnumerable<T>, but found 'System.Int32'.\r\nParameter name: relationMember")]
+        "Expected a closed generic type implementing IEnumerable<T>, but found 'System.Int32'.\r\nParameter name: relationMember")]
     public void Create_InvalidRelationMember ()
     {
       var idMember = typeof (Cook).GetProperty ("ID");
