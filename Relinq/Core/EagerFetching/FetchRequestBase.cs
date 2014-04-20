@@ -16,7 +16,6 @@
 // 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -100,8 +99,8 @@ namespace Remotion.Linq.EagerFetching
     {
       ArgumentUtility.CheckNotNull ("source", source);
 
-      Debug.Assert (RelationMember.DeclaringType != null);
-      if (!RelationMember.DeclaringType.IsAssignableFrom (source.Type))
+      Assertion.DebugAssert (RelationMember.DeclaringType != null);
+      if (!RelationMember.DeclaringType.GetTypeInfo().IsAssignableFrom (source.Type.GetTypeInfo()))
         source = Expression.Convert (source, RelationMember.DeclaringType);
       return Expression.MakeMemberAccess (source, RelationMember);
     }

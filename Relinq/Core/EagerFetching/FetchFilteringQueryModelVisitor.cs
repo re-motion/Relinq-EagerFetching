@@ -49,7 +49,7 @@ namespace Remotion.Linq.EagerFetching
 
     protected ReadOnlyCollection<FetchQueryModelBuilder> FetchQueryModelBuilders
     {
-      get { return _fetchQueryModelBuilders.AsReadOnly (); }
+      get { return new ReadOnlyCollection<FetchQueryModelBuilder> (_fetchQueryModelBuilders); }
     }
 
     public override void VisitResultOperator (ResultOperatorBase resultOperator, QueryModel queryModel, int index)

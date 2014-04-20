@@ -35,7 +35,7 @@ namespace Remotion.Linq.EagerFetching
         : base (ArgumentUtility.CheckNotNull ("relationMember", relationMember))
     {
       var memberType = ReflectionUtility.GetMemberReturnType (relationMember);
-      _relatedObjectType = ReflectionUtility.GetItemTypeOfIEnumerable (memberType, "relationMember");
+      _relatedObjectType = ReflectionUtility.GetItemTypeOfClosedGenericIEnumerable (memberType, "relationMember");
     }
 
     /// <summary>
