@@ -1,5 +1,5 @@
 // This file is part of the re-motion Core Framework (www.re-motion.org)
-// Copyright (c) rubicon IT GmbH, www.rubicon.eu
+// Copyright (C) 2005-2009 rubicon informationstechnologie gmbh, www.rubicon.eu
 // 
 // The re-motion Core Framework is free software; you can redistribute it 
 // and/or modify it under the terms of the GNU Lesser General Public License 
@@ -15,27 +15,24 @@
 // along with re-motion; if not, see http://www.gnu.org/licenses.
 // 
 using System;
-using System.Reflection;
+using System.Linq;
+using NUnit.Framework;
+using Remotion.Data.UnitTests.Linq.IntegrationTests.LinqSamples101.TestDomain;
 
-//
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-//
-
-[assembly: AssemblyTitle("Unit Tests for Remotion DomainObjects Library")]
-[assembly: AssemblyCulture("")]		
-[assembly: CLSCompliant(true)]
-
-//
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Revision and Build Numbers 
-// by using the '*' as shown below:
-
-//[assembly: ApplyQueryExecutorMixin]
+namespace Remotion.Data.UnitTests.Linq.IntegrationTests.LinqSamples101.Parsing
+{
+  /// <summary>
+  /// http://msdn.microsoft.com/en-us/bb737922.aspx
+  /// </summary>
+  [TestFixture]
+  public class CountTest : TestBase
+  {
+    [Test]
+    public void Test_Simple ()
+    {
+      CheckParsedQuery (
+          () => QuerySource.Customers.Count(),
+          "Customers => Count()");
+    }
+  }
+}
