@@ -21,7 +21,7 @@
     <name>_SharedItems_</name>
   </assembly>
   <members>
-    <member name="N:Remotion.Data.Linq.EagerFetching">
+    <member name="N:Remotion.Linq.EagerFetching">
       <summary>
     <para>
       re-linq provides an infrastructure for eager fetching, which can easily be integrated into LINQ providers based on re-linq.
