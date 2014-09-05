@@ -203,11 +203,11 @@
     <Compile Include="TestDomain\Restaurant.cs">
       <SubType>Code</SubType>
     </Compile>
+    <None Include="..\LGPL.licenseheader">
+      <Link>LGPL.licenseheader</Link>
+    </None>
     <None Include="..\remotion.snk">
       <Link>remotion.snk</Link>
-    </None>
-    <None Include="..\Apache-2.0.licenseheader">
-      <Link>Apache-2.0.licenseheader</Link>
     </None>
     <None Include="App_Packages\Remotion.Development.UnitTesting.PrivateInvoke.Sources.1.15.23.0\SharedSource Apache-2.0.licenseheader" />
     <None Include="App_Packages\Remotion.Development.UnitTesting.Serializer.Sources.1.15.23.0\SharedSource Apache-2.0.licenseheader" />

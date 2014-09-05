@@ -122,8 +122,8 @@
     <Compile Include="EagerFetching\FetchRequestCollection.cs" />
     <Compile Include="EagerFetching\FluentFetchRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="..\Apache-2.0.licenseheader">
-      <Link>Apache-2.0.licenseheader</Link>
+    <None Include="..\LGPL.licenseheader">
+      <Link>LGPL.licenseheader</Link>
     </None>
     <None Include="..\remotion.snk">
       <Link>remotion.snk</Link>
