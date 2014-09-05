@@ -21,9 +21,6 @@
     <ReleaseProjectFiles Include="$(SolutionDirectory)Core\Core.csproj">
       <CreateNuGetPackageWithSymbolServerSupport>True</CreateNuGetPackageWithSymbolServerSupport>
     </ReleaseProjectFiles>
-    <ReleaseProjectFiles Include="$(SolutionDirectory)Development\Development.csproj">
-      <CreateNuGetPackageWithSymbolServerSupport>True</CreateNuGetPackageWithSymbolServerSupport>
-    </ReleaseProjectFiles>
     <UnitTestProjectFiles Include="$(SolutionDirectory)UnitTests\UnitTests.csproj">
       <IsDatabaseTest>False</IsDatabaseTest>
     </UnitTestProjectFiles>
