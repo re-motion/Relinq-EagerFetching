@@ -23,11 +23,5 @@ namespace Remotion.Linq.EagerFetching.UnitTests.TestDomain
   {
     public int ID { get; set; }
     public Cook Cook { get; set; }
-    public string Name { get; set; }
-    public int RoomNumber { get; set; }
-    public Restaurant Restaurant { get; set; }
-    public DateTime? LastCleaningDay { get; set; }
-    public bool? PassedLastInspection { get; set; }
-    public int? LastInspectionScore { get; set; }
   }
 }

@@ -173,34 +173,10 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TestDomain\Chef.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\Company.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TestDomain\Cook.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TestDomain\Course.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\ISpecificCook.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TestDomain\Kitchen.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\Knife.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\MetaID.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\QueryableWithTooManyArguments.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\Restaurant.cs">
       <SubType>Code</SubType>
     </Compile>
     <None Include="..\LGPL.licenseheader">
