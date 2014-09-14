@@ -16,20 +16,16 @@
 // 
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using NUnit.Framework;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Development.UnitTesting;
+using Remotion.Linq.EagerFetching.UnitTests.TestDomain;
 using Remotion.Linq.Parsing.Structure;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
-using Remotion.Linq.Parsing.Structure.NodeTypeProviders;
-using Remotion.Linq.UnitTests.TestDomain;
 
-namespace Remotion.Linq.UnitTests.Parsing.Structure.IntermediateModel
+namespace Remotion.Linq.EagerFetching.UnitTests.Parsing
 {
   public abstract class ExpressionNodeTestBase
   {

@@ -14,6 +14,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 // 
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ using System.Linq.Expressions;
 using Remotion.Linq.Parsing.ExpressionTreeVisitors.Transformation;
 using Remotion.Linq.Parsing.ExpressionTreeVisitors.Transformation.PredefinedTransformations;
 
-namespace Remotion.Linq.UnitTests.TestDomain
+namespace Remotion.Linq.EagerFetching.UnitTests.TestDomain
 {
   public class Cook : ISpecificCook
   {

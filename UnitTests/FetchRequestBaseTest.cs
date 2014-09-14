@@ -25,11 +25,10 @@ using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
 using Remotion.Linq.Clauses.StreamedData;
 using Remotion.Linq.Development.UnitTesting;
-using Remotion.Linq.EagerFetching;
-using Remotion.Linq.UnitTests.TestDomain;
+using Remotion.Linq.EagerFetching.UnitTests.TestDomain;
 using Rhino.Mocks;
 
-namespace Remotion.Linq.UnitTests.EagerFetching
+namespace Remotion.Linq.EagerFetching.UnitTests
 {
   [TestFixture]
   public class FetchRequestBaseTest

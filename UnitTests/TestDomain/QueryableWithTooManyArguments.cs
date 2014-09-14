@@ -14,13 +14,14 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 // 
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Remotion.Linq.UnitTests.TestDomain
+namespace Remotion.Linq.EagerFetching.UnitTests.TestDomain
 {
 // ReSharper disable UnusedTypeParameter
   public class QueryableWithTooManyArguments<T1, T2> : IQueryable<T1>

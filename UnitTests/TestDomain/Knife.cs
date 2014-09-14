@@ -14,9 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 // 
+
 using System;
 
-namespace Remotion.Linq.UnitTests.TestDomain
+namespace Remotion.Linq.EagerFetching.UnitTests.TestDomain
 {
   public class Knife
   {

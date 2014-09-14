@@ -14,10 +14,11 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 // 
+
 using System;
 using System.Collections.Generic;
 
-namespace Remotion.Linq.UnitTests.TestDomain
+namespace Remotion.Linq.EagerFetching.UnitTests.TestDomain
 {
   public class Restaurant
   {

@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Remotion.Linq.UnitTests.TestDomain
+namespace Remotion.Linq.EagerFetching.UnitTests.TestDomain
 {
   public class Course
   {

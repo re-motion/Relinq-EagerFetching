@@ -17,9 +17,8 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Remotion.Linq.EagerFetching;
 
-namespace Remotion.Linq.UnitTests.EagerFetching
+namespace Remotion.Linq.EagerFetching.UnitTests
 {
   public class TestFetchFilteringQueryModelVisitor : FetchFilteringQueryModelVisitor
   {

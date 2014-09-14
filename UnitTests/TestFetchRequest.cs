@@ -19,10 +19,9 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq.Clauses;
-using Remotion.Linq.EagerFetching;
 using Remotion.Utilities;
 
-namespace Remotion.Linq.UnitTests.EagerFetching
+namespace Remotion.Linq.EagerFetching.UnitTests
 {
   public class TestFetchRequest : FetchRequestBase
   {

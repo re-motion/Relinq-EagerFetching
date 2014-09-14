@@ -19,12 +19,10 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Remotion.Linq.Development.UnitTesting;
-using Remotion.Linq.EagerFetching;
 using Remotion.Linq.EagerFetching.Parsing;
-using Remotion.Linq.UnitTests.Parsing.Structure.IntermediateModel;
-using Remotion.Linq.UnitTests.TestDomain;
+using Remotion.Linq.EagerFetching.UnitTests.TestDomain;
 
-namespace Remotion.Linq.UnitTests.EagerFetching.Parsing
+namespace Remotion.Linq.EagerFetching.UnitTests.Parsing
 {
   [TestFixture]
   public class FetchManyExpressionNodeTest : ExpressionNodeTestBase

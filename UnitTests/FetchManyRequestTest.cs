@@ -24,10 +24,9 @@ using Remotion.Development.UnitTesting;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Development.UnitTesting;
-using Remotion.Linq.EagerFetching;
-using Remotion.Linq.UnitTests.TestDomain;
+using Remotion.Linq.EagerFetching.UnitTests.TestDomain;
 
-namespace Remotion.Linq.UnitTests.EagerFetching
+namespace Remotion.Linq.EagerFetching.UnitTests
 {
   [TestFixture]
   public class FetchManyRequestTest
