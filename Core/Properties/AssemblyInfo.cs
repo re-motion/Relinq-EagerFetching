@@ -19,8 +19,8 @@ using System;
 using System.Reflection;
 using System.Security;
 
-[assembly: AssemblyTitle ("re-linq - re-motion Linq Library")]
-[assembly: AssemblyDescription ("With re-linq, it's now easier than ever to create full-featured LINQ providers.")]
+[assembly: AssemblyTitle ("re-linq Eager Fetching Support")]
+[assembly: AssemblyDescription ("Provides an end-user API for implementing eager fetching in a re-linq-based library.")]
 [assembly: AssemblyCulture ("")]
 [assembly: CLSCompliant (true)]
 [assembly: SecurityTransparent] // required to allow assembly to be linked from assemblies having the AllowPartiallyTrustedCallersAttribute applied
