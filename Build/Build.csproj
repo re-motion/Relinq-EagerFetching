@@ -11,7 +11,7 @@
     <AssemblyName>Build</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>124f8b8d</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>c909e6d8</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Remotion.BuildScript">
+      <HintPath>..\packages\Remotion.BuildScript.2.0.0-alpha003\lib\net45\Remotion.BuildScript.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,8 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Customizations\Projects.targets" />
+    <None Include="Customizations\Properties.targets" />
+    <None Include="Customizations\Version.targets" />
     <None Include="packages.config" />
+    <None Include="Remotion.build" />
     <None Include="Remotion.Local.build" />
+    <None Include="Remotion.Server.build" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
