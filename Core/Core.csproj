@@ -120,7 +120,6 @@
     <Compile Include="FetchRequestBase.cs" />
     <Compile Include="FetchManyRequest.cs" />
     <Compile Include="FetchRequestCollection.cs" />
-    <Compile Include="FluentFetchRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="..\LGPL.licenseheader">
       <Link>LGPL.licenseheader</Link>
