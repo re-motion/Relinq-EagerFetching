@@ -15,6 +15,6 @@
   <files>
     <file src="bin\$configuration$\$id$.pdb" target="lib\portable-net45+win+wpa81+wp80" />
     <!-- By using a wildcard, the file-inclusion does not fail if no documentation file was found. -->
-    <file src="$documentationFolder$\**\$id$.chm" target="doc" />
+    <file src="$documentationFile$" target="doc" />
   </files>
 </package>
