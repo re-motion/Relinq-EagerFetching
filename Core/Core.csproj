@@ -70,7 +70,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Remotion.Linq">
-      <HintPath>..\packages\Remotion.Linq.2.0.0-alpha-001\lib\portable-net45+win+wpa81+wp80\Remotion.Linq.dll</HintPath>
+      <HintPath>..\packages\Remotion.Linq.2.0.0-alpha-003\lib\portable-net45+win+wpa81+wp80\Remotion.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -121,6 +121,7 @@
     <Compile Include="FetchManyRequest.cs" />
     <Compile Include="FetchRequestCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\ReflectionUtility.cs" />
     <None Include="..\LGPL.licenseheader">
       <Link>LGPL.licenseheader</Link>
     </None>
