@@ -21,6 +21,7 @@ using System.Security;
 
 [assembly: AssemblyTitle ("re-linq Eager Fetching Support")]
 [assembly: AssemblyDescription ("Provides an end-user API for implementing eager fetching in a re-linq-based library.")]
+[assembly: AssemblyMetadata ("tags", "re-motion LINQ EagerFetching")]
 [assembly: AssemblyCulture ("")]
 [assembly: CLSCompliant (true)]
 [assembly: SecurityTransparent] // required to allow assembly to be linked from assemblies having the AllowPartiallyTrustedCallersAttribute applied
