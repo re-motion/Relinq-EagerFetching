@@ -23,7 +23,7 @@ using System.Reflection;
 // associated with an assembly.
 //
 
-[assembly: AssemblyTitle("Unit Tests for Remotion Linq Library")]
-[assembly: AssemblyDescription("Unit Tests for Remotion Linq Library")]
+[assembly: AssemblyTitle("Unit Tests for Remotion Linq Eager Fetching Support")]
+[assembly: AssemblyDescription("Unit Tests for Remotion Linq Eager Fetching Support")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
