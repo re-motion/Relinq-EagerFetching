@@ -4,7 +4,7 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4072553E-D04B-47B3-9BDC-9D2CA912744E}</ProjectGuid>
+    <ProjectGuid>{E36A6F6B-E055-434A-8677-FC17D2141FB3}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ApplicationIcon>
@@ -32,7 +32,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\remotion.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -49,6 +49,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <NuGetPackageImportStamp>773f98fc</NuGetPackageImportStamp>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -102,19 +104,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="nunit.framework">
+    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Remotion.Linq.2.0.0-alpha-003\lib\net40\Remotion.Linq.dll</HintPath>
     </Reference>
-    <Reference Include="Remotion.Linq.Development, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Remotion.Linq.Development.2.0.0-alpha-003\lib\net45\Remotion.Linq.Development.dll</HintPath>
+    <Reference Include="Remotion.Linq.Development">
+      <HintPath>..\packages\Remotion.Linq.Development.2.0.0-alpha-003\lib\net40\Remotion.Linq.Development.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Rhino.Mocks">
+    <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System">
@@ -128,8 +131,17 @@
     <Compile Include="..\AssemblyInfoShared.cs">
       <Link>Properties\AssemblyInfoShared.cs</Link>
     </Compile>
+    <Compile Include="..\Core.Net_4_0\Utilities\TypeExtensions.cs">
+      <Link>Utilities\TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Core.Net_4_0\Utilities\TypeInfo.cs">
+      <Link>Utilities\TypeInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Core\Utilities\ReflectionUtility.cs">
       <Link>Utilities\ReflectionUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\**\*.cs" Exclude="..\UnitTests\App_Packages\**\*.*;..\UnitTests\bin\**\*.*;..\UnitTests\obj\**\*.*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="App_Packages\Remotion.Development.UnitTesting.PrivateInvoke.Sources.1.15.23.0\PrivateInvoke.cs" />
     <Compile Include="App_Packages\Remotion.JetBrains.Annotations.Sources.1.15.23.0\AssertionConditionAttribute.cs" />
@@ -158,32 +170,8 @@
     <Compile Include="App_Packages\Remotion.Utilities.ArgumentUtility.Sources.1.15.23.0\ArgumentUtility.cs" />
     <Compile Include="App_Packages\Remotion.Utilities.ExceptionUtility.Sources.1.15.23.0\ExceptionUtility.cs" />
     <Compile Include="App_Packages\Remotion.Utilities.NullableTypeUtility.Sources.1.15.23.0\NullableTypeUtility.cs" />
-    <Compile Include="Parsing\ExpressionNodeTestBase.cs" />
-    <Compile Include="FetchFilteringQueryModelVisitorTest.cs" />
-    <Compile Include="FetchManyRequestTest.cs" />
-    <Compile Include="FetchOneRequestTest.cs" />
-    <Compile Include="FetchQueryModelBuilderTest.cs" />
-    <Compile Include="FetchRequestBaseTest.cs" />
-    <Compile Include="FetchRequestCollectionTest.cs" />
-    <Compile Include="Parsing\FetchExpressionNodeBaseTest.cs" />
-    <Compile Include="Parsing\FetchExpressionNode_IntegrationTest.cs" />
-    <Compile Include="Parsing\FetchManyExpressionNodeTest.cs" />
-    <Compile Include="Parsing\FetchOneExpressionNodeTest.cs" />
-    <Compile Include="Parsing\TestFetchExpressionNodeBase.cs" />
-    <Compile Include="Parsing\ThenFetchManyExpressionNodeTest.cs" />
-    <Compile Include="Parsing\ThenFetchOneExpressionNodeTest.cs" />
-    <Compile Include="TestFetchFilteringQueryModelVisitor.cs" />
-    <Compile Include="TestFetchRequest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\Cook.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TestDomain\Kitchen.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Utilities\ReflectionUtilityTest.cs" />
+    <Compile Include="Utilities\MethodInfoExtensions.cs" />
+    <Compile Include="Utilities\TypeInfoTest.cs" />
     <None Include="..\LGPL.licenseheader">
       <Link>LGPL.licenseheader</Link>
     </None>
@@ -191,6 +179,8 @@
       <Link>remotion.snk</Link>
     </None>
     <None Include="App_Packages\Remotion.Development.UnitTesting.PrivateInvoke.Sources.1.15.23.0\SharedSource Apache-2.0.licenseheader" />
+    <None Include="App_Packages\Remotion.JetBrains.Annotations.Sources.1.15.23.0\ReSharperAnnotations Apache-2.0.licenseheader" />
+    <None Include="App_Packages\Remotion.Utilities.ArgumentUtility.Sources.1.15.23.0\SharedSource Apache-2.0.licenseheader" />
     <None Include="App_Packages\Remotion.Utilities.ExceptionUtility.Sources.1.15.23.0\SharedSource Apache-2.0.licenseheader" />
     <None Include="App_Packages\Remotion.Utilities.NullableTypeUtility.Sources.1.15.23.0\SharedSource Apache-2.0.licenseheader" />
     <None Include="packages.config" />
@@ -199,9 +189,9 @@
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
-      <Project>{028e7899-0d5f-49c8-9eb6-8b051e02f1e0}</Project>
-      <Name>Core</Name>
+    <ProjectReference Include="..\Core.Net_4_0\Core.Net_4_0.csproj">
+      <Project>{aa6d28ca-a313-4eab-a21c-961ce7cd7f88}</Project>
+      <Name>Core.Net_4_0</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
