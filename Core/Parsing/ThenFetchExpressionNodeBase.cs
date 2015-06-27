@@ -40,7 +40,7 @@ namespace Remotion.Linq.EagerFetching.Parsing
       throw new NotImplementedException ("Call ApplyNodeSpecificSemantics instead.");
     }
 
-    protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    protected override void ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
     {
       ArgumentUtility.CheckNotNull ("queryModel", queryModel);
 
@@ -52,8 +52,6 @@ namespace Remotion.Linq.EagerFetching.Parsing
       innerFetchRequest = previousFetchRequest.GetOrAddInnerFetchRequest (innerFetchRequest);
       // Store a mapping between this node and the innerFetchRequest so that a later ThenFetch... node may add its request to the innerFetchRequest.
       clauseGenerationContext.AddContextInfo (this, innerFetchRequest);
-
-      return queryModel;
     }
   }
 }
