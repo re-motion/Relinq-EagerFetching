@@ -36,7 +36,7 @@ namespace Remotion.Linq.EagerFetching.Parsing
 
     protected abstract FetchRequestBase CreateFetchRequest ();
 
-    protected override QueryModel ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
+    protected override void ApplyNodeSpecificSemantics (QueryModel queryModel, ClauseGenerationContext clauseGenerationContext)
     {
       ArgumentUtility.CheckNotNull ("queryModel", queryModel);
 
@@ -46,10 +46,9 @@ namespace Remotion.Linq.EagerFetching.Parsing
       {
         // Store a mapping between this node and the resultOperator so that a later ThenFetch... node may add its request to the resultOperator.
         clauseGenerationContext.AddContextInfo (this, existingMatchingFetchRequest);
-        return queryModel;
       }
       else
-        return base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
+        base.ApplyNodeSpecificSemantics (queryModel, clauseGenerationContext);
     }
 
     protected override ResultOperatorBase CreateResultOperator (ClauseGenerationContext clauseGenerationContext)
