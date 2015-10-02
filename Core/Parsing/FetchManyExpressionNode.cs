@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq.Expressions;
+using Remotion.Linq.Parsing.Structure;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Utilities;
 
@@ -29,7 +30,59 @@ namespace Remotion.Linq.EagerFetching.Parsing
   /// </summary>
   /// <remarks>
   /// This class is not automatically configured for any query operator methods. LINQ provider implementations must explicitly provide and register 
-  /// these  methods in order for <see cref="FetchManyExpressionNode"/> to be used. See also <see cref="FluentFetchRequest{TQueried,TFetch}"/>.
+  /// these  methods with the <see cref="QueryParser"/> in order for <see cref="FetchManyExpressionNode"/> to be used.
+  /// <example>
+  /// Sample code for using fluent syntax when specifying fetch requests.
+  ///   <code>
+  ///   public static class EagerFetchingExtensionMethods
+  ///   {
+  ///     public static FluentFetchRequest&lt;TOriginating, TRelated&gt; FetchMany&lt;TOriginating, TRelated&gt; (
+  ///         this IQueryable&lt;TOriginating&gt; query, 
+  ///         Expression&lt;Func&lt;TOriginating, IEnumerable&lt;TRelated&gt;&gt;&gt; relatedObjectSelector)
+  ///     {
+  ///      
+  ///       var methodInfo = ((MethodInfo) MethodBase.GetCurrentMethod ()).MakeGenericMethod (typeof (TOriginating), typeof (TRelated));
+  ///       return CreateFluentFetchRequest&lt;TOriginating, TRelated&gt; (methodInfo, query, relatedObjectSelector);
+  ///     }
+  ///  
+  ///     private static FluentFetchRequest&lt;TOriginating, TRelated&gt; CreateFluentFetchRequest&lt;TOriginating, TRelated&gt; (
+  ///         MethodInfo currentFetchMethod, 
+  ///         IQueryable&lt;TOriginating&gt; query, 
+  ///         LambdaExpression relatedObjectSelector)
+  ///     {
+  ///       var queryProvider = (QueryProviderBase) query.Provider;
+  ///       var callExpression = Expression.Call (currentFetchMethod, query.Expression, relatedObjectSelector);
+  ///       return new FluentFetchRequest&lt;TOriginating, TRelated&gt; (queryProvider, callExpression);
+  ///     }
+  ///   }
+  ///   
+  ///   public class FluentFetchRequest&lt;TQueried, TFetch&gt; : QueryableBase&lt;TQueried&gt;
+  ///   {
+  ///     public FluentFetchRequest (IQueryProvider provider, Expression expression)
+  ///         : base (provider, expression)
+  ///     {
+  ///     }
+  ///   }
+  ///   
+  ///   public IQueryParser CreateQueryParser ()
+  ///   {
+  ///     var customNodeTypeProvider = new MethodInfoBasedNodeTypeRegistry ();
+  ///     customNodeTypeProvider.Register (new[] { typeof (EagerFetchingExtensionMethods).GetMethod ("FetchMany") }, typeof (FetchManyExpressionNode));
+  ///     
+  ///     var nodeTypeProvider = ExpressionTreeParser.CreateDefaultNodeTypeProvider ();
+  ///     nodeTypeProvider.InnerProviders.Insert (0, customNodeTypeProvider);
+  ///     
+  ///     var transformerRegistry = ExpressionTransformerRegistry.CreateDefault ();
+  ///     var processor = ExpressionTreeParser.CreateDefaultProcessor (transformerRegistry);
+  ///     var expressionTreeParser = new ExpressionTreeParser (nodeTypeProvider, processor);
+  ///     
+  ///     return new QueryParser (expressionTreeParser);
+  ///   }
+  ///   </code>
+  /// </example>
+  /// <seealso cref="FetchOneExpressionNode"/>
+  /// <seealso cref="ThenFetchOneExpressionNode"/>
+  /// <seealso cref="ThenFetchManyExpressionNode"/>
   /// </remarks>
   public class FetchManyExpressionNode : OuterFetchExpressionNodeBase
   {

@@ -6,15 +6,21 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
+    <licenseUrl>http://opensource.org/licenses/LGPL-2.1</licenseUrl>
     <projectUrl>http://relinq.codeplex.com</projectUrl>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
-    <tags>re-motion LiNQ ExpressionTrees $extraTags$</tags>
+    <tags>$tags$ $extraTags$</tags>
   </metadata>
   <files>
     <file src="bin\$configuration$\$id$.pdb" target="lib\portable-net45+win+wpa81+wp80" />
+    <file src="..\Core.Net_3_5\bin\$configuration$\$id$.*" target="lib\net35" />
+    <file src="..\Core.Net_4_0\bin\$configuration$\$id$.*" target="lib\net40" />
+    <!-- Dedicated entry for .NET 4.5 to force NuGet to prefer the portable build over the .NET 4.0 build-->
+    <file src="bin\$configuration$\$id$.*" target="lib\net45" />
     <!-- By using a wildcard, the file-inclusion does not fail if no documentation file was found. -->
-    <file src="$documentationFolder$\**\$id$.chm" target="doc" />
+    <file src="$documentationFile$" target="doc" />
+    <file src="..\Core.Net_3_5\**\*.cs" target="src\Core.Net_3_5" />
+    <file src="..\Core.Net_4_0\**\*.cs" target="src\Core.Net_4_0" />
   </files>
 </package>
