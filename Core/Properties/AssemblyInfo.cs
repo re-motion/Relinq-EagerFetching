@@ -20,7 +20,7 @@ using System.Reflection;
 using System.Security;
 
 [assembly: AssemblyTitle ("re-linq Eager Fetching Support")]
-[assembly: AssemblyDescription ("Provides an end-user API for implementing eager fetching in a re-linq-based library.")]
+[assembly: AssemblyDescription ("Allows LINQ providers based on re-linq Frontend to support eager fetching.")]
 #if !NET_4_0 && !NET_3_5
 [assembly: AssemblyMetadata ("tags", "re-motion LINQ EagerFetching")]
 #endif
