@@ -10,10 +10,13 @@
     <projectUrl>http://relinq.codeplex.com</projectUrl>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
-    <tags>$tags$ $extraTags$</tags>
+    <tags>re-motion LINQ Eager Fetching $extraTags$</tags>
   </metadata>
   <files>
-    <file src="bin\$configuration$\$id$.pdb" target="lib\portable-net45+win+wpa81+wp80" />
+    <file src="bin\$configuration$\pcl\$id$.pdb" target="lib\portable-net45+win+wpa81+wp80" />
+    <file src="bin\$configuration$\netstandard1.0\$id$.dll" target="lib\netstandard1.0\" />
+    <file src="bin\$configuration$\netstandard1.0\$id$.pdb" target="lib\netstandard1.0\" />
+    <file src="bin\$configuration$\netstandard1.0\$id$.xml" target="lib\netstandard1.0\" />
     <file src="..\Core.Net_3_5\bin\$configuration$\$id$.*" target="lib\net35" />
     <file src="..\Core.Net_4_0\bin\$configuration$\$id$.*" target="lib\net40" />
     <file src="..\Core.Net_4_5\bin\$configuration$\$id$.*" target="lib\net45" />
