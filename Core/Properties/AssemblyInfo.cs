@@ -21,7 +21,7 @@ using System.Security;
 
 [assembly: AssemblyTitle ("re-linq Eager Fetching Support")]
 [assembly: AssemblyDescription ("Allows LINQ providers based on re-linq Frontend to support eager fetching.")]
-#if !NET_4_0 && !NET_3_5
+#if !NET_4_5 && !NET_4_0 && !NET_3_5
 [assembly: AssemblyMetadata ("tags", "re-motion LINQ EagerFetching")]
 #endif
 [assembly: AssemblyCulture ("")]
