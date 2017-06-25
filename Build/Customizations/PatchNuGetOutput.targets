@@ -5,11 +5,20 @@
     <!-- The dependency list must only be updated based on the list in Core.nuspec.
     -->
     <DotNetCore_Dependencies>
-      <group xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-        <dependency id="Remotion.Linq" version="[2.1.1, )" />
+      <group targetFramework="net35" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+      </group>
+      <group targetFramework="net40" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+      </group>
+      <group targetFramework="net45" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+      </group>
+      <group targetFramework="portable-net45+win+wpa81+wp80" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
       </group>
       <group targetFramework=".NETStandard1.0" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-        <dependency id="Remotion.Linq" version="[2.1.1, )" />
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
         <dependency id="System.Collections" version="[4.0.11, )" />
         <dependency id="System.Linq" version="[4.1.0, )" />
         <dependency id="System.Linq.Expressions" version="[4.1.0, )" />
