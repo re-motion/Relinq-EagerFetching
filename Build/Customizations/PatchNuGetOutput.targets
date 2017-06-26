@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- The dependency list must only be updated based on the list in Core.nuspec.
+    -->
+    <DotNetCore_Dependencies>
+      <group targetFramework="net35" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+      </group>
+      <group targetFramework="net40" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+      </group>
+      <group targetFramework="net45" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+      </group>
+      <group targetFramework="portable-net45+win+wpa81+wp80" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+      </group>
+      <group targetFramework=".NETStandard1.0" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+        <dependency id="System.Collections" version="[4.0.11, )" />
+        <dependency id="System.Linq" version="[4.1.0, )" />
+        <dependency id="System.Linq.Expressions" version="[4.1.0, )" />
+        <dependency id="System.ObjectModel" version="[4.0.12, )" />
+        <dependency id="System.Reflection" version="[4.1.0, )" />
+        <dependency id="System.Runtime" version="[4.1.0, )" />
+      </group>
+    </DotNetCore_Dependencies>
+  </PropertyGroup>
+  
+  <Target Name="DotNetCore_PatchNuGetPackages" AfterTargets="CreateNuGetPackagesWithDebugSymbols">
+    <Message Text="Patching NuGet packages, ConfigurationID=$(ConfigurationID)" Importance="High"/>
+
+    <Error Text="The property 'ConfigurationID' is not set." Condition="'$(ConfigurationID)' == ''" />
+
+    <MakeDir Directories="$(_nuGetTempDirectory)"/>
+
+    <!-- Extract the NUPKG-files, remove the SRC-files, re-zip the NUPKG-files -->
+
+    <ItemGroup>
+      <_nuGetFiles Remove="@(_nuGetFiles)" />
+      <_nuGetFiles Include="$(NuGetWithDebugSymbolsOutputDirectory)Remotion.Linq.EagerFetching.*.nupkg">
+        <ExtractionPath>$(TempDirectory)nuget\$([System.Guid]::NewGuid())\</ExtractionPath>
+      </_nuGetFiles>
+      <_nuGetFiles Include="$(NuGetWithSymbolServerSupportDirectory)Remotion.Linq.EagerFetching.*.nupkg" Exclude="$(NuGetWithSymbolServerSupportDirectory)Remotion.Linq.EagerFetching.*symbols.nupkg">
+        <ExtractionPath>$(TempDirectory)nuget\$([System.Guid]::NewGuid())\</ExtractionPath>
+      </_nuGetFiles>
+      <_nuGetFiles Include="$(NuGetWithSymbolServerSupportDirectory)Remotion.Linq.EagerFetching.*.symbols.nupkg">
+        <ExtractionPath>$(TempDirectory)nuget\$([System.Guid]::NewGuid())\</ExtractionPath>
+      </_nuGetFiles>
+    </ItemGroup>
+
+    <MSBuild.ExtensionPack.Compression.Zip
+        TaskAction="Extract"
+        ExtractPath="%(_nuGetFiles.ExtractionPath)" 
+        ZipFileName="%(_nuGetFiles.Identity)" />
+
+    <MSBuild.ExtensionPack.FileSystem.File
+        TaskAction="Replace" 
+        RegexPattern="xmlns=&quot;http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd&quot;"
+        Replacement="xmlns=&quot;http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd&quot;"
+        Files="%(_nuGetFiles.ExtractionPath)\Remotion.Linq.EagerFetching.nuspec"/>
+
+    <MSBuild.ExtensionPack.FileSystem.File
+        TaskAction="Replace" 
+        RegexPattern="xmlns=&quot;http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd&quot;"
+        Replacement="xmlns=&quot;http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd&quot;"
+        Files="%(_nuGetFiles.ExtractionPath)\Remotion.Linq.EagerFetching.nuspec"/>
+
+    <ItemGroup>
+      <_namespaces Remove="@(_namespaces)" />
+      <_namespaces Include="NuSpec">
+        <Prefix>nuspec</Prefix>
+        <Uri>http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd</Uri>
+      </_namespaces>
+    </ItemGroup>
+
+    <MSBuild.ExtensionPack.Xml.XmlFile
+        TaskAction="UpdateElement"
+        File="%(_nuGetFiles.ExtractionPath)\Remotion.Linq.EagerFetching.nuspec"
+        XPath="/nuspec:package/nuspec:metadata/nuspec:dependencies"
+        InnerXml="$(DotNetCore_Dependencies)"
+        Namespaces="@(_namespaces)"/>
+
+    <MSBuild.ExtensionPack.Compression.Zip
+        TaskAction="Create"
+        CompressPath="%(_nuGetFiles.ExtractionPath)" 
+        RemoveRoot="%(_nuGetFiles.ExtractionPath)"
+        ZipFileName="%(_nuGetFiles.Identity)" />
+
+    <Message Text="Done patching NuGet packages, ConfigurationID=$(ConfigurationID)" Importance="High"/>
+  </Target>
+</Project>

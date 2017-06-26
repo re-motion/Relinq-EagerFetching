@@ -1,8 +1,8 @@
 @echo off
 pushd %~dp0
-set msbuild="C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe"
-set log-dir=build\BuildOutput\log
-set nuget-bin=build\BuildOutput\temp\nuget-bin
+set msbuild="C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe"
+set log-dir=Build\BuildOutput\log
+set nuget-bin=Build\BuildOutput\temp\nuget-bin
 set nuget=%nuget-bin%\nuget.exe
 set nuget-download=powershell.exe -NoProfile -Command "& {(New-Object System.Net.WebClient).DownloadFile('https://www.nuget.org/nuget.exe','%nuget%')}"
 set solutionFile=Relinq-EagerFetching.sln
