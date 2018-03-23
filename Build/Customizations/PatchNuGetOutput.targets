@@ -2,23 +2,23 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <!-- The dependency list must only be updated based on the list in Core.nuspec.
+    <!-- The dependency list must only be updated based on the list in Core.nuspec and project.json.
     -->
     <DotNetCore_Dependencies>
       <group targetFramework="net35" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+        <dependency id="Remotion.Linq" version="[2.2.0, )" />
       </group>
       <group targetFramework="net40" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+        <dependency id="Remotion.Linq" version="[2.2.0, )" />
       </group>
       <group targetFramework="net45" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+        <dependency id="Remotion.Linq" version="[2.2.0, )" />
       </group>
       <group targetFramework="portable-net45+win+wpa81+wp80" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+        <dependency id="Remotion.Linq" version="[2.2.0, )" />
       </group>
       <group targetFramework=".NETStandard1.0" xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
-        <dependency id="Remotion.Linq" version="[2.1.2, )" />
+        <dependency id="Remotion.Linq" version="[2.2.0, )" />
         <dependency id="System.Collections" version="[4.0.11, )" />
         <dependency id="System.Linq" version="[4.1.0, )" />
         <dependency id="System.Linq.Expressions" version="[4.1.0, )" />
