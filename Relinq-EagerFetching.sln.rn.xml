@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CustomizeVSWindowTitle>
+  <SettingsSet
+    AppendedString=" "
+    PatternIfRunningMode="Relinq-EagerFetching - [gitBranchName] (Running)"
+    PatternIfBreakMode="Relinq-EagerFetching - [gitBranchName] (Debugging)"
+    PatternIfDesignMode="Relinq-EagerFetching - [gitBranchName]" />
+</CustomizeVSWindowTitle>
